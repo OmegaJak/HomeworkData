@@ -56,18 +56,9 @@ public class Testing {
 	 *            The string to fill the cell with */
 	private static void writeCell(int row, int column, String fill) {
 		try {
-			Path path = FileSystems.getDefault().getPath(
+			ArrayList<String[]> rows = readFile(
 					"/home/jak/Programming/HomeworkData/HomeworkData",
-					"test.csv");
-			BufferedReader reader = Files.newBufferedReader(path, charset);
-			String line = null;
-
-			ArrayList<String[]> rows = new ArrayList<String[]>();
-			String curLine[] = {};
-			while ((line = reader.readLine()) != null) {//Go through each line sequentially until there are no more
-				curLine = line.split(",", -10); //Creates an array of each element between the commas
-				rows.add(curLine);
-			}
+					"test.csv", false);
 
 			PrintWriter pw = new PrintWriter(new FileWriter("test.csv"));
 
@@ -99,7 +90,8 @@ public class Testing {
 		}
 	}
 
-	public static void readFile(String dir, String file, boolean ignoreEmptyLines) {
+	public static ArrayList<String[]> readFile(String dir, String file,
+			boolean ignoreEmptyLines) {
 		try {
 			Path path = FileSystems.getDefault().getPath(dir, file);
 			BufferedReader reader = Files.newBufferedReader(path, charset);
@@ -109,13 +101,15 @@ public class Testing {
 			String curLine[] = {};
 			while ((line = reader.readLine()) != null) {//Go through each line sequentially until there are no more
 				curLine = line.split(","); //Creates an array of each element between the commas
-				if (line.charAt(0) != ',') {//Ignore empty rows
+				if (ignoreEmptyLines || line.charAt(0) != ',') {//Ignore empty rows
 					rows.add(curLine);
 				}
 			}
+			return rows;
 		} catch (IOException ioex) {
 			System.out.println("There was an IOExceptiojn. Stahp.");
 		}
+		return new ArrayList<String[]>();
 	}
 
 }
