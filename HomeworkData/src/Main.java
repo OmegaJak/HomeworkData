@@ -40,6 +40,8 @@ public class Main {
 
 			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
 			
+			convertTime("Blabla", "HH:MM:SS", "Don' matter");
+			
 			timePerUnit(readFile(csvDir, csvName, false), 4);
 			
 		} catch (IOException e) {
@@ -133,7 +135,7 @@ public class Main {
 	//-------------------------------------------------------------------------------------//
 
 	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
-		double calculatedResult = convertTimeToDouble(dataSheet.get(row)[7]) / Double.parseDouble(dataSheet.get(row)[4]);
+		double calculatedResult = convertTime(dataSheet.get(row)[7], "", "") / Double.parseDouble(dataSheet.get(row)[4]);
 		writeCell(row, 5, String.valueOf(calculatedResult), csvDir, csvName, false);
 		return null;
 	}
@@ -144,12 +146,15 @@ public class Main {
 	
 	/**
 	 * 
-	 * @param time Needs to be in the format of H:MM
+	 * @param input Needs to be in the format of H:MM
 	 * @return The total minutes in the time provided
 	 */
-	public static double convertTimeToDouble(String time) {
-		String minutes = time.substring(time.length() - 2, time.length());
-		String hours = time.substring(0, 1);
+	public static double convertTime(String input, String inputFormat, String outputFormat) {
+		
+		String[] inBetweenInput = findInBetween(inputFormat, ':');		
+		
+		String minutes = input.substring(input.length() - 2, input.length());
+		String hours = input.substring(0, 1);
 		
 		double total = 0;
 		
@@ -161,5 +166,45 @@ public class Main {
 		}
 		
 		return total;
+	}
+	
+	/**
+	 * This finds the substrings in between the divider given
+	 * @param input - The string to loop through and find the substrings of
+	 * @param divider - The character to look for when dividing up the input
+	 * @return A String[] of the substrings in between
+	 */
+	public static String[] findInBetween(String input, char divider) {
+		int[] colons = {};
+		for (int i = 0; i < input.length(); i++) { //This loop finds all of the dividers in input and adds them to colons, with each index holding the index
+			if (input.charAt(i) == divider) {	   //of each colon within input
+				int[] colons2 = new int[colons.length + 1];
+				System.arraycopy(colons, 0, colons2, 0, colons.length);
+				colons2[colons.length] = i;
+				colons = colons2;
+			}
+		}
+		
+		String[] inBetween = {};
+		for (int i = 0; i <= colons.length; i++) {
+			if (i == 0) { //If this is the first colon 
+				String[] inBetween2 = new String[inBetween.length + 1];
+				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+				inBetween2[inBetween.length] = input.substring(0, colons[i]);
+				inBetween = inBetween2;
+			} else if (i == colons.length) { //If this is the last colon
+				String[] inBetween2 = new String[inBetween.length + 1];
+				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+				inBetween2[inBetween.length] = input.substring(colons[i - 1] + 1, input.length());
+				inBetween = inBetween2;
+			} else {
+				String[] inBetween2 = new String[inBetween.length + 1];
+				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+				inBetween2[inBetween.length] = input.substring(colons[i - 1] + 1, colons[i]);
+				inBetween = inBetween2;
+			}
+		}
+		
+		return inBetween;
 	}
 }
