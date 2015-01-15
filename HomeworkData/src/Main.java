@@ -40,7 +40,7 @@ public class Main {
 
 			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
 			
-			convertTime("Blabla", "HH:MM:SS", "Don' matter");
+			convertTime("02:23:54", "HH:MM:SS", "##.##");
 			
 			timePerUnit(readFile(csvDir, csvName, false), 4);
 			
@@ -135,7 +135,7 @@ public class Main {
 	//-------------------------------------------------------------------------------------//
 
 	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
-		double calculatedResult = convertTime(dataSheet.get(row)[7], "", "") / Double.parseDouble(dataSheet.get(row)[4]);
+		double calculatedResult = convertTime(dataSheet.get(row)[7], "H:MM", "") / Double.parseDouble(dataSheet.get(row)[4]);
 		writeCell(row, 5, String.valueOf(calculatedResult), csvDir, csvName, false);
 		return null;
 	}
@@ -153,6 +153,9 @@ public class Main {
 		
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
+		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens);
+		
+		int totalSeconds = convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
 		
 		String minutes = input.substring(input.length() - 2, input.length());
 		String hours = input.substring(0, 1);
@@ -171,7 +174,7 @@ public class Main {
 	
 	public static int[] convertStringsToInts(String[] toConvert) {
 		try {
-			int[] convertedTo = {toConvert.length};
+			int[] convertedTo = new int[toConvert.length];
 			for (int i = 0; i < toConvert.length; i++) {
 				convertedTo[i] = Integer.parseInt(toConvert[i]);
 			}
@@ -217,23 +220,28 @@ public class Main {
 		}
 		
 		String[] inBetween = {};
-		for (int i = 0; i <= dividerIndexes.length; i++) {
-			if (i == 0) { //If this is the first colon 
-				String[] inBetween2 = new String[inBetween.length + 1];
-				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(0, dividerIndexes[i]);
-				inBetween = inBetween2;
-			} else if (i == dividerIndexes.length) { //If this is the last colon
-				String[] inBetween2 = new String[inBetween.length + 1];
-				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, input.length());
-				inBetween = inBetween2;
-			} else {
-				String[] inBetween2 = new String[inBetween.length + 1];
-				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, dividerIndexes[i]);
-				inBetween = inBetween2;
+		try {
+			for (int i = 0; i <= dividerIndexes.length; i++) {
+				if (i == 0) { //If this is the first colon 
+					String[] inBetween2 = new String[inBetween.length + 1];
+					System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+					inBetween2[inBetween.length] = input.substring(0, dividerIndexes[i]);
+					inBetween = inBetween2;
+				} else if (i == dividerIndexes.length) { //If this is the last colon
+					String[] inBetween2 = new String[inBetween.length + 1];
+					System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+					inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, input.length());
+					inBetween = inBetween2;
+				} else {
+					String[] inBetween2 = new String[inBetween.length + 1];
+					System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+					inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, dividerIndexes[i]);
+					inBetween = inBetween2;
+				}
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("Something went wrong in findInBetween. If I had to guess, I'd say that your format's wrong.");
+			e.printStackTrace();
 		}
 		
 		return inBetween;
