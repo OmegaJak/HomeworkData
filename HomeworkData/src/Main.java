@@ -151,7 +151,8 @@ public class Main {
 	 */
 	public static double convertTime(String input, String inputFormat, String outputFormat) {
 		
-		String[] inBetweenInput = findInBetween(inputFormat, ':');		
+		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
+		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
 		
 		String minutes = input.substring(input.length() - 2, input.length());
 		String hours = input.substring(0, 1);
@@ -168,6 +169,36 @@ public class Main {
 		return total;
 	}
 	
+	public static int[] convertStringsToInts(String[] toConvert) {
+		try {
+			int[] convertedTo = {toConvert.length};
+			for (int i = 0; i < toConvert.length; i++) {
+				convertedTo[i] = Integer.parseInt(toConvert[i]);
+			}
+			return convertedTo;
+		} catch (NumberFormatException e) {
+			System.out.println("There was an error while converting a string to ints");
+		}
+		int[] blank = {};
+		return blank;
+	}
+	
+	// Convert this to double
+	public static int convertTimeToSeconds(String[] formatInBetweens, int[] inputInBetweens) {
+		int totalSeconds = 0;
+		for (int i = 0; i < formatInBetweens.length; i++) {
+			if (formatInBetweens[i].contains("H")) {
+				totalSeconds += inputInBetweens[i] * 3600;
+			} else if (formatInBetweens[i].contains("M")) {
+				totalSeconds += inputInBetweens[i] * 60;
+			} else if (formatInBetweens[i].contains("S")) {
+				totalSeconds += inputInBetweens[i];
+			}
+		}
+		
+		return totalSeconds;
+	}
+
 	/**
 	 * This finds the substrings in between the divider given
 	 * @param input - The string to loop through and find the substrings of
@@ -175,32 +206,32 @@ public class Main {
 	 * @return A String[] of the substrings in between
 	 */
 	public static String[] findInBetween(String input, char divider) {
-		int[] colons = {};
+		int[] dividerIndexes = {};
 		for (int i = 0; i < input.length(); i++) { //This loop finds all of the dividers in input and adds them to colons, with each index holding the index
 			if (input.charAt(i) == divider) {	   //of each colon within input
-				int[] colons2 = new int[colons.length + 1];
-				System.arraycopy(colons, 0, colons2, 0, colons.length);
-				colons2[colons.length] = i;
-				colons = colons2;
+				int[] dividerIndexes2 = new int[dividerIndexes.length + 1];
+				System.arraycopy(dividerIndexes, 0, dividerIndexes2, 0, dividerIndexes.length);
+				dividerIndexes2[dividerIndexes.length] = i;
+				dividerIndexes = dividerIndexes2;
 			}
 		}
 		
 		String[] inBetween = {};
-		for (int i = 0; i <= colons.length; i++) {
+		for (int i = 0; i <= dividerIndexes.length; i++) {
 			if (i == 0) { //If this is the first colon 
 				String[] inBetween2 = new String[inBetween.length + 1];
 				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(0, colons[i]);
+				inBetween2[inBetween.length] = input.substring(0, dividerIndexes[i]);
 				inBetween = inBetween2;
-			} else if (i == colons.length) { //If this is the last colon
+			} else if (i == dividerIndexes.length) { //If this is the last colon
 				String[] inBetween2 = new String[inBetween.length + 1];
 				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(colons[i - 1] + 1, input.length());
+				inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, input.length());
 				inBetween = inBetween2;
 			} else {
 				String[] inBetween2 = new String[inBetween.length + 1];
 				System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
-				inBetween2[inBetween.length] = input.substring(colons[i - 1] + 1, colons[i]);
+				inBetween2[inBetween.length] = input.substring(dividerIndexes[i - 1] + 1, dividerIndexes[i]);
 				inBetween = inBetween2;
 			}
 		}
