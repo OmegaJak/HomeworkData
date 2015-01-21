@@ -40,7 +40,7 @@ public class Main {
 
 			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
 			
-			convertTime("02:23:54", "HH:MM:SS", "##.##");
+			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
 			timePerUnit(readFile(csvDir, csvName, false), 4);
 			
@@ -125,7 +125,7 @@ public class Main {
 			return rows;
 		} catch (IOException e) {
 			System.out.println("There was an error while reading the file!");
-			System.out.println(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 		return new ArrayList<String[]>();
 	}
@@ -135,8 +135,13 @@ public class Main {
 	//-------------------------------------------------------------------------------------//
 
 	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
-		double calculatedResult = convertTime(dataSheet.get(row)[7], "H:MM", "") / Double.parseDouble(dataSheet.get(row)[4]);
-		writeCell(row, 5, String.valueOf(calculatedResult), csvDir, csvName, false);
+		try {
+			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
+			writeCell(row, 5, String.valueOf(calculatedResult), csvDir, csvName, false);
+		} catch (NumberFormatException e) {
+			System.out.println("What are numbers!?");
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
@@ -146,30 +151,26 @@ public class Main {
 	
 	/**
 	 * 
-	 * @param input Needs to be in the format of H:MM
+	 * @param input Needs to be in the format provided
+	 * @param inputFormat Something like HH:MM:SS
+	 * @param outputFormat Same as above, like HH:MM:SS
 	 * @return The total minutes in the time provided
 	 */
-	public static double convertTime(String input, String inputFormat, String outputFormat) {
+	public static String convertTime(String input, String inputFormat, String outputFormat) {
+		
+		System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\"");
 		
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
 		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens);
+		String[] outputFormatInBetweens = findInBetween(outputFormat, ':');
 		
 		int totalSeconds = convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
+		String outputString = convertSecondsToFormattedString(outputFormatInBetweens, totalSeconds);
 		
-		String minutes = input.substring(input.length() - 2, input.length());
-		String hours = input.substring(0, 1);
+		System.out.println("The converted output was " + outputString);
 		
-		double total = 0;
-		
-		try {
-			total = (Double.parseDouble(hours) * 60) + Double.parseDouble(minutes);
-		} catch (NumberFormatException e) {
-			System.out.println("Them numbers ain't right...");
-			e.printStackTrace();
-		}
-		
-		return total;
+		return outputString;
 	}
 	
 	public static int[] convertStringsToInts(String[] toConvert) {
@@ -186,21 +187,57 @@ public class Main {
 		return blank;
 	}
 	
-	// Convert this to double
-	public static int convertTimeToSeconds(String[] formatInBetweens, int[] inputInBetweens) {
+	// TODO Convert this to return a double
+	public static int convertTimeToSeconds(String[] inputFormatInBetweens, int[] inputInBetweens) {
 		int totalSeconds = 0;
-		for (int i = 0; i < formatInBetweens.length; i++) {
-			if (formatInBetweens[i].contains("H")) {
+		for (int i = 0; i < inputFormatInBetweens.length; i++) {
+			if (inputFormatInBetweens[i].contains("H")) {
 				totalSeconds += inputInBetweens[i] * 3600;
-			} else if (formatInBetweens[i].contains("M")) {
+			} else if (inputFormatInBetweens[i].contains("M")) {
 				totalSeconds += inputInBetweens[i] * 60;
-			} else if (formatInBetweens[i].contains("S")) {
+			} else if (inputFormatInBetweens[i].contains("S")) {
 				totalSeconds += inputInBetweens[i];
 			}
 		}
 		
 		return totalSeconds;
 	}
+	
+	public static String convertSecondsToFormattedString(String[] outputFormatInBetweens, int totalSeconds) {
+		String[] output = new String[outputFormatInBetweens.length];
+		int hours = -1, minutes = -1, seconds = -1;
+		for (int i = 0; i < outputFormatInBetweens.length; i++) {
+			if (outputFormatInBetweens[i].toUpperCase().contains("H")) {
+				hours = totalSeconds / (60*60);
+				totalSeconds = totalSeconds % (60*60);
+				output[i] = hours + "";
+			} else if (outputFormatInBetweens[i].toUpperCase().contains("M")) {
+				minutes = totalSeconds / 60;
+				totalSeconds = totalSeconds % 60;
+				output[i] = minutes + "";
+			} else if (outputFormatInBetweens[i].toUpperCase().contains("S")) {
+				seconds = totalSeconds;
+				output[i] = seconds + "";
+			}
+		}
+		
+		String toReturn = convertArrayToSeperatedString(output, ':');
+		return toReturn;
+	}
+	
+	public static String convertArrayToSeperatedString(String[] inBetweens, char divider) {
+		String outputString = "";
+		for (int i = 0; i < inBetweens.length; i++) {
+			if (i == 0) {
+				outputString = outputString + inBetweens[i] + divider;
+			}  else {
+				outputString = outputString + divider + inBetweens[i];
+			}
+		}
+		
+		return outputString;
+	}
+	
 
 	/**
 	 * This finds the substrings in between the divider given
@@ -222,7 +259,12 @@ public class Main {
 		String[] inBetween = {};
 		try {
 			for (int i = 0; i <= dividerIndexes.length; i++) {
-				if (i == 0) { //If this is the first colon 
+				if (dividerIndexes.length == 0) {
+					String[] inBetween2 = new String[inBetween.length + 1];
+					System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
+					inBetween2[inBetween.length] = input;
+					inBetween = inBetween2;
+				} else if (i == 0) { //If this is the first colon 
 					String[] inBetween2 = new String[inBetween.length + 1];
 					System.arraycopy(inBetween, 0, inBetween2, 0, inBetween.length);
 					inBetween2[inBetween.length] = input.substring(0, dividerIndexes[i]);
