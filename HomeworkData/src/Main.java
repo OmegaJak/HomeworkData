@@ -16,8 +16,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData/bin";
-			csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
+			csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
+			//csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
 			csvName = "HomeworkData.csv";
 			
 			ArrayList<String[]> rows = readFile(csvDir, csvName, false);
@@ -38,7 +38,7 @@ public class Main {
 				System.out.println(rows.get(i)[2]);
 			}*/
 
-			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
+			writeCell(6, 4, "Test", csvDir /*+ "\\HomeworkData"*/, "test.csv", false);
 			
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
@@ -77,8 +77,6 @@ public class Main {
 		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
 
 		if (!isMakingACopy) {
-			System.out.println("writeCell()");
-			System.out.println(rows.size());
 			System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file);
 		}
 
@@ -137,7 +135,8 @@ public class Main {
 	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
-			writeCell(row, 5, String.valueOf(calculatedResult), csvDir, csvName, false);
+			String formattedResult = convertTime("" + calculatedResult, "SS", "MM:SS");
+			writeCell(row, 5, formattedResult, csvDir, csvName, false);
 		} catch (NumberFormatException e) {
 			System.out.println("What are numbers!?");
 			e.printStackTrace();
@@ -228,11 +227,11 @@ public class Main {
 	public static String convertArrayToSeperatedString(String[] inBetweens, char divider) {
 		String outputString = "";
 		for (int i = 0; i < inBetweens.length; i++) {
-			if (i == 0) {
-				outputString = outputString + inBetweens[i] + divider;
-			}  else {
-				outputString = outputString + divider + inBetweens[i];
-			}
+				if (i == inBetweens.length - 1) {
+					outputString = outputString + inBetweens[i];
+				} else {
+					outputString = outputString + inBetweens[i] + divider;
+				}
 		}
 		
 		return outputString;
