@@ -135,7 +135,7 @@ public class Main {
 	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
-			String formattedResult = convertTime("" + calculatedResult, "SS", "MM:SS");
+			String formattedResult = convertTime("" + (int)calculatedResult, "SS", "MM:SS");
 			writeCell(row, 5, formattedResult, csvDir, csvName, false);
 		} catch (NumberFormatException e) {
 			System.out.println("What are numbers!?");
