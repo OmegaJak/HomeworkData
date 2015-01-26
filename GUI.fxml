@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TitledPane animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" text="Homework Data" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <TextField editable="false" layoutX="14.0" layoutY="40.0" />
+            <Label layoutX="82.0" layoutY="25.0" text="Date" />
+            <TextField layoutX="214.0" layoutY="40.0" />
+            <TextField layoutX="413.0" layoutY="40.0" />
+            <TextField layoutX="13.0" layoutY="107.0" />
+            <TextField layoutX="214.0" layoutY="107.0" />
+            <TextField layoutX="15.0" layoutY="174.0" />
+            <TextField layoutX="215.0" layoutY="174.0" />
+            <TextField layoutX="414.0" layoutY="174.0" />
+            <Label layoutX="281.0" layoutY="25.0" text="Class" />
+            <Label alignment="CENTER" layoutX="438.0" layoutY="25.0" text="Type of Homework" />
+            <Label layoutX="82.0" layoutY="92.0" text="Unit" />
+            <Label alignment="CENTER" layoutX="249.0" layoutY="92.0" text="Number of Unit" />
+            <Label alignment="CENTER" layoutX="455.0" layoutY="92.0" text="Time Per Unit" />
+            <Label alignment="CENTER" layoutX="57.0" layoutY="159.0" text="Time Started" />
+            <Label alignment="CENTER" layoutX="266.0" layoutY="159.0" text="Time Spent" />
+            <Label layoutX="461.0" layoutY="159.0" text="Time Ended" />
+            <TextField layoutX="413.0" layoutY="107.0" />
+         </children></AnchorPane>
+  </content>
+</TitledPane>
