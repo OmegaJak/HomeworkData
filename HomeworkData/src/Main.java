@@ -13,11 +13,15 @@ public class Main {
 	private static Charset charset = Charset.forName("US-ASCII");
 	public static String csvDir = "";
 	public static String csvName = "";
+	
+	public Main() {
+		main();
+	}
 
-	public static void main(String[] args) {
+	public static void main() { //not the real and proper main method
 		try {
-			csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
-			//csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
+			//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
+			csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
 			csvName = "HomeworkData.csv";
 			
 			ArrayList<String[]> rows = readFile(csvDir, csvName, false);
@@ -38,7 +42,7 @@ public class Main {
 				System.out.println(rows.get(i)[2]);
 			}*/
 
-			writeCell(6, 4, "Test", csvDir /*+ "\\HomeworkData"*/, "test.csv", false);
+			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
 			
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
