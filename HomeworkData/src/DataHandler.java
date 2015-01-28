@@ -8,13 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-public class Main {
+public class DataHandler {
 
 	private static Charset charset = Charset.forName("US-ASCII");
 	public static String csvDir = "";
 	public static String csvName = "";
 	
-	public Main() {
+	public DataHandler() {
 		main();
 	}
 

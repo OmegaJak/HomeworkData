@@ -12,6 +12,7 @@ public class EventHandlerController {
 	 * method.
 	 */
 	public EventHandlerController() {
+		DataHandler handler = new DataHandler();
 	}
 	
 	/**
