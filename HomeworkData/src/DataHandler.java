@@ -15,15 +15,14 @@ public class DataHandler {
 	public static String csvName = "";
 	
 	public DataHandler() {
+		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
+		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
+		csvName = "HomeworkData.csv";
 		main();
 	}
 
 	public static void main() { //not the real and proper main method
 		try {
-			//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
-			csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
-			csvName = "HomeworkData.csv";
-			
 			ArrayList<String[]> rows = readFile(csvDir, csvName, false);
 
 			boolean switchBoolean = false;
@@ -47,6 +46,8 @@ public class DataHandler {
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
 			timePerUnit(readFile(csvDir, csvName, false), 4);
+			
+			insertNewRow(-1, 7, csvDir + "\\HomeworkData", "test.csv", false);
 			
 		} catch (IOException e) {
 			System.out.println("There was an IOException somewhere. Stahp.");
@@ -86,8 +87,12 @@ public class DataHandler {
 
 		for (int i = 0; i < rows.size(); i++) {
 			for (int k = 0; k < rows.get(i).length; k++) {
-				if (i == row && k == column && !isMakingACopy) { //A specific cell, row 4 column 3
-					pw.write(fill + ",");
+				if (i == row && k == column && !isMakingACopy) { //A specific cell, like row 4 column 3
+					if (k == rows.get(i).length - 1) {// If this is the last cell in the row
+						pw.write(fill);
+					} else {
+						pw.write(fill + ",");
+					}
 				} else {
 					if (k == rows.get(i).length - 1) { //If this is the last cell in the row
 						pw.write(rows.get(i)[k] + "\n");
@@ -98,7 +103,79 @@ public class DataHandler {
 			}
 		}
 
-		pw.close();
+		pw.close(); //Don't forget to close the PrintWriter
+	}
+	
+	/**
+	 * Inserts a new row, basically just adds some commas where you tell it to
+	 * 
+	 * @param precedingRow - The row preceding where you will insert the new row 
+	 * @param precedingRow = -2 - Add a new row to the end of the document
+	 * @param precedingRow > -1 - Add a new row to the beginning of the document
+	 * @param precedingRow >= 0 - Exactly as it sounds
+	 * @param columns - The number of columns to create in between and after the commas
+	 * @param dir - The directory of the file to be edited
+	 * @param file - The name of the file to be edited
+	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
+	 * @throws IOException - If something goes wrong reading the file
+	 */
+	private static void insertNewRow(int precedingRow, int columns, String dir, String file, boolean isMakingACopy) throws IOException {
+		if (!isMakingACopy) {
+			insertNewRow(precedingRow, columns, dir, file, true); //Making a backup
+		}
+
+		ArrayList<String[]> rows = readFile(dir, file, true);
+
+		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
+
+		if (!isMakingACopy) {
+			System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file);
+		}
+
+		if (precedingRow == -1) { //Special case, in order to add a line before everything else
+			for (int comma = 1; comma <= columns - 1; comma++) {
+				if (comma == columns - 1) { //If this is the last comma to add
+					pw.write("," + "\n");
+				} else {
+					pw.write(",");
+				}
+			}
+		}
+
+		for (int i = 0; i < rows.size(); i++) {
+			for (int k = 0; k < rows.get(i).length; k++) {
+				if (i == precedingRow && !isMakingACopy) { //If this is just after the preceding row
+					for (int comma = 1; comma <= columns - 1; comma++) {
+						if (comma == columns - 1) { //If this is the last comma to add
+							pw.write("," + "\n");
+						} else {
+							pw.write(",");
+						}
+					}
+					precedingRow = precedingRow - 1;
+					i = i - 1;
+					break;
+				} else {
+					if (k == rows.get(i).length - 1) { //If this is the last cell in the row
+						pw.write(rows.get(i)[k] + "\n");
+					} else {
+						pw.write(rows.get(i)[k] + ",");
+					}
+				}
+			}
+		}
+
+		if (precedingRow == -2) { //Special case, in order to add a line to the end of the document
+			for (int comma = 1; comma <= columns - 1; comma++) {
+				if (comma == columns - 1) { //If this is the last comma to add
+					pw.write("," + "\n");
+				} else {
+					pw.write(",");
+				}
+			}
+		}
+
+		pw.close(); //Don't forget to close the PrintWriter
 	}
 
 	/**
@@ -231,13 +308,13 @@ public class DataHandler {
 	public static String convertArrayToSeperatedString(String[] inBetweens, char divider) {
 		String outputString = "";
 		for (int i = 0; i < inBetweens.length; i++) {
-				if (i == inBetweens.length - 1) {
-					outputString = outputString + inBetweens[i];
-				} else {
-					outputString = outputString + inBetweens[i] + divider;
-				}
+			if (i == inBetweens.length - 1) {
+				outputString = outputString + inBetweens[i];
+			} else {
+				outputString = outputString + inBetweens[i] + divider;
+			}
 		}
-		
+
 		return outputString;
 	}
 	

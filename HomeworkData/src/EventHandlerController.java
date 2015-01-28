@@ -6,13 +6,14 @@
 import javafx.fxml.FXML;
 
 public class EventHandlerController {
+	private static DataHandler handler;
 	
 	/**
 	 * The constructor. The constructor is called before the initialize()
 	 * method.
 	 */
 	public EventHandlerController() {
-		DataHandler handler = new DataHandler();
+		this.handler = new DataHandler();
 	}
 	
 	/**
@@ -25,6 +26,6 @@ public class EventHandlerController {
 	
 	@FXML
 	private void handleButtonAction() {
-		System.out.println("Button Action\n");
+		System.out.println("Button Action");
 	}
 }

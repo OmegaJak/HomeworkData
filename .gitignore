@@ -3,3 +3,5 @@
 GUI.fxml
 GUI.fxml
 *.classpath
+*.class
+*.csv
