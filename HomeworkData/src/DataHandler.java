@@ -73,21 +73,17 @@ public class DataHandler {
 	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 */
 	public static void writeCell(int row, int column, String fill, String dir, String file, boolean isMakingACopy) throws IOException {
-		if (!isMakingACopy) {
-			writeCell(row, column, fill, dir, file, true); //Making a backup
-		}
+		makeBackup(dir, file);
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
 		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
 
-		if (!isMakingACopy) {
-			System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file);
-		}
+		System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file);
 
 		for (int i = 0; i < rows.size(); i++) {
 			for (int k = 0; k < rows.get(i).length; k++) {
-				if (i == row && k == column && !isMakingACopy) { //A specific cell, like row 4 column 3
+				if (i == row && k == column) { //A specific cell, like row 4 column 3
 					if (k == rows.get(i).length - 1) {// If this is the last cell in the row
 						pw.write(fill);
 					} else {
@@ -99,6 +95,31 @@ public class DataHandler {
 					} else {
 						pw.write(rows.get(i)[k] + ",");
 					}
+				}
+			}
+		}
+
+		pw.close(); //Don't forget to close the PrintWriter
+	}
+	
+	/**
+	 * This just makes a backup copy of the specified .csv file
+	 *  
+	 * @param dir - The directory of the file to be edited
+	 * @param file - The name of the file to be edited
+	 */
+	public static void makeBackup(String dir, String file) throws IOException {
+
+		ArrayList<String[]> rows = readFile(dir, file, true);
+
+		PrintWriter pw = new PrintWriter(new FileWriter("Backup-" + file));
+
+		for (int i = 0; i < rows.size(); i++) {
+			for (int k = 0; k < rows.get(i).length; k++) {
+				if (k == rows.get(i).length - 1) { //If this is the last cell in the row
+					pw.write(rows.get(i)[k] + "\n");
+				} else {
+					pw.write(rows.get(i)[k] + ",");
 				}
 			}
 		}
@@ -120,17 +141,12 @@ public class DataHandler {
 	 * @throws IOException - If something goes wrong reading the file
 	 */
 	public static void insertNewRow(int precedingRow, int columns, String dir, String file, boolean isMakingACopy) throws IOException {
-		if (!isMakingACopy) {
-			insertNewRow(precedingRow, columns, dir, file, true); //Making a backup
-		}
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
 		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
 
-		if (!isMakingACopy) {
-			System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file);
-		}
+		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file);
 
 		if (precedingRow == -1) { //Special case, in order to add a line before everything else
 			for (int comma = 1; comma <= columns - 1; comma++) {
@@ -144,7 +160,7 @@ public class DataHandler {
 
 		for (int i = 0; i < rows.size(); i++) {
 			for (int k = 0; k < rows.get(i).length; k++) {
-				if (i == precedingRow && !isMakingACopy) { //If this is just after the preceding row
+				if (i == precedingRow) { //If this is just after the preceding row
 					for (int comma = 1; comma <= columns - 1; comma++) {
 						if (comma == columns - 1) { //If this is the last comma to add
 							pw.write("," + "\n");
