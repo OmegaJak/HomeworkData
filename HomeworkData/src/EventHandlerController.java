@@ -4,13 +4,10 @@
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-
-import com.sun.javafx.css.StyleCache.Key;
 
 public class EventHandlerController {
 	
@@ -45,9 +42,10 @@ public class EventHandlerController {
 	@FXML 
 	private TextField postMoodField;
 	@FXML 
-	private TextField focusField;
+	private TextField focusField; 
 	
 	private DataHandler handler;
+	private TextField[] inputFields;
 	
 	/**
 	 * The constructor. The constructor is called before the initialize()
@@ -63,29 +61,42 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		
+		TextField[] inputFields = {dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, 
+									musicField, preAlertField, postAlertField, preMoodField, postMoodField, focusField}; // Ewwwww
+		this.inputFields = inputFields; // Ewwwwww
 	}
 	
 	@FXML
 	private void newRow() {
 		try {
-			this.handler.insertNewRow(-2, 16, handler.csvDir, "HomeworkDataSem2.csv", false);
+			this.handler.insertNewRow(-2, 16, handler.csvDir, "HomeworkDataSem2.csv");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	@FXML
 	private void saveRow() {
 		try {
-			handler.writeCell(handler.getNumberOfLines(handler.csvDir, "HomeworkDataSem2.csv", false), 0, dateField.getText(), handler.csvDir, handler.csvName, false);
+			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true);// Get the current data sheet
+			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
+			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
+			
+			if (currentRow.length >= inputFields.length) {
+				for (int i = 0; i < inputFields.length; i++) {
+					currentRow[i] = inputFields[i].getText(); // Set the cells to the input fields
+				}
+			}
+			
+			dataSheet.set(numLines, currentRow); // Set the data sheet line to the modified line
+			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	@FXML
 	private void handleKeyReleased() {
 		//???????
