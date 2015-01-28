@@ -119,7 +119,7 @@ public class DataHandler {
 	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 * @throws IOException - If something goes wrong reading the file
 	 */
-	private static void insertNewRow(int precedingRow, int columns, String dir, String file, boolean isMakingACopy) throws IOException {
+	public static void insertNewRow(int precedingRow, int columns, String dir, String file, boolean isMakingACopy) throws IOException {
 		if (!isMakingACopy) {
 			insertNewRow(precedingRow, columns, dir, file, true); //Making a backup
 		}

@@ -70,7 +70,7 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label alignment="CENTER" text="Date" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField maxWidth="-Infinity" onKeyReleased="#handleKeyReleased" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
@@ -167,7 +167,8 @@
             </GridPane>
             <Pane layoutX="7.0" layoutY="285.0" prefHeight="97.0" prefWidth="633.0">
                <children>
-                  <Button layoutX="283.0" layoutY="36.0" mnemonicParsing="false" onAction="#handleButtonAction" text="New Row" />
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="250.0" layoutY="36.0" mnemonicParsing="false" onAction="#newRow" text="New Row" />
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="316.0" layoutY="36.0" mnemonicParsing="false" onAction="#saveRow" text="Save Row" />
                </children>
             </Pane>
          </children>

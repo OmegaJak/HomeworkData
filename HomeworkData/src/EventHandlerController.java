@@ -3,10 +3,21 @@
  * http://code.makery.ch/blog/javafx-2-event-handlers-and-change-listeners/
  */
 
+import java.io.IOException;
+
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+
+import com.sun.javafx.css.StyleCache.Key;
 
 public class EventHandlerController {
-	private static DataHandler handler;
+	
+	@FXML
+	private TextField textField;
+	
+	private DataHandler handler;
 	
 	/**
 	 * The constructor. The constructor is called before the initialize()
@@ -22,10 +33,25 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
+		
 	}
 	
 	@FXML
-	private void handleButtonAction() {
-		System.out.println("Button Action");
+	private void newRow() {
+		try {
+			this.handler.insertNewRow(-2, 16, handler.csvDir + "\\HomeworkData", "HomeworkDataSem2.csv", false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@FXML
+	private void saveRow() {
+		
+	}
+	
+	@FXML
+	private void handleKeyReleased() {
+		//???????
 	}
 }
