@@ -16,8 +16,8 @@ public class DataHandler {
 	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
-		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData";
-		csvName = "HomeworkData.csv";
+		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
+		csvName = "HomeworkDataSem2.csv";
 		main();
 	}
 
@@ -41,13 +41,13 @@ public class DataHandler {
 				System.out.println(rows.get(i)[2]);
 			}*/
 
-			writeCell(6, 4, "Test", csvDir + "\\HomeworkData", "test.csv", false);
+			writeCell(6, 4, "Test", csvDir, "test.csv", false);
 			
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
-			timePerUnit(readFile(csvDir, csvName, false), 4);
+			//timePerUnit(readFile(csvDir, csvName, false), 4);
 			
-			insertNewRow(-1, 7, csvDir + "\\HomeworkData", "test.csv", false);
+			insertNewRow(-1, 7, csvDir, "test.csv", false);
 			
 		} catch (IOException e) {
 			System.out.println("There was an IOException somewhere. Stahp.");
@@ -72,7 +72,7 @@ public class DataHandler {
 	 * @param file - The name of the file to be edited
 	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 */
-	private static void writeCell(int row, int column, String fill, String dir, String file, boolean isMakingACopy) throws IOException {
+	public static void writeCell(int row, int column, String fill, String dir, String file, boolean isMakingACopy) throws IOException {
 		if (!isMakingACopy) {
 			writeCell(row, column, fill, dir, file, true); //Making a backup
 		}
@@ -208,12 +208,17 @@ public class DataHandler {
 		}
 		return new ArrayList<String[]>();
 	}
+	
+	public static int getNumberOfLines(String dir, String file, boolean allowEmptyLines) {
+		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines);
+		return temp.size();
+	}
 
 	//-------------------------------------------------------------------------------------//
 	//--------------------------------Data analysis methods--------------------------------//
 	//-------------------------------------------------------------------------------------//
 
-	private static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
+	public static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
 			String formattedResult = convertTime("" + (int)calculatedResult, "SS", "MM:SS");

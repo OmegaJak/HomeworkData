@@ -14,8 +14,38 @@ import com.sun.javafx.css.StyleCache.Key;
 
 public class EventHandlerController {
 	
-	@FXML
-	private TextField textField;
+	@FXML 
+	private TextField dateField;
+	@FXML 
+	private TextField classField;
+	@FXML 
+	private TextField typeField;
+	@FXML 
+	private TextField unitField;
+	@FXML 
+	private TextField numUnitField;
+	@FXML 
+	private TextField timeUnitField;
+	@FXML 
+	private TextField startedField;
+	@FXML 
+	private TextField spentField;
+	@FXML 
+	private TextField endedField;
+	@FXML 
+	private TextField varianceField;
+	@FXML 
+	private TextField musicField;
+	@FXML 
+	private TextField preAlertField;
+	@FXML 
+	private TextField postAlertField;
+	@FXML 
+	private TextField preMoodField;
+	@FXML 
+	private TextField postMoodField;
+	@FXML 
+	private TextField focusField;
 	
 	private DataHandler handler;
 	
@@ -39,15 +69,21 @@ public class EventHandlerController {
 	@FXML
 	private void newRow() {
 		try {
-			this.handler.insertNewRow(-2, 16, handler.csvDir + "\\HomeworkData", "HomeworkDataSem2.csv", false);
+			this.handler.insertNewRow(-2, 16, handler.csvDir, "HomeworkDataSem2.csv", false);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	@FXML
 	private void saveRow() {
-		
+		try {
+			handler.writeCell(handler.getNumberOfLines(handler.csvDir, "HomeworkDataSem2.csv", false), 0, dateField.getText(), handler.csvDir, handler.csvName, false);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@FXML

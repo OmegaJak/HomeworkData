@@ -70,97 +70,97 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label alignment="CENTER" text="Date" />
-                        <TextField maxWidth="-Infinity" onKeyReleased="#handleKeyReleased" />
+                        <TextField fx:id="dateField" maxWidth="-Infinity" onKeyReleased="#handleKeyReleased" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Class" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="classField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Type of Homework" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="typeField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Unit" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="unitField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Number of Unit" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="numUnitField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Time Per Unit" />
-                        <TextField editable="false" maxWidth="-Infinity" />
+                        <TextField fx:id="timeUnitField" editable="false" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Time Started" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="startedField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Time Spent" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="spentField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Time Ended" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="endedField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Time Variance" />
-                        <TextField editable="false" maxWidth="-Infinity" />
+                        <TextField fx:id="varianceField" editable="false" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Music" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="musicField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Pre-Alertness" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="preAlertField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Post-Alertness" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="postAlertField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Pre-Mood" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="preMoodField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Post-Mood" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="postMoodField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Focus" />
-                        <TextField maxWidth="-Infinity" />
+                        <TextField fx:id="focusField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                </children>
