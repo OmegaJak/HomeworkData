@@ -41,7 +41,7 @@ public class DataHandler {
 				System.out.println(rows.get(i)[2]);
 			}*/
 
-			writeCell(6, 4, "Test", csvDir, "test.csv");
+			/*writeCell(6, 4, "Test", csvDir, "test.csv");
 			
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
@@ -51,7 +51,7 @@ public class DataHandler {
 			
 		} catch (IOException e) {
 			System.out.println("There was an IOException somewhere. Stahp.");
-			e.printStackTrace();
+			e.printStackTrace();*/
 		} catch (Exception e) {
 			System.out.println("Something went wrong, who the hell knows...");
 			e.printStackTrace();
