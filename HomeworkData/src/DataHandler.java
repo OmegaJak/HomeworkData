@@ -21,7 +21,7 @@ public class DataHandler {
 		main();
 	}
 
-	public static void main() { //not the real and proper main method
+	public void main() { //not the real and proper main method
 		try {
 			ArrayList<String[]> rows = readFile(csvDir, csvName, false);
 
@@ -71,7 +71,7 @@ public class DataHandler {
 	 * @param dir - The directory of the file to be edited
 	 * @param file - The name of the file to be edited
 	 */
-	public static void writeCell(int row, int column, String fill, String dir, String file) throws IOException {
+	public void writeCell(int row, int column, String fill, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
@@ -109,7 +109,7 @@ public class DataHandler {
 	 * @param file - The name of the file to be edited
 	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 */
-	public static void writeStringArray(ArrayList<String[]> fileArray, String dir, String file) throws IOException {
+	public void writeStringArray(ArrayList<String[]> fileArray, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
 		PrintWriter pw = new PrintWriter(new FileWriter(file));
@@ -133,7 +133,7 @@ public class DataHandler {
 	 * @param dir - The directory of the file to be edited
 	 * @param file - The name of the file to be edited
 	 */
-	public static void makeBackup(String dir, String file) throws IOException {
+	public void makeBackup(String dir, String file) throws IOException {
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
@@ -164,7 +164,7 @@ public class DataHandler {
 	 * @param file - The name of the file to be edited
 	 * @throws IOException - If something goes wrong reading the file
 	 */
-	public static void insertNewRow(int precedingRow, int columns, String dir, String file) throws IOException {
+	public void insertNewRow(int precedingRow, int columns, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 		
 		ArrayList<String[]> rows = readFile(dir, file, true);
@@ -225,7 +225,7 @@ public class DataHandler {
 	 * @param allowEmptyLines - If this is false, it will only add lines that have something in the first cell
 	 * @return An Arraylist of String arrays, with each String array being a row of the csv file, each index of each array a cell
 	 */
-	public static ArrayList<String[]> readFile(String dir, String file, boolean allowEmptyLines) {
+	public ArrayList<String[]> readFile(String dir, String file, boolean allowEmptyLines) {
 		try {
 			Path path = FileSystems.getDefault().getPath(dir, file); //The path to the file, needed for newBufferedReader()
 
@@ -250,7 +250,7 @@ public class DataHandler {
 		return new ArrayList<String[]>();
 	}
 	
-	public static int getNumberOfLines(String dir, String file, boolean allowEmptyLines) {
+	public int getNumberOfLines(String dir, String file, boolean allowEmptyLines) {
 		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines);
 		return temp.size();
 	}
@@ -259,7 +259,7 @@ public class DataHandler {
 	//--------------------------------Data analysis methods--------------------------------//
 	//-------------------------------------------------------------------------------------//
 
-	public static ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
+	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
 			String formattedResult = convertTime("" + (int)calculatedResult, "SS", "MM:SS");
