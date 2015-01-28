@@ -41,13 +41,13 @@ public class DataHandler {
 				System.out.println(rows.get(i)[2]);
 			}*/
 
-			writeCell(6, 4, "Test", csvDir, "test.csv", false);
+			writeCell(6, 4, "Test", csvDir, "test.csv");
 			
 			convertTime("02:23:54", "HH:MM:SS", "MM:SS");
 			
 			//timePerUnit(readFile(csvDir, csvName, false), 4);
 			
-			insertNewRow(-1, 7, csvDir, "test.csv", false);
+			insertNewRow(-1, 7, csvDir, "test.csv");
 			
 		} catch (IOException e) {
 			System.out.println("There was an IOException somewhere. Stahp.");
@@ -70,14 +70,13 @@ public class DataHandler {
 	 * @param fill - The string to fill the cell with
 	 * @param dir - The directory of the file to be edited
 	 * @param file - The name of the file to be edited
-	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 */
-	public static void writeCell(int row, int column, String fill, String dir, String file, boolean isMakingACopy) throws IOException {
+	public static void writeCell(int row, int column, String fill, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
-		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
+		PrintWriter pw = new PrintWriter(new FileWriter(file));
 
 		System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file);
 
@@ -95,6 +94,32 @@ public class DataHandler {
 					} else {
 						pw.write(rows.get(i)[k] + ",");
 					}
+				}
+			}
+		}
+
+		pw.close(); //Don't forget to close the PrintWriter
+	}
+	
+	/**
+	 * Write a given ArrayList<String[]> to a file
+	 * 
+	 * @param fileArray - an ArrayList<String[]> representation of the .csv file, with outer indexes being the rows and the inner indexes being the columns
+	 * @param dir - The directory of the file to be edited
+	 * @param file - The name of the file to be edited
+	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
+	 */
+	public static void writeStringArray(ArrayList<String[]> fileArray, String dir, String file) throws IOException {
+		makeBackup(dir, file);
+
+		PrintWriter pw = new PrintWriter(new FileWriter(file));
+
+		for (int i = 0; i < fileArray.size(); i++) {
+			for (int k = 0; k < fileArray.get(i).length; k++) {
+				if (k == fileArray.get(i).length - 1) { //If this is the last cell in the row
+					pw.write(fileArray.get(i)[k] + "\n");
+				} else {
+					pw.write(fileArray.get(i)[k] + ",");
 				}
 			}
 		}
@@ -137,14 +162,14 @@ public class DataHandler {
 	 * @param columns - The number of columns to create in between and after the commas
 	 * @param dir - The directory of the file to be edited
 	 * @param file - The name of the file to be edited
-	 * @param isMakingACopy - If this is true, then it will just copy the whole thing to another file, and not make any changes
 	 * @throws IOException - If something goes wrong reading the file
 	 */
-	public static void insertNewRow(int precedingRow, int columns, String dir, String file, boolean isMakingACopy) throws IOException {
-
+	public static void insertNewRow(int precedingRow, int columns, String dir, String file) throws IOException {
+		makeBackup(dir, file);
+		
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
-		PrintWriter pw = new PrintWriter(new FileWriter(isMakingACopy ? "Backup-" + file : file));
+		PrintWriter pw = new PrintWriter(new FileWriter(file));
 
 		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file);
 
@@ -238,7 +263,7 @@ public class DataHandler {
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
 			String formattedResult = convertTime("" + (int)calculatedResult, "SS", "MM:SS");
-			writeCell(row, 5, formattedResult, csvDir, csvName, false);
+			writeCell(row, 5, formattedResult, csvDir, csvName);
 		} catch (NumberFormatException e) {
 			System.out.println("What are numbers!?");
 			e.printStackTrace();
