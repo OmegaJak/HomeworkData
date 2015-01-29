@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.chart.*?>
@@ -70,7 +71,7 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label alignment="CENTER" text="Date" />
-                        <TextField fx:id="dateField" maxWidth="-Infinity" onKeyReleased="#handleKeyReleased" />
+                        <TextField fx:id="dateField" maxWidth="-Infinity" onDragExited="#autoFillDate" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
@@ -100,7 +101,10 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Time Per Unit" />
-                        <TextField fx:id="timeUnitField" editable="false" focusTraversable="false" maxWidth="-Infinity" />
+                        <TextField fx:id="timeUnitField" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor></TextField>
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
@@ -124,7 +128,10 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Time Variance" />
-                        <TextField fx:id="varianceField" editable="false" focusTraversable="false" maxWidth="-Infinity" />
+                        <TextField fx:id="varianceField" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor></TextField>
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">

@@ -4,8 +4,13 @@
  */
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -62,10 +67,19 @@ public class EventHandlerController {
 	@FXML
 	private void initialize() {
 		TextField[] inputFields = {dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, 
-									musicField, preAlertField, postAlertField, preMoodField, postMoodField, focusField}; // Ewwwww
+ musicField, preAlertField, postAlertField, preMoodField, postMoodField, focusField }; // Ewwwww
 		this.inputFields = inputFields; // Ewwwwww
+
+		dateField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the dateField comes into focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) {
+					autoFillDate();
+				}
+			}
+		});
 	}
-	
+
 	@FXML
 	private void newRow() {
 		try {
@@ -105,7 +119,9 @@ public class EventHandlerController {
 	}
 
 	@FXML
-	private void handleKeyReleased() {
-		//???????
+	private void autoFillDate() {
+		DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+		Date date = new Date();
+		dateField.setText(dateFormat.format(date));
 	}
 }
