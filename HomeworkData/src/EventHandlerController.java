@@ -78,6 +78,24 @@ public class EventHandlerController {
 				}
 			}
 		});
+		
+		startedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) {
+					autoFillStartTime();
+				}
+			}
+		});
+		
+		endedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					autoFillEndTime();
+				}
+			}
+		});
 	}
 
 	@FXML
@@ -123,5 +141,19 @@ public class EventHandlerController {
 		DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
 		Date date = new Date();
 		dateField.setText(dateFormat.format(date));
+	}
+	
+	@FXML
+	private void autoFillStartTime() {
+		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
+		Date date = new Date();
+		startedField.setText(dateFormat.format(date));
+	}
+	
+	@FXML
+	private void autoFillEndTime() {
+		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
+		Date date = new Date();
+		endedField.setText(dateFormat.format(date));
 	}
 }
