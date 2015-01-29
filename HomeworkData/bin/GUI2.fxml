@@ -98,25 +98,22 @@
                         <TextField fx:id="numUnitField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
-                        <Label alignment="CENTER" text="Time Per Unit" />
-                        <TextField fx:id="timeUnitField" editable="false" focusTraversable="false" maxWidth="-Infinity">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor></TextField>
+                        <Label alignment="CENTER" text="Pre-Alertness" />
+                        <TextField fx:id="preAlertField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
 				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                      <children>
-                        <Label alignment="CENTER" text="Time Started" />
-                        <TextField fx:id="startedField" maxWidth="-Infinity" />
+                        <Label alignment="CENTER" text="Pre-Mood" />
+                        <TextField fx:id="preMoodField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
                      <children>
-                        <Label alignment="CENTER" text="Time Wasted" />
-                        <TextField fx:id="spentField" maxWidth="-Infinity" />
+                        <Label alignment="CENTER" text="Time Started" />
+                        <TextField fx:id="startedField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="2">
@@ -127,11 +124,8 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
-                        <Label alignment="CENTER" text="Time Variance" />
-                        <TextField fx:id="varianceField" editable="false" focusTraversable="false" maxWidth="-Infinity">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor></TextField>
+                        <Label alignment="CENTER" text="Time Wasted" />
+                        <TextField fx:id="spentField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
@@ -140,25 +134,29 @@
                         <TextField fx:id="musicField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
-				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
                      <children>
-                        <Label alignment="CENTER" text="Pre-Alertness" />
-                        <TextField fx:id="preAlertField" maxWidth="-Infinity" />
+                        <Label alignment="CENTER" text="Focus" />
+                        <TextField fx:id="focusField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
-				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="3">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="3">
+                     <children>
+                        <Label alignment="CENTER" text="Time Per Unit" />
+                        <TextField fx:id="timeUnitField1" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </TextField>
+                     </children>
+                  </VBox>
+				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Post-Alertness" />
                         <TextField fx:id="postAlertField" maxWidth="-Infinity" />
                      </children>
                   </VBox>
-				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <children>
-                        <Label alignment="CENTER" text="Pre-Mood" />
-                        <TextField fx:id="preMoodField" maxWidth="-Infinity" />
-                     </children>
-                  </VBox>
-				  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Post-Mood" />
                         <TextField fx:id="postMoodField" maxWidth="-Infinity" />
@@ -166,8 +164,12 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
                      <children>
-                        <Label alignment="CENTER" text="Focus" />
-                        <TextField fx:id="focusField" maxWidth="-Infinity" />
+                        <Label alignment="CENTER" text="Time Variance" />
+                        <TextField fx:id="varianceField" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </TextField>
                      </children>
                   </VBox>
                </children>
