@@ -70,9 +70,16 @@ public class EventHandlerController {
 	private void newRow() {
 		try {
 			this.handler.insertNewRow(-2, 16, handler.csvDir, "HomeworkDataSem2.csv");
+			clearInputs();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	private void clearInputs() {
+		for (int i = 0; i < inputFields.length; i++) {
+			inputFields[i].setText("");
 		}
 	}
 
