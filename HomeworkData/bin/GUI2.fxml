@@ -143,7 +143,7 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Time Per Unit" />
-                        <TextField fx:id="timeUnitField1" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                        <TextField fx:id="timeUnitField" editable="false" focusTraversable="false" maxWidth="-Infinity">
                            <cursor>
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>
