@@ -111,7 +111,9 @@ public class EventHandlerController {
 
 	private void clearInputs() {
 		for (int i = 0; i < inputFields.length; i++) {
-			inputFields[i].setText("");
+			if (i != 0) {
+				inputFields[i].setText("");
+			}
 		}
 	}
 
