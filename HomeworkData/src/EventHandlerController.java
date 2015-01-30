@@ -96,6 +96,15 @@ public class EventHandlerController {
 				}
 			}
 		});
+		
+		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField comes into focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) {
+					autoFillWasted();
+				}
+			}
+		});
 	}
 
 	@FXML
@@ -157,5 +166,10 @@ public class EventHandlerController {
 		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
 		Date date = new Date();
 		endedField.setText(dateFormat.format(date));
+	}
+	
+	@FXML
+	private void autoFillWasted() {
+		spentField.setText("0");
 	}
 }
