@@ -299,6 +299,102 @@ public class DataHandler {
 		return outputString;
 	}
 	
+	/**
+	 * The times must be in the format of HH:MM, military time
+	 * 
+	 * @param earlierTime - The time that comes before
+	 * @param laterTime - The time that comes after
+	 * @return - The amount of time between laterTime and earlierTime
+	 */
+	// TODO Add seconds capability
+	public String subtractTime(String earlierTime, String laterTime) {
+		int[] earlierParts = convertStringsToInts(findInBetween(earlierTime, ':'));
+		int[] laterParts = convertStringsToInts(findInBetween(laterTime, ':'));
+		
+		int hoursDiff = laterParts[0] - earlierParts[0];
+		if (hoursDiff < 0) {
+			laterParts[0] += 23;
+			hoursDiff = laterParts[0] - earlierParts[0];
+		}
+		
+		int minutesDiff = laterParts[1] - earlierParts[1];
+		if (minutesDiff < 0) {
+			laterParts[1] += 60;
+			minutesDiff = laterParts[1] - earlierParts[1];
+		}
+		
+		String hoursReturn = "" + hoursDiff;
+		String minutesReturn = addZeroes("" + minutesDiff, 2); // Just for formatting
+		
+		return hoursReturn + ":" + minutesReturn;
+	}
+	
+	/**
+	 * Divides an amount of time by a number
+	 * 
+	 * @param time - The amount of time to divide, in the format of HH:MM:SS
+	 * @param num - The number to divide the time by
+	 * @return - The rounded, divided time
+	 */
+	public String divideTime(String time, int num) {
+		int[] parts = convertStringsToInts(findInBetween(time, ':'));
+		double returnHours = 0, returnMinutes = 0, returnSeconds = 0;
+		
+		double dividedHours = parts[0] / (double)num;
+		double decimalHours = dividedHours - round(dividedHours, 2);
+		returnHours = dividedHours - decimalHours;
+		
+		returnMinutes += round(60 * decimalHours, 2);
+
+		if (parts.length > 1) {
+			double dividedMinutes = parts[1] / (double)num;
+			double decimalMinutes = dividedMinutes - round(dividedMinutes, 2);
+			returnMinutes = returnMinutes + dividedMinutes - decimalMinutes;
+			if (returnMinutes > 60) {
+				// TODO Do some stuff here that will probably never be run
+			}
+
+			returnSeconds += round(60 * decimalMinutes, 2);
+
+			if (parts.length > 2) {
+				double dividedSeconds = parts[2] / (double)num;
+				double decimalSeconds = dividedSeconds - round(dividedSeconds, 2);
+				returnSeconds = returnSeconds + dividedSeconds - decimalSeconds;
+				if (returnSeconds > 60) {
+					// TODO Do some stuff here
+				}
+			}
+		}
+
+		return (int)returnHours + ":" + addZeroes("" + (int)returnMinutes, 2) + ":" + addZeroes("" + (int)returnSeconds, 2);
+	}
+	
+	/**
+	 * Rounds a number
+	 * 
+	 * @param num - The double to round
+	 * @param decimalPlaces - The number of decimal places to round the number to
+	 * @return
+	 */
+	public double round(double num, int decimalPlaces) {
+		return ((int)(num * (int)Math.pow(10, decimalPlaces)) / (int)Math.pow(10, decimalPlaces));
+	}
+	
+	/**
+	 * Puts zero(es) in front of a string
+	 * 
+	 * @param input - The input string
+	 * @param preferredLength - How long you want the string to be in the end
+	 * @return
+	 */
+	public String addZeroes(String input, int preferredLength) {
+		while (input.length() < preferredLength) {
+			input = "0" + input;
+		}
+		
+		return input;
+	}
+	
 	public static int[] convertStringsToInts(String[] toConvert) {
 		try {
 			int[] convertedTo = new int[toConvert.length];

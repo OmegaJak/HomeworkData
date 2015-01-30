@@ -92,7 +92,8 @@ public class EventHandlerController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					autoFillEndTime();
+					//autoFillEndTime();
+					timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), 2));
 				}
 			}
 		});
