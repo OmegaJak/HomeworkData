@@ -48,8 +48,8 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		TextField[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField,
-				varianceField, musicField, preAlertField, postAlertField, preMoodField, postMoodField, focusField }; // Ewwwww
+		TextField[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, musicField, preAlertField,
+				postAlertField, preMoodField, postMoodField, focusField }; // Ewwwww
 		this.inputFields = inputFields; // Ewwwwww
 
 		dateField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the dateField comes into focus
@@ -60,12 +60,23 @@ public class EventHandlerController {
 						}
 					}
 				});
+		
+		numUnitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					checkForTimePerUnit();
+				}
+			}
+		});
 
 		startedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into focus
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (newPropertyValue) {
 							autoFillStartTime();
+						} else {
+							checkForTimePerUnit();
 						}
 					}
 				});
@@ -75,15 +86,7 @@ public class EventHandlerController {
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (!newPropertyValue) {
 							//autoFillEndTime();
-							try {
-								TextField[] neededInputs = { numUnitField, startedField, endedField };
-								if (checkIfAllFilled(neededInputs)) {
-									timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()),
-											Integer.parseInt(numUnitField.getText())));
-								}
-							} catch (NumberFormatException e) {
-								System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
-							}
+							checkForTimePerUnit();
 						}
 					}
 				});
@@ -114,6 +117,17 @@ public class EventHandlerController {
 			if (i != 0) {
 				inputFields[i].setText("");
 			}
+		}
+	}
+
+	private void checkForTimePerUnit() {
+		try {
+			TextField[] neededInputs = { numUnitField, startedField, endedField };
+			if (checkIfAllFilled(neededInputs)) {
+				timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), Integer.parseInt(numUnitField.getText())));
+			}
+		} catch (NumberFormatException e) {
+			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
 		}
 	}
 
