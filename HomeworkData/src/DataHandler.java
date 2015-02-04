@@ -313,14 +313,19 @@ public class DataHandler {
 		
 		int hoursDiff = laterParts[0] - earlierParts[0];
 		if (hoursDiff < 0) {
-			laterParts[0] += 23;
+			laterParts[0] += 24;
 			hoursDiff = laterParts[0] - earlierParts[0];
 		}
-		
+
 		int minutesDiff = laterParts[1] - earlierParts[1];
 		if (minutesDiff < 0) {
-			laterParts[1] += 60;
-			minutesDiff = laterParts[1] - earlierParts[1];
+			minutesDiff = 60 - earlierParts[1] + laterParts[1];
+			if (minutesDiff > 60) {
+				hoursDiff++;
+				minutesDiff -= 60;
+			} else {
+				hoursDiff--;
+			}
 		}
 		
 		String hoursReturn = "" + hoursDiff;
