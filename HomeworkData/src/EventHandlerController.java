@@ -93,7 +93,14 @@ public class EventHandlerController {
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					//autoFillEndTime();
-					timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), 2));
+					try {
+						TextField[] neededInputs = {numUnitField, startedField, endedField};
+						if (checkIfAllFilled(neededInputs)) {
+							timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), Integer.parseInt(numUnitField.getText())));
+						}
+					} catch (NumberFormatException e) {
+						System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
+					}
 				}
 			}
 		});
@@ -125,6 +132,21 @@ public class EventHandlerController {
 				inputFields[i].setText("");
 			}
 		}
+	}
+	
+	/**
+	 * Checks if every TextField provided contains text
+	 * @param fields - An array of the TextFields to check
+	 * @return Whether or not they all contain something
+	 */
+	private boolean checkIfAllFilled(TextField[] fields) {
+		boolean allFilled = true;
+		for (int i = 0; i < fields.length; i++) {
+			if (fields[i].getText().length() == 0) {
+				allFilled = false;
+			}
+		}
+		return allFilled;
 	}
 
 	@FXML
