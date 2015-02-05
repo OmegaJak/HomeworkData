@@ -254,6 +254,36 @@ public class DataHandler {
 		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines);
 		return temp.size();
 	}
+	
+	/**
+	 * Generates an array representing the cells in a given column
+	 * @param column - The number of the column to generate from, starting at 0
+	 * @param allowDuplicates - Whether or not there can be more than one of an item in the generated array
+	 * @param dir - The directory of the file to read from
+	 * @param file - The name of the file to read from
+	 * @param allowEmptyLines - Whether or not empty lines are allowed when reading the file
+	 * @return A String[] representing the individual cells in a given column
+	 */
+	public String[] getColumnArray(int column, boolean allowDuplicates, String dir, String file, boolean allowEmptyLines) {
+		ArrayList<String[]> rows = readFile(dir, file, allowEmptyLines);
+		String[] columnCells = {};
+		
+		for (int i = 0; i < rows.size(); i++) {
+			if (!allowDuplicates && !alreadyAdded(columnCells, rows.get(i)[column])) {
+				String[] columnCells2 = new String[columnCells.length + 1];
+				System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
+				columnCells2[columnCells.length] = rows.get(i)[column];
+				columnCells = columnCells2;
+			} else if (allowDuplicates) {
+				String[] columnCells2 = new String[columnCells.length + 1];
+				System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
+				columnCells2[columnCells.length] = rows.get(i)[column];
+				columnCells = columnCells2;
+			}
+		}
+		
+		return columnCells;
+	}
 
 	//-------------------------------------------------------------------------------------//
 	//--------------------------------Data analysis methods--------------------------------//
@@ -274,6 +304,24 @@ public class DataHandler {
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//
+	
+	/**
+	 * Goes through given array and checks if the given string is already in the given array
+	 * @param arr - The array to check
+	 * @param toCheck - The string to check
+	 * @return Whether or not it's already been added
+	 */
+	public boolean alreadyAdded(String[] arr, String toCheck) {
+		if (arr.length == 0) {
+			return false;
+		}
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i].equals(toCheck)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * 

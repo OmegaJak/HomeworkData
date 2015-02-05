@@ -11,7 +11,10 @@ import java.util.Date;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 public class EventHandlerController {
@@ -32,6 +35,8 @@ public class EventHandlerController {
 	@FXML private TextField preMoodField;
 	@FXML private TextField postMoodField;
 	@FXML private TextField focusField;
+	
+	@FXML private ComboBox comboTest;
 
 	private DataHandler handler;
 	private TextField[] inputFields;
@@ -85,7 +90,7 @@ public class EventHandlerController {
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (!newPropertyValue) {
-							//autoFillEndTime();
+							autoFillEndTime();
 							checkForTimePerUnit();
 						}
 					}
@@ -99,6 +104,11 @@ public class EventHandlerController {
 						}
 					}
 				});
+		
+		new AutoCompleteComboBoxListener(comboTest);
+		String[] test = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false);
+		ObservableList<String> options = FXCollections.observableArrayList(test);
+		comboTest.setItems(options);
 	}
 
 	@FXML
