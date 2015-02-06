@@ -77,19 +77,19 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
                      <children>
                         <Label alignment="CENTER" text="Class" />
-                        <TextField fx:id="classField" maxWidth="-Infinity" />
+                        <ComboBox fx:id="classField" editable="true" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2">
                      <children>
                         <Label alignment="CENTER" text="Type of Homework" />
-                        <TextField fx:id="typeField" maxWidth="-Infinity" />
+                        <ComboBox fx:id="typeField" editable="true" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3">
                      <children>
                         <Label alignment="CENTER" text="Unit" />
-                        <TextField fx:id="unitField" maxWidth="-Infinity" />
+                        <ComboBox fx:id="unitField" editable="true" maxWidth="-Infinity" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
