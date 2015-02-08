@@ -36,12 +36,9 @@ public class EventHandlerController {
 	@FXML private TextField preMoodField;
 	@FXML private TextField postMoodField;
 	@FXML private TextField focusField;
-	
-	@FXML private ComboBox comboTest;
 
 	private DataHandler handler;
-	private ArrayList<Control[]> inputFields = new ArrayList<Control[]>();
-	private Control[] inputs = new Control[5];
+	private Control[] inputFields = new Control[16];
 
 	/**
 	 * The constructor. The constructor is called before the initialize() method.
@@ -55,12 +52,9 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		TextField[] textFields = {dateField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, musicField, preAlertField,
-				postAlertField, preMoodField, postMoodField, focusField }; // Ewwwww
-		ComboBox[] comboBoxes = {classField, typeField, unitField};
-		this.inputFields.add(textFields);
-		this.inputFields.add(comboBoxes);
-		inputs[0] = dateField;
+		Control[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, musicField, preAlertField,
+				postAlertField, preMoodField, postMoodField, focusField };//Ewwwwww
+		this.inputFields = inputFields;
 
 		dateField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the dateField comes into focus
 					@Override
@@ -75,7 +69,7 @@ public class EventHandlerController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					//checkForTimePerUnit();
+					checkForTimePerUnit();
 				}
 			}
 		});
@@ -86,7 +80,7 @@ public class EventHandlerController {
 						if (newPropertyValue) {
 							autoFillStartTime();
 						} else {
-							//checkForTimePerUnit();
+							checkForTimePerUnit();
 						}
 					}
 				});
@@ -96,7 +90,7 @@ public class EventHandlerController {
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (!newPropertyValue) {
 							autoFillEndTime();
-							//checkForTimePerUnit();
+							checkForTimePerUnit();
 						}
 					}
 				});
@@ -110,10 +104,20 @@ public class EventHandlerController {
 					}
 				});
 		
-		new AutoCompleteComboBoxListener(comboTest);
-		String[] test = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false);
-		ObservableList<String> options = FXCollections.observableArrayList(test);
-		comboTest.setItems(options);
+		new AutoCompleteComboBoxListener(classField);
+		String[] classes = handler.getColumnArray(1, false, handler.csvDir, handler.csvName, false);
+		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
+		classField.setItems(classOptions);
+		
+		new AutoCompleteComboBoxListener(typeField);
+		String[] types = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false);
+		ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
+		typeField.setItems(typeOptions);
+		
+		new AutoCompleteComboBoxListener(unitField);
+		String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false);
+		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
+		unitField.setItems(unitOptions);
 	}
 
 	@FXML
@@ -128,20 +132,12 @@ public class EventHandlerController {
 	}
 
 	private void clearInputs() {
-		try {
-			for (int i = 0; i < inputFields.get(0).length; i++) { //This assumes that the first array is a TextField[]
-				if (i != 0) {
-					((TextField)(inputFields.get(0)[i])).setText("");
-				}
+		for (int i = 0; i < inputFields.length; i++) {
+			if (i == 0 || i > 3) {
+				((TextField)inputFields[i]).setText("");
+			} else if (i > 0 && i < 3) {
+				((ComboBox)inputFields[i]).getEditor().setText("");
 			}
-			for (int i = 0; i < inputFields.get(1).length; i++) { //This assumes that the second array is a ComboBox[]
-				if (i != 0) {
-					((ComboBox)(inputFields.get(1)[i])).getEditor().setText("");
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("Check the casting, it probably got screwed up.");
-			e.printStackTrace();
 		}
 	}
 
@@ -171,50 +167,20 @@ public class EventHandlerController {
 		}
 		return allFilled;
 	}
-	
-	private int getTotalInputs(ArrayList<Control[]> arr) {
-		int total = 0 ;
-		
-		for (int i = 0; i < arr.size(); i++) {
-			for (int k = 0; k < arr.get(i).length; k++) {
-				total++;
-			}
-		}
-		
-		return total;
-	}
 
 	@FXML
-	private void saveRow() { // THIS IS NOT FLEXIBLE AT ALL
+	private void saveRow() {
 		try {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true);// Get the current data sheet
 			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
-			
-			int currentIndex = 0;
-			int lingeringK = 0;
-			if (currentRow.length >= getTotalInputs(inputFields)) {
-				for (int i = 0; i < inputFields.size(); i++) {
-					for (int k = lingeringK; k < inputFields.get(i).length; k++) {
-						if (i == 0) { //Assuming it's a TextField[]
-							if (k == 1 && lingeringK != 1) {
-								break;
-							} else if (k == inputFields.get(i).length - 1) {
-								lingeringK = 3;
-							} else {
-								currentRow[currentIndex] = ((TextField)inputFields.get(i)[k]).getText(); // Set the cells to the input fields
-								currentIndex++;
-							}
-						} else if (i == 1) { //Assuming it's a ComboBox[]
-							currentRow[currentIndex] = ((ComboBox)inputFields.get(i)[k]).getEditor().getText();
-							currentIndex++;
-							
-							if (k == 2) {
-								i = -1;
-								lingeringK = 1;
-								break;
-							}
-						}
+
+			if (currentRow.length >= inputFields.length) {
+				for (int i = 0; i < inputFields.length; i++) {
+					if (i == 0 || i >= 4) {
+						currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
+					} else if (i > 0 && i <= 3) {
+						currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
 					}
 				}
 			}

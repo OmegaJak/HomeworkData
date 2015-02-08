@@ -178,7 +178,6 @@
                <children>
                   <Button alignment="CENTER" contentDisplay="CENTER" layoutX="250.0" layoutY="36.0" mnemonicParsing="false" onAction="#newRow" text="New Row" />
                   <Button alignment="CENTER" contentDisplay="CENTER" layoutX="316.0" layoutY="36.0" mnemonicParsing="false" onAction="#saveRow" text="Save Row" />
-                  <ComboBox fx:id="comboTest" editable="true" layoutX="14.0" layoutY="36.0" prefWidth="150.0" promptText="Test" />
                </children>
             </Pane>
          </children>
