@@ -74,12 +74,12 @@ public class EventHandlerController {
 			}
 		});
 
-		startedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into focus
+		startedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into or out of focus
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (newPropertyValue) {
+						if (newPropertyValue) { //Into focus
 							autoFillStartTime();
-						} else {
+						} else { //Out of focus
 							checkForTimePerUnit();
 						}
 					}
@@ -104,18 +104,40 @@ public class EventHandlerController {
 					}
 				});
 		
+		classField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the classField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					String[] types = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false, 1, classField.getEditor().getText());
+					ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
+					typeField.setItems(typeOptions);
+				}
+			}
+		});
+		
+		typeField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when typeField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false, 2, typeField.getEditor().getText());
+					ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
+					unitField.setItems(unitOptions);
+				}
+			}
+		});
+		
 		new AutoCompleteComboBoxListener(classField);
-		String[] classes = handler.getColumnArray(1, false, handler.csvDir, handler.csvName, false);
+		String[] classes = handler.getColumnArray(1, false, handler.csvDir, handler.csvName, false, 0, "");
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
 		classField.setItems(classOptions);
 		
 		new AutoCompleteComboBoxListener(typeField);
-		String[] types = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false);
+		String[] types = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false, 1, "");
 		ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
 		typeField.setItems(typeOptions);
 		
 		new AutoCompleteComboBoxListener(unitField);
-		String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false);
+		String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false, 2, "");
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		unitField.setItems(unitOptions);
 	}

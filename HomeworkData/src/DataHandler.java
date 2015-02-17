@@ -17,6 +17,7 @@ public class DataHandler {
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
 		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
+		//csvDir = "C:\\Users\\JAK\\Documents\\Google Drive";
 		csvName = "HomeworkDataSem2.csv";
 		main();
 	}
@@ -171,7 +172,7 @@ public class DataHandler {
 
 		PrintWriter pw = new PrintWriter(new FileWriter(file));
 
-		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file);
+		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file + " (directory of " + dir + ")");
 
 		if (precedingRow == -1) { //Special case, in order to add a line before everything else
 			for (int comma = 1; comma <= columns - 1; comma++) {
@@ -264,21 +265,23 @@ public class DataHandler {
 	 * @param allowEmptyLines - Whether or not empty lines are allowed when reading the file
 	 * @return A String[] representing the individual cells in a given column
 	 */
-	public String[] getColumnArray(int column, boolean allowDuplicates, String dir, String file, boolean allowEmptyLines) {
+	public String[] getColumnArray(int column, boolean allowDuplicates, String dir, String file, boolean allowEmptyLines, int conditionalColumn, String ifMatches) {
 		ArrayList<String[]> rows = readFile(dir, file, allowEmptyLines);
 		String[] columnCells = {};
 		
 		for (int i = 0; i < rows.size(); i++) {
-			if (!allowDuplicates && !alreadyAdded(columnCells, rows.get(i)[column])) {
-				String[] columnCells2 = new String[columnCells.length + 1];
-				System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
-				columnCells2[columnCells.length] = rows.get(i)[column];
-				columnCells = columnCells2;
-			} else if (allowDuplicates) {
-				String[] columnCells2 = new String[columnCells.length + 1];
-				System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
-				columnCells2[columnCells.length] = rows.get(i)[column];
-				columnCells = columnCells2;
+			if (ifMatches.length() > 0 ? rows.get(i)[conditionalColumn].equals(ifMatches) : true) {
+				if (!allowDuplicates && !alreadyAdded(columnCells, rows.get(i)[column])) {
+					String[] columnCells2 = new String[columnCells.length + 1];
+					System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
+					columnCells2[columnCells.length] = rows.get(i)[column];
+					columnCells = columnCells2;
+				} else if (allowDuplicates) {
+					String[] columnCells2 = new String[columnCells.length + 1];
+					System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
+					columnCells2[columnCells.length] = rows.get(i)[column];
+					columnCells = columnCells2;
+				}
 			}
 		}
 		
