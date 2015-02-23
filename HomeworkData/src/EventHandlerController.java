@@ -98,7 +98,7 @@ public class EventHandlerController {
 		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField comes into focus
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (newPropertyValue) {
+						if (newPropertyValue && spentField.getText().equals("")) {
 							autoFillWasted();
 						}
 					}
@@ -238,6 +238,6 @@ public class EventHandlerController {
 
 	@FXML
 	private void autoFillWasted() {
-		spentField.setText("0");
+		spentField.setText("0:00");
 	}
 }
