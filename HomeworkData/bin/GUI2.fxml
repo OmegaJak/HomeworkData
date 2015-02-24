@@ -164,8 +164,8 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
                      <children>
-                        <Label alignment="CENTER" text="Time Variance" />
-                        <TextField fx:id="varianceField" editable="false" focusTraversable="false" maxWidth="-Infinity">
+                        <Label alignment="CENTER" text="Time Predicted" />
+                        <TextField fx:id="predictedField" editable="false" focusTraversable="false" maxWidth="-Infinity">
                            <cursor>
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>

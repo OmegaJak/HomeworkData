@@ -29,7 +29,7 @@ public class EventHandlerController {
 	@FXML private TextField startedField;
 	@FXML private TextField spentField;
 	@FXML private TextField endedField;
-	@FXML private TextField varianceField;
+	@FXML private TextField predictedField;
 	@FXML private TextField musicField;
 	@FXML private TextField preAlertField;
 	@FXML private TextField postAlertField;
@@ -52,7 +52,7 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		Control[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, varianceField, musicField, preAlertField,
+		Control[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
 				postAlertField, preMoodField, postMoodField, focusField };//Ewwwwww
 		this.inputFields = inputFields;
 

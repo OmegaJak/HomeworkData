@@ -37,6 +37,20 @@ public class DataHandler {
 			}
 
 			System.out.println(rows.size());
+			
+			ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+			for (int i = 0; i < dataSheet.size(); i++) {
+				if (dataSheet.get(i)[7].equals("0")) {
+					writeCell(i, 7, "0:00", csvDir, csvName);
+				}
+			}
+			
+			dataSheet = readFile(csvDir, csvName, false);
+			for (int i = 1; i < dataSheet.size(); i++) {
+				timePerUnit(dataSheet, i);
+			}
+			
+			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");
 
 			/*for (int i = 0; i < rows.size(); i++) {
 				System.out.println(rows.get(i)[2]);
@@ -304,6 +318,23 @@ public class DataHandler {
 		return null;
 	}
 	
+	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
+		String[] timePerUnits = {};
+		String[] currentRow;
+		
+		for (int i = 0; i < datasheet.size(); i++) {
+			currentRow = datasheet.get(i);
+			if (currentRow[1].equals(homeworkClass) && currentRow[2].equals(homeworkType) && currentRow[3].equals(homeworkUnit)) {
+				String[] timePerUnits2 = new String[timePerUnits.length + 1];
+				System.arraycopy(timePerUnits, 0, timePerUnits2, 0, timePerUnits.length);
+				timePerUnits2[timePerUnits.length] = currentRow[5];
+				timePerUnits = timePerUnits2;
+			}
+		}
+		
+		return divideTime(addTimes(timePerUnits), timePerUnits.length);
+	}
+	
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//
@@ -348,6 +379,44 @@ public class DataHandler {
 		System.out.println("The converted output was " + outputString);
 		
 		return outputString;
+	}
+	
+	/**
+	 * Adds together the times provided
+	 * @param times - An array of times, in the format of MM:SS
+	 * @return The total sum of all times given, format of H:MM:SS
+	 */
+	public String addTimes(String[] times) {
+		ArrayList<int[]> timeParts = new ArrayList<int[]>();
+		for (int i = 0; i < times.length; i++) {
+			timeParts.add(convertStringsToInts(findInBetween(times[i], ':')));
+		}
+		
+		int hours = 0;
+		
+		int minutesSum = 0;
+		for (int i = 0; i < timeParts.size(); i++) {
+			minutesSum += timeParts.get(i)[0];
+		}
+		while (minutesSum > 59) {
+			hours++;
+			minutesSum -= 60;
+		}
+		
+		int secondsSum = 0;
+		for (int i = 0; i < timeParts.size(); i++) {
+			secondsSum += timeParts.get(i)[1];
+		}
+		while (secondsSum > 59) {
+			minutesSum++;
+			secondsSum -= 60;
+		}
+
+		String hoursReturn = "" + hours;
+		String minutesReturn = addZeroes("" + minutesSum, 2);
+		String secondsReturn = addZeroes("" + secondsSum, 2);
+
+		return hoursReturn + ":" + minutesReturn + ":" + secondsReturn;
 	}
 	
 	/**
