@@ -38,19 +38,19 @@ public class DataHandler {
 
 			System.out.println(rows.size());
 			
-			ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+			/*ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
 			for (int i = 0; i < dataSheet.size(); i++) {
 				if (dataSheet.get(i)[7].equals("0")) {
 					writeCell(i, 7, "0:00", csvDir, csvName);
 				}
 			}
 			
-			dataSheet = readFile(csvDir, csvName, false);
+			/*dataSheet = readFile(csvDir, csvName, false);
 			for (int i = 1; i < dataSheet.size(); i++) {
 				timePerUnit(dataSheet, i);
 			}
 			
-			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");
+			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");*/
 
 			/*for (int i = 0; i < rows.size(); i++) {
 				System.out.println(rows.get(i)[2]);
