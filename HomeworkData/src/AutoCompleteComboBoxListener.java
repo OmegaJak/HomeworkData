@@ -12,6 +12,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
@@ -67,6 +69,20 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
             event.getCode() == KeyCode.END || event.getCode() == KeyCode.TAB
             )
             return;
+        
+        if (event.getCode() == KeyCode.DOWN) {
+        	ListView lv = ((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView();
+        	if (lv.getSelectionModel().getSelectedIndex() + 1 < lv.getItems().size()) {
+        		lv.getSelectionModel().clearAndSelect(lv.getSelectionModel().getSelectedIndex() + 1);
+        	}
+            lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
+        } else if (event.getCode() == KeyCode.UP) {
+        	ListView lv = ((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView();
+        	if (lv.getSelectionModel().getSelectedIndex() - 1 >= 0) {
+        		lv.getSelectionModel().clearAndSelect(lv.getSelectionModel().getSelectedIndex() - 1);
+        	}
+            lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
+        }
         
         IndexRange ir = comboBox.getEditor().getSelection();
         sb.delete(0, sb.length());

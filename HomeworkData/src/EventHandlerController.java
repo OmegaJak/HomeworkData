@@ -103,16 +103,18 @@ public class EventHandlerController {
 		endedField.focusedProperty().addListener(endedListener);
 
 		mainGrid.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent k) {
-				if (k.getCode() == KeyCode.CONTROL) {
+			@Override
+			public void handle(KeyEvent ke) {
+				if (ke.getCode() == KeyCode.CONTROL) {
 					endedField.focusedProperty().removeListener(endedListener);
 				}
 			}
 		});
 		
 		mainGrid.setOnKeyReleased(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent k) {
-				if (k.getCode() == KeyCode.CONTROL) {
+			@Override
+			public void handle(KeyEvent ke) {
+				if (ke.getCode() == KeyCode.CONTROL) {
 					endedField.focusedProperty().addListener(endedListener);
 				}
 			}

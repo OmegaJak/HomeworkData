@@ -283,7 +283,7 @@ public class DataHandler {
 		ArrayList<String[]> rows = readFile(dir, file, allowEmptyLines);
 		String[] columnCells = {};
 		
-		for (int i = 0; i < rows.size(); i++) {
+		for (int i = 1; i < rows.size(); i++) {
 			if (ifMatches.length() > 0 ? rows.get(i)[conditionalColumn].equals(ifMatches) : true) {
 				if (!allowDuplicates && !alreadyAdded(columnCells, rows.get(i)[column])) {
 					String[] columnCells2 = new String[columnCells.length + 1];
