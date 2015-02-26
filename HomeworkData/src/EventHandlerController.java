@@ -13,13 +13,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 
 public class EventHandlerController {
 
+	@FXML private GridPane mainGrid;
 	@FXML private TextField dateField;
 	@FXML private ComboBox classField;
 	@FXML private ComboBox typeField;
@@ -85,15 +90,33 @@ public class EventHandlerController {
 					}
 				});
 
-		endedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
-					@Override
-					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (!newPropertyValue) {
-							autoFillEndTime();
-							checkForTimePerUnit();
-						}
-					}
-				});
+		
+		ChangeListener<Boolean> endedListener = new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					autoFillEndTime();
+					checkForTimePerUnit();
+				}
+			}
+		};
+		endedField.focusedProperty().addListener(endedListener);
+
+		mainGrid.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent k) {
+				if (k.getCode() == KeyCode.CONTROL) {
+					endedField.focusedProperty().removeListener(endedListener);
+				}
+			}
+		});
+		
+		mainGrid.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent k) {
+				if (k.getCode() == KeyCode.CONTROL) {
+					endedField.focusedProperty().addListener(endedListener);
+				}
+			}
+		});
 
 		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField comes into focus
 					@Override
