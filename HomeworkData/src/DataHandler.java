@@ -18,7 +18,7 @@ public class DataHandler {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
 		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
 		//csvDir = "C:\\Users\\JAK\\Documents\\Google Drive";
-		csvName = "HomeworkDataSem2.csv";
+		csvName = "Backup-HomeworkDataSem2.csv";
 		main();
 	}
 
@@ -38,19 +38,19 @@ public class DataHandler {
 
 			System.out.println(rows.size());
 			
-			/*ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+			ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
 			for (int i = 0; i < dataSheet.size(); i++) {
 				if (dataSheet.get(i)[7].equals("0")) {
 					writeCell(i, 7, "0:00", csvDir, csvName);
 				}
 			}
 			
-			/*dataSheet = readFile(csvDir, csvName, false);
+			dataSheet = readFile(csvDir, csvName, false);
 			for (int i = 1; i < dataSheet.size(); i++) {
 				timePerUnit(dataSheet, i);
 			}
 			
-			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");*/
+			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");
 
 			/*for (int i = 0; i < rows.size(); i++) {
 				System.out.println(rows.get(i)[2]);
@@ -93,7 +93,7 @@ public class DataHandler {
 
 		PrintWriter pw = new PrintWriter(new FileWriter(file));
 
-		System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file);
+		System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file + ", which used to say \"" + rows.get(row)[column] + "\"");
 
 		for (int i = 0; i < rows.size(); i++) {
 			for (int k = 0; k < rows.get(i).length; k++) {
@@ -306,10 +306,11 @@ public class DataHandler {
 	//--------------------------------Data analysis methods--------------------------------//
 	//-------------------------------------------------------------------------------------//
 
-	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException{
+	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException {
 		try {
-			double calculatedResult = Double.parseDouble(convertTime(dataSheet.get(row)[7], "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
-			String formattedResult = convertTime("" + (int)calculatedResult, "SS", "MM:SS");
+			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
+			System.out.println("The calculated result was " + calculatedResult);
+			String formattedResult = convertTime(addZeroes("" + (int)(calculatedResult + 0.5), 2), "SS", "M:SS"); // The "+ 0.5" is for rounding to the nearest integer, rather than just rounding down
 			writeCell(row, 5, formattedResult, csvDir, csvName);
 		} catch (NumberFormatException e) {
 			System.out.println("What are numbers!?");
@@ -364,19 +365,22 @@ public class DataHandler {
 	 * @param outputFormat Same as above, like HH:MM:SS
 	 * @return The total minutes in the time provided
 	 */
-	public static String convertTime(String input, String inputFormat, String outputFormat) {
-		
-		System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\"");
+	public String convertTime(String input, String inputFormat, String outputFormat) {
 		
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
-		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens);
+		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens); // Just converting inputInBetweens to integers
 		String[] outputFormatInBetweens = findInBetween(outputFormat, ':');
 		
-		int totalSeconds = convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
-		String outputString = convertSecondsToFormattedString(outputFormatInBetweens, totalSeconds);
-		
-		System.out.println("The converted output was " + outputString);
+		String outputString = "";
+		if (!outputFormat.contains("H") && !outputFormat.contains("M")) { // Check whether this helps at some point.... it might...
+			outputString = "" + convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
+		} else {
+			int totalSeconds = convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
+			outputString = convertSecondsToFormattedString(outputFormatInBetweens, totalSeconds);
+		}
+
+		System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\". The result is: " + outputString);
 		
 		return outputString;
 	}
@@ -550,21 +554,24 @@ public class DataHandler {
 		return totalSeconds;
 	}
 	
-	public static String convertSecondsToFormattedString(String[] outputFormatInBetweens, int totalSeconds) {
+	public String convertSecondsToFormattedString(String[] outputFormatInBetweens, int totalSeconds) {
 		String[] output = new String[outputFormatInBetweens.length];
-		int hours = -1, minutes = -1, seconds = -1;
+		int hours = -1, minutes = -1, seconds = -1, indexes = 0;
 		for (int i = 0; i < outputFormatInBetweens.length; i++) {
 			if (outputFormatInBetweens[i].toUpperCase().contains("H")) {
 				hours = totalSeconds / (60*60);
 				totalSeconds = totalSeconds % (60*60);
-				output[i] = hours + "";
+				indexes = outputFormatInBetweens[i].length();
+				output[i] = addZeroes("" + hours, indexes);
 			} else if (outputFormatInBetweens[i].toUpperCase().contains("M")) {
 				minutes = totalSeconds / 60;
 				totalSeconds = totalSeconds % 60;
-				output[i] = minutes + "";
+				indexes = outputFormatInBetweens[i].length();
+				output[i] = addZeroes("" + minutes, indexes);
 			} else if (outputFormatInBetweens[i].toUpperCase().contains("S")) {
 				seconds = totalSeconds;
-				output[i] = seconds + "";
+				indexes = outputFormatInBetweens[i].length();
+				output[i] = addZeroes("" + seconds, indexes);
 			}
 		}
 		
