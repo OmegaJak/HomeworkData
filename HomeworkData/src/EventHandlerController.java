@@ -96,6 +96,7 @@ public class EventHandlerController {
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					autoFillEndTime();
+					checkForTimePerUnit();
 				}
 			}
 		};
@@ -109,13 +110,13 @@ public class EventHandlerController {
 			}
 		};
 		endedField.focusedProperty().addListener(endedAutoFillListener);
-		endedField.focusedProperty().addListener(endedCalculateListener);
 
 		mainGrid.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent ke) {
 				if (ke.getCode() == KeyCode.CONTROL) {
 					endedField.focusedProperty().removeListener(endedAutoFillListener);
+					endedField.focusedProperty().addListener(endedCalculateListener);
 				}
 			}
 		});
@@ -125,6 +126,7 @@ public class EventHandlerController {
 			public void handle(KeyEvent ke) {
 				if (ke.getCode() == KeyCode.CONTROL) {
 					endedField.focusedProperty().addListener(endedAutoFillListener);
+					endedField.focusedProperty().removeListener(endedCalculateListener);
 				}
 			}
 		});
