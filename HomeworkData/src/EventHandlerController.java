@@ -91,22 +91,31 @@ public class EventHandlerController {
 				});
 
 		
-		ChangeListener<Boolean> endedListener = new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
+		ChangeListener<Boolean> endedAutoFillListener = new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					autoFillEndTime();
+				}
+			}
+		};
+		
+		ChangeListener<Boolean> endedCalculateListener = new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
 					checkForTimePerUnit();
 				}
 			}
 		};
-		endedField.focusedProperty().addListener(endedListener);
+		endedField.focusedProperty().addListener(endedAutoFillListener);
+		endedField.focusedProperty().addListener(endedCalculateListener);
 
 		mainGrid.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent ke) {
 				if (ke.getCode() == KeyCode.CONTROL) {
-					endedField.focusedProperty().removeListener(endedListener);
+					endedField.focusedProperty().removeListener(endedAutoFillListener);
 				}
 			}
 		});
@@ -115,7 +124,7 @@ public class EventHandlerController {
 			@Override
 			public void handle(KeyEvent ke) {
 				if (ke.getCode() == KeyCode.CONTROL) {
-					endedField.focusedProperty().addListener(endedListener);
+					endedField.focusedProperty().addListener(endedAutoFillListener);
 				}
 			}
 		});
@@ -170,7 +179,7 @@ public class EventHandlerController {
 	@FXML
 	private void newRow() {
 		try {
-			this.handler.insertNewRow(-2, 16, handler.csvDir, "HomeworkDataSem2.csv");
+			this.handler.insertNewRow(-2, 16, handler.csvDir, handler.csvName);
 			//			clearInputs(); // I decided this was too dangerous
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

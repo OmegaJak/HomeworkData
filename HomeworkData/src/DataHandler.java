@@ -18,7 +18,7 @@ public class DataHandler {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
 		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
 		//csvDir = "C:\\Users\\JAK\\Documents\\Google Drive";
-		csvName = "Backup-HomeworkDataSem2.csv";
+		csvName = "HomeworkDataSem2.csv";
 		main();
 	}
 
