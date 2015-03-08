@@ -47,10 +47,12 @@ public class DataHandler {
 			
 			dataSheet = readFile(csvDir, csvName, false);
 			for (int i = 1; i < dataSheet.size(); i++) {
-				timePerUnit(dataSheet, i);
+				if (dataSheet.get(i).equals("")) {
+					timePerUnit(dataSheet, i);
+				}
 			}
 			
-			averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages");
+			//multiplyTime(averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages"), 4);
 
 			/*for (int i = 0; i < rows.size(); i++) {
 				System.out.println(rows.get(i)[2]);
@@ -306,7 +308,7 @@ public class DataHandler {
 	//--------------------------------Data analysis methods--------------------------------//
 	//-------------------------------------------------------------------------------------//
 
-	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException {
+	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException { // This is a different methodology than checkForTimePerUnit in EventHandlerController, but it produces the same result. Might as well leave this in.
 		try {
 			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
 			System.out.println("The calculated result was " + calculatedResult);
@@ -333,7 +335,9 @@ public class DataHandler {
 			}
 		}
 		
-		return divideTime(addTimes(timePerUnits), timePerUnits.length);
+		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
+		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + " in the class \"" + homeworkClass + "\" to be " + result + ".");
+		return result;
 	}
 	
 	//------------------------------------------------------------------------------------//
@@ -456,6 +460,38 @@ public class DataHandler {
 		String minutesReturn = addZeroes("" + minutesDiff, 2); // Just for formatting
 		
 		return hoursReturn + ":" + minutesReturn;
+	}
+	
+	/**
+	 * Multiplies the time by a given number... who would've guessed that...
+	 * 
+	 * @param time - The time to multiply, in the format of H:MM:SS
+	 * @param num - The number to multiply it by
+	 * @return - The multiplied result in format of H:MM:SS
+	 */
+	public String multiplyTime(String time, int num) {
+		int[] parts = convertStringsToInts(findInBetween(time, ':'));
+		
+		int hours = parts[0] * num;
+		
+		int minutesProduct = 0;
+		minutesProduct = parts[1] * num;
+		while (minutesProduct > 59) {
+			hours++;
+			minutesProduct -= 60;
+		}
+		
+		int secondsProduct = parts[2] * num;
+		while (secondsProduct > 59) {
+			minutesProduct++;
+			secondsProduct -= 60;
+		}
+		
+		String hoursReturn = "" + hours;
+		String minutesReturn = addZeroes("" + minutesProduct, 2);
+		String secondsReturn = addZeroes("" + secondsProduct, 2);
+
+		return hoursReturn + ":" + minutesReturn + ":" + secondsReturn;
 	}
 	
 	/**

@@ -18,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -75,6 +76,7 @@ public class EventHandlerController {
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					checkForTimePerUnit();
+					checkForTimePrediction();
 				}
 			}
 		});
@@ -147,6 +149,16 @@ public class EventHandlerController {
 					String[] types = handler.getColumnArray(2, false, handler.csvDir, handler.csvName, false, 1, classField.getEditor().getText());
 					ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
 					typeField.setItems(typeOptions);
+					checkForTimePrediction();
+				}
+			}
+		});
+		
+		unitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the classField goes out of focus
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (!newPropertyValue) {
+					checkForTimePrediction();
 				}
 			}
 		});
@@ -158,6 +170,7 @@ public class EventHandlerController {
 					String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false, 2, typeField.getEditor().getText());
 					ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 					unitField.setItems(unitOptions);
+					checkForTimePrediction();
 				}
 			}
 		});
@@ -198,8 +211,19 @@ public class EventHandlerController {
 			}
 		}
 	}
+	
+	private void checkForTimePrediction() {
+		TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
+		if (checkIfAllFilled(neededInputs)) {
+			System.out.println("The right things were filled");
+			String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(), unitField.getEditor().getText());
+			predictedField.setText(handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText())));
+			Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
+			predictedField.setTooltip(averageTime);
+		}
+	}
 
-	private void checkForTimePerUnit() {
+	private void checkForTimePerUnit() { // This is a different methodology than timePerUnit in DataHandler, but it produces the same result. Might as well leave this in.
 		try {
 			TextField[] neededInputs = { numUnitField, startedField, endedField };
 			if (checkIfAllFilled(neededInputs)) {
