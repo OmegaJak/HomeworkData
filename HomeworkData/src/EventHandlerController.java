@@ -88,6 +88,7 @@ public class EventHandlerController {
 							autoFillStartTime();
 						} else { //Out of focus
 							checkForTimePerUnit();
+							checkForEndPrediction();
 						}
 					}
 				});
@@ -215,11 +216,21 @@ public class EventHandlerController {
 	private void checkForTimePrediction() {
 		TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
 		if (checkIfAllFilled(neededInputs)) {
-			System.out.println("The right things were filled");
+			//System.out.println("The right things were filled");
 			String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(), unitField.getEditor().getText());
-			predictedField.setText(handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText())));
+			String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
+			predictedField.setText(predictedTimeSpent);
 			Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
 			predictedField.setTooltip(averageTime);
+		}
+	}
+	
+	private void checkForEndPrediction() {
+		TextField[] neededInputs = {startedField, predictedField};
+		if (checkIfAllFilled(neededInputs)) {
+			String[] timesToAdd = {startedField.getText(), predictedField.getText()};
+			Tooltip prediction = new Tooltip("The predicted end time is: " + handler.addTimes(timesToAdd));
+			endedField.setTooltip(prediction);
 		}
 	}
 
