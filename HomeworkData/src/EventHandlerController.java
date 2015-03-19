@@ -238,7 +238,7 @@ public class EventHandlerController {
 		try {
 			TextField[] neededInputs = { numUnitField, startedField, endedField };
 			if (checkIfAllFilled(neededInputs)) {
-				timeUnitField.setText(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), Integer.parseInt(numUnitField.getText())));
+				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS"));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
@@ -280,9 +280,22 @@ public class EventHandlerController {
 
 			dataSheet.set(numLines, currentRow); // Set the data sheet line to the modified line
 			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
+			
+			System.out.println("Saved");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("The data did not save! Shit... Outputting data to console(hopefully)...");
+			System.out.print("[");
+			for (int i = 0; i < inputFields.length; i++) {
+				System.out.print(inputFields[i].getId() + ":");
+				if (inputFields[i] instanceof TextField) {
+					System.out.print(((TextField)inputFields[i]).getText() + (i != inputFields.length - 1 ? ", " : ""));
+				} else if (inputFields[i] instanceof ComboBox) {
+					System.out.print(((ComboBox)inputFields[i]).getEditor().getText() + (i != inputFields.length - 1 ? ", " : ""));
+				}
+			}
+			System.out.print("]");
 		}
 	}
 
@@ -290,21 +303,27 @@ public class EventHandlerController {
 	private void autoFillDate() {
 		DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
 		Date date = new Date();
-		dateField.setText(dateFormat.format(date));
+		String settingTo = dateFormat.format(date);
+		System.out.println("Setting the date to: \"" + settingTo + "\". (It used to be \"" + dateField.getText() + "\")");
+		dateField.setText(settingTo);
 	}
 
 	@FXML
 	private void autoFillStartTime() {
 		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
 		Date date = new Date();
-		startedField.setText(dateFormat.format(date));
+		String settingTo = dateFormat.format(date);
+		System.out.println("Setting the starting time to: \"" + settingTo + "\". (It used to be \"" + startedField.getText() + "\")");
+		startedField.setText(settingTo);
 	}
 
 	@FXML
 	private void autoFillEndTime() {
 		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
 		Date date = new Date();
-		endedField.setText(dateFormat.format(date));
+		String settingTo = dateFormat.format(date);
+		System.out.println("Setting the end time to: " + settingTo + "\". (It used to be \"" + endedField.getText() + "\")");
+		endedField.setText(settingTo);
 	}
 
 	@FXML
