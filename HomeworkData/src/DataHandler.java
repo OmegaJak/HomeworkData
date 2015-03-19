@@ -373,8 +373,8 @@ public class DataHandler {
 		
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
-		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens); // Just converting inputInBetweens to integers
-		String[] outputFormatInBetweens = findInBetween(outputFormat, ':');
+		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens); // Just converting inputInBetweens to integers, so now it's {5,32,50}
+		String[] outputFormatInBetweens = findInBetween(outputFormat, ':'); //Same as inputFormatInBetweens, but for the output
 		
 		String outputString = "";
 		if (!outputFormat.contains("H") && !outputFormat.contains("M")) { // Check whether this helps at some point.... it might...

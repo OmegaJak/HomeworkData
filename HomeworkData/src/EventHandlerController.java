@@ -1,5 +1,5 @@
 /**
- * Credit for this goes to this blog:
+ * Credit for the basis of this goes to this blog:
  * http://code.makery.ch/blog/javafx-2-event-handlers-and-change-listeners/
  */
 

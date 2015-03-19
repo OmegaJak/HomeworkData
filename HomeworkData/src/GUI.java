@@ -11,7 +11,7 @@ public class GUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("Event Handler Demo");
+		primaryStage.setTitle("Homework Data");
 		
 		try {
 			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("GUI2.fxml"));
