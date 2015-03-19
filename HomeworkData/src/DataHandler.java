@@ -336,7 +336,7 @@ public class DataHandler {
 		}
 		
 		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
-		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + " in the class \"" + homeworkClass + "\" to be " + result + ".");
+		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
 		return result;
 	}
 	
