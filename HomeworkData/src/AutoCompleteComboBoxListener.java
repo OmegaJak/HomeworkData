@@ -109,7 +109,7 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
         }
     }
 
-    /*
+    /**
      * selectClosestResultBasedOnTextFieldValue() - selects the item and scrolls to it when
      * the popup is shown.
      * 
