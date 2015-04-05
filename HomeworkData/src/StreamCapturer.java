@@ -1,3 +1,9 @@
+/**
+ * This was originally taken from the post from MadProgrammer in this StackOverflow thread: 
+ * http://stackoverflow.com/questions/12945537/how-to-set-output-stream-to-textarea
+ * Many thanks to him/her
+ */
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
