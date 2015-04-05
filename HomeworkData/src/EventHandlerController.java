@@ -4,6 +4,7 @@
  */
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -42,6 +44,7 @@ public class EventHandlerController {
 	@FXML private TextField preMoodField;
 	@FXML private TextField postMoodField;
 	@FXML private TextField focusField;
+	@FXML private TextArea consoleLog;
 
 	private DataHandler handler;
 	private Control[] inputFields = new Control[16];
@@ -176,6 +179,7 @@ public class EventHandlerController {
 			}
 		});
 		
+		
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getColumnArray(1, false, handler.csvDir, handler.csvName, false, 0, "");
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
@@ -190,6 +194,12 @@ public class EventHandlerController {
 		String[] units = handler.getColumnArray(3, false, handler.csvDir, handler.csvName, false, 2, "");
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		unitField.setItems(unitOptions);
+		
+		
+		PrintStream ps = System.out;
+		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps)));
+		
+		System.out.println("Hello World");
 	}
 
 	@FXML
