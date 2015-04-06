@@ -8,7 +8,9 @@ import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,7 +21,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
@@ -283,59 +288,75 @@ public class EventHandlerController {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true);// Get the current data sheet
 			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
-
-			if (currentRow.length >= inputFields.length) {
+			boolean shouldSave = true;
+			
+			boolean isEmpty = true;
+			for (String item : currentRow) {
+				if (!item.equals("")) isEmpty = false;
+			}
+			
+			if (!isEmpty) {
+				Alert confirmationAlert  = new Alert(AlertType.CONFIRMATION); // Creates a confirmation alert, to ensure that you want to overwrite the data
+				confirmationAlert.setTitle("Are You Sure?");
+				confirmationAlert.setHeaderText("Are you sure you want to save?");
+				confirmationAlert.setContentText("You will overwrite existing data:\n    " + Arrays.toString(currentRow));
 				
-				boolean isEmpty = true;
-				for (String item : currentRow) {
-					if (!item.equals("")) isEmpty = false;
-				}
-				
-				if (isEmpty) {
-					
-				}
-				
-				for (int i = 0; i < inputFields.length; i++) {
-					if (i == 0 || i >= 4) {// Special conditions for the TextFields
-						currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
-					} else if (i > 0 && i <= 3) {// Special conditons for the ComboBoxes
-						currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
-					}
+				Optional<ButtonType> result = confirmationAlert.showAndWait();
+				if (result.get() != ButtonType.OK) { // If the user says no to the dialogue and cancels
+					shouldSave = false;
+					System.out.println("Save canceled!");
+				} else { // Otherwise by default the data is saved
+					System.out.print("The following data was overwritten: ");
+					System.out.println(Arrays.toString(currentRow));
 				}
 			}
 
-			dataSheet.set(numLines, currentRow); // Set the data sheet line to the modified line
-			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
-			
-			System.out.println("Saved");
-			
-			long period = 1;
-			TimerTask task = new TimerTask() {
-				int timesToRun = 201;
-				boolean isStillDecreasing = true;
-				public void run() {
-					if (timesToRun == 0) {
-						cancel();
-					} else {
-						Platform.runLater(new Runnable() {
-						    @Override 
-						    public void run() {
-						    	saveRowButton.setOpacity(opacityEaseFunction(timesToRun -201));
-						    }
-						});
-						
-						timesToRun -= 1;
+			if (shouldSave) {
+				// Save the data
+				if (currentRow.length >= inputFields.length) {
+					for (int i = 0; i < inputFields.length; i++) {
+						if (i == 0 || i >= 4) {// Special conditions for the TextFields
+							currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
+						} else if (i > 0 && i <= 3) {// Special conditons for the ComboBoxes
+							currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
+						}
 					}
 				}
-				
-				public double opacityEaseFunction(double x) {
-					double result = 0.5 * Math.cos((Math.PI * x) / 100) + 0.5;
-					return result;
-				}
-			};
-			
-			Timer timer = new Timer();
-			timer.schedule(task, 0, period);
+
+				dataSheet.set(numLines, currentRow); // Set the data sheet line to the modified line
+				handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
+
+				// Save confirmation stuff
+				System.out.println("Saved");
+
+				long period = 1;
+				TimerTask task = new TimerTask() {
+					int timesToRun = 201;
+					boolean isStillDecreasing = true;
+
+					public void run() {
+						if (timesToRun == 0) {
+							cancel();
+						} else {
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									saveRowButton.setOpacity(opacityEaseFunction(timesToRun - 201));
+								}
+							});
+
+							timesToRun -= 1;
+						}
+					}
+
+					public double opacityEaseFunction(double x) {
+						double result = 0.5 * Math.cos((Math.PI * x) / 100) + 0.5;
+						return result;
+					}
+				};
+				Timer timer = new Timer();
+				timer.schedule(task, 0, period);
+			}
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
