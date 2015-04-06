@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,7 +28,8 @@ public class DataHandler {
 	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
-		csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
+		//csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
+		csvDir = "C:/Users/JAK/Programming/Other Random Java/HomeworkData/HomeworkData/";
 		//csvDir = "C:\\Users\\JAK\\Documents\\Google Drive";
 		csvName = "HomeworkDataSem2.csv";
 		main();
@@ -119,7 +121,7 @@ public class DataHandler {
 
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
-		PrintWriter pw = new PrintWriter(new FileWriter(file));
+		PrintWriter pw = new PrintWriter(new File(dir + file));
 
 		System.out.println("Writing \"" + fill + "\" to row " + row + ", column " + column + " of " + file + ", which used to say \"" + rows.get(row)[column] + "\"");
 
@@ -155,7 +157,7 @@ public class DataHandler {
 	public void writeStringArray(ArrayList<String[]> fileArray, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
-		PrintWriter pw = new PrintWriter(new FileWriter(file));
+		PrintWriter pw = new PrintWriter(new File(dir + file));
 
 		for (int i = 0; i < fileArray.size(); i++) {
 			for (int k = 0; k < fileArray.get(i).length; k++) {
@@ -212,7 +214,7 @@ public class DataHandler {
 		
 		ArrayList<String[]> rows = readFile(dir, file, true);
 
-		PrintWriter pw = new PrintWriter(new FileWriter(file));
+		PrintWriter pw = new PrintWriter(new File(dir + file));
 
 		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file + " (directory of " + dir + ")");
 
