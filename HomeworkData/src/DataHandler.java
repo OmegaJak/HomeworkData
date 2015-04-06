@@ -12,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -25,6 +26,7 @@ public class DataHandler {
 	private static Charset charset = Charset.forName("US-ASCII");
 	public String csvDir = "";
 	public String csvName = "";
+	public Preferences prefs;
 	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
@@ -34,6 +36,7 @@ public class DataHandler {
 		//csvDir = "C:\\Users\\JAK\\Documents\\Google Drive";
 		csvName = "HomeworkDataSem2.csv";
 		main();
+		initPreferences();
 	}
 
 	public void main() { //not the real and proper main method
@@ -272,6 +275,7 @@ public class DataHandler {
 	 * @return An Arraylist of String arrays, with each String array being a row of the csv file, each index of each array a cell
 	 */
 	public ArrayList<String[]> readFile(String dir, String file, boolean allowEmptyLines) {
+		
 		try {
 			Path path = FileSystems.getDefault().getPath(dir, file); //The path to the file, needed for newBufferedReader()
 
@@ -782,5 +786,18 @@ public class DataHandler {
 		alert.getDialogPane().setExpandableContent(expContent);
 
 		alert.showAndWait();
+	}
+	
+
+	//------------------------------------------------------------------------------------//
+	//------------------------------------Preferences-------------------------------------//
+	//------------------------------------------------------------------------------------//
+	
+	public void initPreferences() {
+		prefs = Preferences.userNodeForPackage(this.getClass());
+		
+		prefs.put("csvDir", "testing prefs");
+		String csvDir = prefs.get("csvDir", "C:/Users/JAK/Documents/Google Drive/");
+		System.out.println(csvDir);
 	}
 }
