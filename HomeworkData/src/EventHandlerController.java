@@ -301,7 +301,7 @@ public class EventHandlerController {
 			
 			long period = 1;
 			TimerTask task = new TimerTask() {
-				int timesToRun = 200;
+				int timesToRun = 201;
 				boolean isStillDecreasing = true;
 				public void run() {
 					if (timesToRun == 0) {
