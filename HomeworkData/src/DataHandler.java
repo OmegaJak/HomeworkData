@@ -6,7 +6,10 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class DataHandler {
 
@@ -56,7 +59,8 @@ public class DataHandler {
 			//getCellsMeetingCriteria(new int[] {1, 3}, new String[] {"Euro", "Pages"}, "And", new int[] {6, 8});
 			
 			String[] timesToAdd = {};
-			String date = "5-Apr-15";
+			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+			String date = dateFormat.format(new Date());
 			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8});
 			for (int i = 0; i < matchingCells.size(); i++) {
 				String[] timesToAdd2 = new String[timesToAdd.length + 1];
