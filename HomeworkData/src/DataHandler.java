@@ -57,14 +57,6 @@ public class DataHandler {
 			
 			String[] timesToAdd = {};
 			String date = "5-Apr-15";
-			/*for (int i = 1; i < dataSheet.size(); i++) {
-				if (dataSheet.get(i)[0].equals(date)) {
-					String[] timesToAdd2 = new String[timesToAdd.length + 1];
-					System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
-					timesToAdd2[timesToAdd.length] = subtractTime(dataSheet.get(i)[6], dataSheet.get(i)[8]);
-					timesToAdd = timesToAdd2;
-				}
-			}*/
 			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8});
 			for (int i = 0; i < matchingCells.size(); i++) {
 				String[] timesToAdd2 = new String[timesToAdd.length + 1];
@@ -344,20 +336,7 @@ public class DataHandler {
 	}
 	
 	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
-		String[] timePerUnits = {};
-		/*String[] currentRow;
-		
-		for (int i = 0; i < datasheet.size(); i++) {
-			currentRow = datasheet.get(i);
-			if (currentRow[1].equals(homeworkClass) && currentRow[2].equals(homeworkType) && currentRow[3].equals(homeworkUnit)) {
-				String[] timePerUnits2 = new String[timePerUnits.length + 1];
-				System.arraycopy(timePerUnits, 0, timePerUnits2, 0, timePerUnits.length);
-				timePerUnits2[timePerUnits.length] = currentRow[5];
-				timePerUnits = timePerUnits2;
-			}
-		}*/
-		
-		timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}).get(0);
+		String[] timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}).get(0);
 		
 		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
 		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
