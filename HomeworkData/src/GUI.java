@@ -15,6 +15,8 @@ public class GUI extends Application {
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Homework Data");
 		
+		final long startTime = System.currentTimeMillis();
+		
 		try {
 			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("GUI2.fxml"));
 			VBox page = (VBox)loader.load();
@@ -30,6 +32,8 @@ public class GUI extends Application {
 			System.err.println("Error loading GUI2.fxml!");
 			e.printStackTrace();
 		}
+		
+		System.out.println("The loading time was: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	public static void main(String[] args) {
