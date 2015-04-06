@@ -14,8 +14,8 @@ import java.util.Date;
 public class DataHandler {
 
 	private static Charset charset = Charset.forName("US-ASCII");
-	public static String csvDir = "";
-	public static String csvName = "";
+	public String csvDir = "";
+	public String csvName = "";
 	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
