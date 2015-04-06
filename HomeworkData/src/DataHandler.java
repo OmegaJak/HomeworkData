@@ -46,11 +46,33 @@ public class DataHandler {
 			}
 			
 			dataSheet = readFile(csvDir, csvName, false);
+			
 			for (int i = 1; i < dataSheet.size(); i++) {
 				if (dataSheet.get(i).equals("")) {
 					timePerUnit(dataSheet, i);
 				}
 			}
+			
+			//getCellsMeetingCriteria(new int[] {1, 3}, new String[] {"Euro", "Pages"}, "And", new int[] {6, 8});
+			
+			String[] timesToAdd = {};
+			String date = "5-Apr-15";
+			/*for (int i = 1; i < dataSheet.size(); i++) {
+				if (dataSheet.get(i)[0].equals(date)) {
+					String[] timesToAdd2 = new String[timesToAdd.length + 1];
+					System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
+					timesToAdd2[timesToAdd.length] = subtractTime(dataSheet.get(i)[6], dataSheet.get(i)[8]);
+					timesToAdd = timesToAdd2;
+				}
+			}*/
+			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8});
+			for (int i = 0; i < matchingCells.size(); i++) {
+				String[] timesToAdd2 = new String[timesToAdd.length + 1];
+				System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
+				timesToAdd2[timesToAdd.length] = subtractTime(matchingCells.get(i)[0], matchingCells.get(i)[1]);
+				timesToAdd = timesToAdd2;
+			}
+			System.out.println(addTimes(timesToAdd));
 			
 			//multiplyTime(averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages"), 4);
 
@@ -323,7 +345,7 @@ public class DataHandler {
 	
 	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
 		String[] timePerUnits = {};
-		String[] currentRow;
+		/*String[] currentRow;
 		
 		for (int i = 0; i < datasheet.size(); i++) {
 			currentRow = datasheet.get(i);
@@ -333,7 +355,9 @@ public class DataHandler {
 				timePerUnits2[timePerUnits.length] = currentRow[5];
 				timePerUnits = timePerUnits2;
 			}
-		}
+		}*/
+		
+		timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}).get(0);
 		
 		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
 		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
@@ -360,6 +384,54 @@ public class DataHandler {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @TODO Make operator actually do something
+	 * @param columnsToLookIn - Which columns the cellValuesToMatch will be looked for in. Ex: new int[] {2, 5}
+	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in columnsToLookIn. Ex: new String[] {"Euro", "Pages"}
+	 * @param operator - An option for whether they're all required ("And"), if just one is needed ("Or"), or if it should grab all that aren't it ("Not")
+	 * @param desiredColumns - The column of the result cells. Ex: new int[] {2, 6, 8}
+	 * @return All of the cells that meet the specified criteria in an Arraylist of String arrays
+	 */
+	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns) {
+		ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+
+		ArrayList<String[]> toReturn = new ArrayList<String[]>();
+		boolean success = true;
+		String[] arrayListIndex = {};
+		for (int i = 0; i < dataSheet.size(); i++) {
+			for (int k = 0; k < columnsToLookIn.length; k++) {
+				if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+					success = false;
+					break;
+				}
+			}
+			if (success) {
+				if (desiredColumns.length > 1) {
+					for (int b : desiredColumns) {
+						String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
+						System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
+						arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
+						arrayListIndex = arrayListIndex2;
+					}
+					toReturn.add(arrayListIndex);
+					arrayListIndex = new String[] {};
+				} else if (desiredColumns.length == 1) {
+					String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
+					System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
+					arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[desiredColumns[0]];
+					arrayListIndex = arrayListIndex2;
+				}
+			}
+			success = true;
+		}
+		
+		if (desiredColumns.length == 1) {
+			toReturn.add(arrayListIndex);
+		}
+
+		return toReturn;
 	}
 	
 	/**
