@@ -285,10 +285,20 @@ public class EventHandlerController {
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
 
 			if (currentRow.length >= inputFields.length) {
+				
+				boolean isEmpty = true;
+				for (String item : currentRow) {
+					if (!item.equals("")) isEmpty = false;
+				}
+				
+				if (isEmpty) {
+					
+				}
+				
 				for (int i = 0; i < inputFields.length; i++) {
-					if (i == 0 || i >= 4) {
+					if (i == 0 || i >= 4) {// Special conditions for the TextFields
 						currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
-					} else if (i > 0 && i <= 3) {
+					} else if (i > 0 && i <= 3) {// Special conditons for the ComboBoxes
 						currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
 					}
 				}
