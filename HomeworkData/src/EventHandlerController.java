@@ -310,23 +310,17 @@ public class EventHandlerController {
 						Platform.runLater(new Runnable() {
 						    @Override 
 						    public void run() {
-						    	double opacity;
-						    	opacity = saveRowButton.getOpacity();
-						    	if (opacity > 0 && isStillDecreasing) {
-						    		saveRowButton.setOpacity(opacity - .01);
-						    	} else if (opacity <= 0.0) {
-						    		isStillDecreasing = false;
-						    		saveRowButton.setOpacity(opacity + .01);
-						    	} else if (opacity == 1.0) {
-						    		isStillDecreasing = true;
-						    	} else {
-						    		saveRowButton.setOpacity(opacity + .01);
-						    	}
+						    	saveRowButton.setOpacity(opacityEaseFunction(timesToRun -201));
 						    }
 						});
 						
 						timesToRun -= 1;
 					}
+				}
+				
+				public double opacityEaseFunction(double x) {
+					double result = 0.5 * Math.cos((Math.PI * x) / 100) + 0.5;
+					return result;
 				}
 			};
 			
