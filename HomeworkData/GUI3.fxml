@@ -186,8 +186,8 @@
                                        <children>
                                           <HBox alignment="CENTER" layoutY="-4.0" prefHeight="65.0" prefWidth="640.0">
                                              <children>
-                                                <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#newRow" text="New Row" />
-                                                <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveRow" text="Save Row" />
+                                                <Button fx:id="newRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#newRow" text="New Row" />
+                                                <Button fx:id="saveRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveRow" text="Save Row" />
                                              </children>
                                           </HBox>
                                        </children>

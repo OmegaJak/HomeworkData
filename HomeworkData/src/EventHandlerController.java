@@ -9,13 +9,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
@@ -45,6 +49,8 @@ public class EventHandlerController {
 	@FXML private TextField postMoodField;
 	@FXML private TextField focusField;
 	@FXML private TextArea consoleLog;
+	@FXML private Button newRowButton;
+	@FXML private Button saveRowButton;
 
 	private DataHandler handler;
 	private Control[] inputFields = new Control[16];
@@ -292,6 +298,41 @@ public class EventHandlerController {
 			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
 			
 			System.out.println("Saved");
+			
+			long period = 1;
+			TimerTask task = new TimerTask() {
+				int timesToRun = 200;
+				boolean isStillDecreasing = true;
+				public void run() {
+					if (timesToRun == 0) {
+						cancel();
+					} else {
+						Platform.runLater(new Runnable() {
+						    @Override 
+						    public void run() {
+						    	double opacity;
+						    	opacity = saveRowButton.getOpacity();
+						    	if (opacity > 0 && isStillDecreasing) {
+						    		saveRowButton.setOpacity(opacity - .01);
+						    	} else if (opacity <= 0.0) {
+						    		isStillDecreasing = false;
+						    		saveRowButton.setOpacity(opacity + .01);
+						    	} else if (opacity == 1.0) {
+						    		isStillDecreasing = true;
+						    	} else {
+						    		saveRowButton.setOpacity(opacity + .01);
+						    	}
+						    }
+						});
+						
+						timesToRun -= 1;
+					}
+				}
+			};
+			
+			Timer timer = new Timer();
+			timer.schedule(task, 0, period);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
