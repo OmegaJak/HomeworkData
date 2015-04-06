@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -10,6 +11,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
 public class DataHandler {
 
@@ -491,30 +499,35 @@ public class DataHandler {
 	 */
 	// TODO Add seconds capability
 	public String subtractTime(String earlierTime, String laterTime) {
-		int[] earlierParts = convertStringsToInts(findInBetween(earlierTime, ':'));
-		int[] laterParts = convertStringsToInts(findInBetween(laterTime, ':'));
-		
-		int hoursDiff = laterParts[0] - earlierParts[0];
-		if (hoursDiff < 0) {
-			laterParts[0] += 24;
-			hoursDiff = laterParts[0] - earlierParts[0];
-		}
-
-		int minutesDiff = laterParts[1] - earlierParts[1];
-		if (minutesDiff < 0) {
-			minutesDiff = 60 - earlierParts[1] + laterParts[1];
-			if (minutesDiff > 60) {
-				hoursDiff++;
-				minutesDiff -= 60;
-			} else {
-				hoursDiff--;
+		try {
+			int[] earlierParts = convertStringsToInts(findInBetween(earlierTime, ':'));
+			int[] laterParts = convertStringsToInts(findInBetween(laterTime, ':'));
+			
+			int hoursDiff = laterParts[0] - earlierParts[0];
+			if (hoursDiff < 0) {
+				laterParts[0] += 24;
+				hoursDiff = laterParts[0] - earlierParts[0];
 			}
+
+			int minutesDiff = laterParts[1] - earlierParts[1];
+			if (minutesDiff < 0) {
+				minutesDiff = 60 - earlierParts[1] + laterParts[1];
+				if (minutesDiff > 60) {
+					hoursDiff++;
+					minutesDiff -= 60;
+				} else {
+					hoursDiff--;
+				}
+			}
+			
+			String hoursReturn = "" + hoursDiff;
+			String minutesReturn = addZeroes("" + minutesDiff, 2); // Just for formatting
+			
+			return hoursReturn + ":" + minutesReturn;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			showErrorDialogue(e);
 		}
-		
-		String hoursReturn = "" + hoursDiff;
-		String minutesReturn = addZeroes("" + minutesDiff, 2); // Just for formatting
-		
-		return hoursReturn + ":" + minutesReturn;
+		return "Error";
 	}
 	
 	/**
@@ -732,5 +745,39 @@ public class DataHandler {
 		}
 		
 		return inBetween;
+	}
+	
+	public void showErrorDialogue(Exception e) { // Credit for this goes to this blog: http://code.makery.ch/blog/javafx-dialogs-official/
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Exception");
+		alert.setHeaderText("There was an exception of type " + e.getClass());
+		alert.setContentText("Shit...");
+
+		// Create expandable Exception.
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		String exceptionText = sw.toString();
+
+		Label label = new Label("The exception stacktrace was:");
+
+		TextArea textArea = new TextArea(exceptionText);
+		textArea.setEditable(false);
+		textArea.setWrapText(true);
+
+		textArea.setMaxWidth(Double.MAX_VALUE);
+		textArea.setMaxHeight(Double.MAX_VALUE);
+		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(label, 0, 0);
+		expContent.add(textArea, 0, 1);
+
+		// Set expandable Exception into the dialog pane.
+		alert.getDialogPane().setExpandableContent(expContent);
+
+		alert.showAndWait();
 	}
 }

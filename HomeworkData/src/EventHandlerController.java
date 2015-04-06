@@ -1,6 +1,9 @@
 /**
- * Credit for the basis of this goes to this blog:
+ * Credit for the original basis of this goes to this blog:
  * http://code.makery.ch/blog/javafx-2-event-handlers-and-change-listeners/
+ * 
+ * Credit for the alert dialogues goes to this blog:
+ * http://code.makery.ch/blog/javafx-dialogs-official/
  */
 
 import java.io.IOException;
