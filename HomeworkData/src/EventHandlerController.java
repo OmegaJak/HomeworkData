@@ -88,12 +88,15 @@ public class EventHandlerController {
 					}
 				});
 		
-		numUnitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into focus
+		numUnitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					checkForTimePerUnit();
 					checkForTimePrediction();
+					if (!startedField.getText().equals("")) { //If there's something in the time started field
+						checkForEndPrediction();
+					}
 				}
 			}
 		});
