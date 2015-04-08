@@ -76,13 +76,13 @@ public class DataHandler {
 			}
 			
 			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "And", new int[] {1, 3});
-			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "Or", new int[] {1, 3});
+			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "Or", new int[] {1, 3}, true, csvDir, csvName);
 			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "Not", new int[] {1, 3});
 			
 			String[] timesToAdd = {};
 			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
 			String date = dateFormat.format(new Date());
-			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8});
+			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8}, true, csvDir, csvName);
 			for (int i = 0; i < matchingCells.size(); i++) {
 				String[] timesToAdd2 = new String[timesToAdd.length + 1];
 				System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
@@ -313,6 +313,7 @@ public class DataHandler {
 	}
 	
 	/**
+	 * @deprecated
 	 * Generates an array representing the cells in a given column
 	 * @param column - The number of the column to generate from, starting at 0
 	 * @param allowDuplicates - Whether or not there can be more than one of an item in the generated array
@@ -343,63 +344,21 @@ public class DataHandler {
 		
 		return columnCells;
 	}
-
-	//-------------------------------------------------------------------------------------//
-	//--------------------------------Data analysis methods--------------------------------//
-	//-------------------------------------------------------------------------------------//
-
-	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException { // This is a different methodology than checkForTimePerUnit in EventHandlerController, but it produces the same result. Might as well leave this in.
-		try {
-			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
-			System.out.println("The calculated result was " + calculatedResult);
-			String formattedResult = convertTime(addZeroes("" + (int)(calculatedResult + 0.5), 2), "SS", "M:SS"); // The "+ 0.5" is for rounding to the nearest integer, rather than just rounding down
-			writeCell(row, 5, formattedResult, csvDir, csvName);
-		} catch (NumberFormatException e) {
-			System.out.println("What are numbers!?");
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
-	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
-		String[] timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}).get(0);
-		
-		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
-		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
-		return result;
-	}
-	
-	//------------------------------------------------------------------------------------//
-	//--------------------------------Other Helper Methods--------------------------------//
-	//------------------------------------------------------------------------------------//
-	
-	/**
-	 * Goes through given array and checks if the given string is already in the given array
-	 * @param arr - The array to check
-	 * @param toCheck - The string to check
-	 * @return Whether or not it's already been added
-	 */
-	public boolean alreadyAdded(String[] arr, String toCheck) {
-		if (arr.length == 0) {
-			return false;
-		}
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i].equals(toCheck)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * @param columnsToLookIn - Which columns the cellValuesToMatch will be looked for in. Ex: new int[] {2, 5}
-	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in columnsToLookIn. Ex: new String[] {"Euro", "Pages"}
+	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in
+	 *            columnsToLookIn. Ex: new String[] {"Euro", "Pages"}
 	 * @param operator - An option for whether they're all required ("And"), if just one is needed ("Or"), or if it should grab all that aren't it ("Not")
-	 * @param desiredColumns - The column of the result cells. Ex: new int[] {2, 6, 8}
-	 * @return All of the cells that meet the specified criteria in an Arraylist of String arrays
+	 * @param desiredColumns - The column of the result cells. Ex: new int[] {2, 6, 8}.   
+	 * 							Note: If this is only one column, then ArrayList will just contain one String[], which will contain that column.
+	 * @param allowDuplicates - Whether or not duplicate values are allowed to be returned. Ex: true: {5, 5, 2, 3, 5}, false: {5, 2, 3}
+	 * @param dir -	The directory of the file to read from
+	 * @param file - The name of the file to read from
+	 * @return All of the cells that meet the specified criteria in an Arraylist of String arrays from the desired column
 	 */
-	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns) {
-		ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, String dir, String file) {
+		ArrayList<String[]> dataSheet = readFile(dir, file, false);
 
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
 		boolean success;
@@ -432,21 +391,17 @@ public class DataHandler {
 				}
 			}
 			if (success) {
-				if (desiredColumns.length > 1) {
-					for (int b : desiredColumns) {
-						String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
-						System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
-						arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
-						arrayListIndex = arrayListIndex2;
-					}
-					toReturn.add(arrayListIndex);
-					arrayListIndex = new String[] {};
-				} else if (desiredColumns.length == 1) {
+				for (int b : desiredColumns) {
 					String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
 					System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
-					arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[desiredColumns[0]];
+					arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
 					arrayListIndex = arrayListIndex2;
 				}
+				if (desiredColumns.length > 1 && (allowDuplicates || !alreadyAdded(toReturn, arrayListIndex))) {
+					toReturn.add(arrayListIndex);
+					arrayListIndex = new String[] {};
+				}
+
 			}
 			if (operator.equals("Or"))
 				success = false;
@@ -454,11 +409,76 @@ public class DataHandler {
 				success = true;
 		}
 		
-		if (desiredColumns.length == 1) {
+		if (desiredColumns.length == 1 && (allowDuplicates || !alreadyAdded(toReturn, arrayListIndex))) {
 			toReturn.add(arrayListIndex);
 		}
 
 		return toReturn;
+	}
+
+	//-------------------------------------------------------------------------------------//
+	//--------------------------------Data analysis methods--------------------------------//
+	//-------------------------------------------------------------------------------------//
+
+	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException { // This is a different methodology than checkForTimePerUnit in EventHandlerController, but it produces the same result. Might as well leave this in.
+		try {
+			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
+			System.out.println("The calculated result was " + calculatedResult);
+			String formattedResult = convertTime(addZeroes("" + (int)(calculatedResult + 0.5), 2), "SS", "M:SS"); // The "+ 0.5" is for rounding to the nearest integer, rather than just rounding down
+			writeCell(row, 5, formattedResult, csvDir, csvName);
+		} catch (NumberFormatException e) {
+			System.out.println("What are numbers!?");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
+		String[] timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}, true, csvDir, csvName).get(0);
+		
+		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
+		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
+		return result;
+	}
+	
+	//------------------------------------------------------------------------------------//
+	//--------------------------------Other Helper Methods--------------------------------//
+	//------------------------------------------------------------------------------------//
+	
+	/**
+	 * Goes through given array and checks if the given string is already in the given array
+	 * @param arr - The array to check
+	 * @param toCheck - The string to check
+	 * @return Whether or not it's already been added
+	 */
+	public boolean alreadyAdded(String[] arr, String toCheck) {
+		if (arr.length == 0) {
+			return false;
+		}
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i].equals(toCheck)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Goes through given ArrayList and checks if the exact given String array is already in the given array 
+	 * @param arr - The array to check
+	 * @param toCheck - The string to check
+	 * @return Whether or not it's already been added
+	 */
+	public boolean alreadyAdded(ArrayList<String[]> arr, String[] toCheck) {
+		if (arr.size() == 0) {
+			return false;
+		}
+		for (int i = 0; i < arr.size(); i++) {
+			if (arr.get(i).equals(toCheck)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
