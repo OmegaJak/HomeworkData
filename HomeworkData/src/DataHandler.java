@@ -75,7 +75,6 @@ public class DataHandler {
 				}
 			}
 			
-			//getCellsMeetingCriteria(new int[] {1, 3}, new String[] {"Euro", "Pages"}, "And", new int[] {6, 8});
 			
 			String[] timesToAdd = {};
 			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
@@ -390,7 +389,6 @@ public class DataHandler {
 	}
 
 	/**
-	 * @TODO Make operator actually do something
 	 * @param columnsToLookIn - Which columns the cellValuesToMatch will be looked for in. Ex: new int[] {2, 5}
 	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in columnsToLookIn. Ex: new String[] {"Euro", "Pages"}
 	 * @param operator - An option for whether they're all required ("And"), if just one is needed ("Or"), or if it should grab all that aren't it ("Not")
@@ -401,13 +399,33 @@ public class DataHandler {
 		ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
 
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
-		boolean success = true;
+		boolean success;
+		if (operator.equals("Or"))
+			success = false;
+		else
+			success = true;
 		String[] arrayListIndex = {};
-		for (int i = 0; i < dataSheet.size(); i++) {
-			for (int k = 0; k < columnsToLookIn.length; k++) {
-				if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-					success = false;
-					break;
+		for (int i = 0; i < dataSheet.size(); i++) { // Loops 'top to bottom' through the whole data sheet
+			for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row
+				switch (operator) {
+					case "And":
+						if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+							success = false;
+							break;
+						}
+						break;
+					case "Or":
+						if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+							success = true;
+							break;
+						}
+						break;
+					case "Not":
+						if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+							success = false;
+							break;
+						}
+						break;
 				}
 			}
 			if (success) {
@@ -427,7 +445,10 @@ public class DataHandler {
 					arrayListIndex = arrayListIndex2;
 				}
 			}
-			success = true;
+			if (operator.equals("Or"))
+				success = false;
+			else
+				success = true;
 		}
 		
 		if (desiredColumns.length == 1) {
