@@ -75,6 +75,9 @@ public class DataHandler {
 				}
 			}
 			
+			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "And", new int[] {1, 3});
+			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "Or", new int[] {1, 3});
+			//getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {"Physics C", "Webassign", "Points"}, "Not", new int[] {1, 3});
 			
 			String[] timesToAdd = {};
 			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
