@@ -24,6 +24,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -36,6 +38,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class EventHandlerController {
 
@@ -287,6 +291,10 @@ public class EventHandlerController {
 		}
 		return allFilled;
 	}
+	
+	public DataHandler getDataHandler() {
+		return this.handler;
+	}
 
 	@FXML
 	private void saveRow() {
@@ -411,5 +419,24 @@ public class EventHandlerController {
 	@FXML
 	private void autoFillWasted() {
 		spentField.setText("0:00");
+	}
+	
+	@FXML
+	private void showPreferences() {
+		try {
+			Stage prefStage = new Stage();
+			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("Preferences.fxml"));
+			VBox page = (VBox)loader.load();
+			page.requestFocus(); // Just so it doesn't focus some textField by default
+			Scene scene = new Scene(page);
+			prefStage.setScene(scene);
+			prefStage.show();
+			((PreferencesHandler)loader.getController()).setPrefArrays(this.handler.prefKeys, this.handler.prefDefs); // Just so it knows what the pref keys and defs are, coming from DataHandler
+			((PreferencesHandler)loader.getController()).setDefaultPrefValues();
+			((PreferencesHandler)loader.getController()).handler = this.handler;
+		} catch (IOException e) {
+			System.out.println("Something went wrong with loading the preferences window in showPreferences()");
+			e.printStackTrace();
+		}
 	}
 }

@@ -12,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javafx.scene.control.Alert;
@@ -27,8 +28,8 @@ public class DataHandler {
 	public String csvDir = "";
 	public String csvName = "";
 	public Preferences prefs;
-	private String[] prefKeys = {"csvDir", "csvName"}; // An array of the keys for all the preferences
-	private String[] prefDefs = {"C:/Users/JAK/Documents/Google Drive/", "HomeworkDataSem2"}; // An array of the defaults for all the preferences, corresponding indexes to the prefKeys
+	public String[] prefKeys = {"csvDir", "csvName"}; // An array of the keys for all the preferences
+	public String[] prefDefs = {"C:/Users/JAK/Documents/Google Drive/", "HomeworkDataSem2"}; // An array of the defaults for all the preferences, corresponding indexes to the prefKeys
 
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
@@ -39,8 +40,7 @@ public class DataHandler {
 		//csvName = "HomeworkDataSem2.csv";
 		
 		initPreferences();
-		csvDir = prefs.get(prefKeys[0], prefDefs[0]); // Set the csvDir to the stored preference value
-		csvName = prefs.get(prefKeys[1], prefDefs[1]) + ".csv"; // The extra ".csv" is necessary because the user isn't allowed to change that in the preferences, so it isn't a part of the stored value
+		refreshPreferences();
 		main();
 	}
 
@@ -797,17 +797,35 @@ public class DataHandler {
 	//------------------------------------------------------------------------------------//
 	//------------------------------------Preferences-------------------------------------//
 	//------------------------------------------------------------------------------------//
-	
+
 	public void initPreferences() {
-		prefs = Preferences.userNodeForPackage(this.getClass());
+		prefs = Preferences.userRoot().node(this.getClass().getName());
 		
 		for (int i = 0; i < prefKeys.length; i++) {
 			if (prefs.get(prefKeys[i], prefDefs[i]).equals(prefDefs[i])) { // If it's the default value currently, this works because .get() returns the default value given when no value is found
 				prefs.put(prefKeys[i], prefDefs[i]); // Make sure the key is there with the default value, otherwise
 			}
 		}
-		
+
 		String csvDir = prefs.get("csvDir", "C:/Users/JAK/Documents/Google Drive/asdf");
 		System.out.println(csvDir);
+
+		try {
+			prefs.sync(); // Not entirely sure that I need this or what exactly it does, but it seems like a good idea 
+		} catch (BackingStoreException e) {
+			System.out.println("The syncing operation in initPreferences() failed");
+			e.printStackTrace();
+		}
+	}
+	
+	public void resetPreferencesToDefaults() {
+		for (int i = 0; i < prefKeys.length; i++) {
+			prefs.put(prefKeys[i], prefDefs[i]);
+		}
+	}
+	
+	public void refreshPreferences() {
+		csvDir = prefs.get(prefKeys[0], prefDefs[0]); // Set the csvDir to the stored preference value
+		csvName = prefs.get(prefKeys[1], prefDefs[1]) + ".csv"; // The extra ".csv" is necessary because the user isn't allowed to change that in the preferences, so it isn't a part of the stored value
 	}
 }
