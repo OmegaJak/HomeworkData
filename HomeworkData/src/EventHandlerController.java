@@ -233,16 +233,6 @@ public class EventHandlerController {
 			e.printStackTrace();
 		}
 	}
-
-	private void clearInputs() {
-		for (int i = 0; i < inputFields.length; i++) {
-			if (i == 0 || i > 3) {
-				((TextField)inputFields[i]).setText("");
-			} else if (i > 0 && i < 3) {
-				((ComboBox)inputFields[i]).getEditor().setText("");
-			}
-		}
-	}
 	
 	private void checkForTimePrediction() {
 		TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
@@ -346,7 +336,6 @@ public class EventHandlerController {
 				long period = 1;
 				TimerTask task = new TimerTask() {
 					int timesToRun = 201;
-					boolean isStillDecreasing = true;
 
 					public void run() {
 						if (timesToRun == 0) {
