@@ -313,39 +313,6 @@ public class DataHandler {
 	}
 	
 	/**
-	 * @deprecated
-	 * Generates an array representing the cells in a given column
-	 * @param column - The number of the column to generate from, starting at 0
-	 * @param allowDuplicates - Whether or not there can be more than one of an item in the generated array
-	 * @param dir - The directory of the file to read from
-	 * @param file - The name of the file to read from
-	 * @param allowEmptyLines - Whether or not empty lines are allowed when reading the file
-	 * @return A String[] representing the individual cells in a given column
-	 */
-	public String[] getColumnArray(int column, boolean allowDuplicates, String dir, String file, boolean allowEmptyLines, int conditionalColumn, String ifMatches) {
-		ArrayList<String[]> rows = readFile(dir, file, allowEmptyLines);
-		String[] columnCells = {};
-		
-		for (int i = 1; i < rows.size(); i++) {
-			if (ifMatches.length() > 0 ? rows.get(i)[conditionalColumn].equals(ifMatches) : true) {
-				if (!allowDuplicates && !alreadyAdded(columnCells, rows.get(i)[column])) {
-					String[] columnCells2 = new String[columnCells.length + 1];
-					System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
-					columnCells2[columnCells.length] = rows.get(i)[column];
-					columnCells = columnCells2;
-				} else if (allowDuplicates) {
-					String[] columnCells2 = new String[columnCells.length + 1];
-					System.arraycopy(columnCells, 0, columnCells2, 0, columnCells.length);
-					columnCells2[columnCells.length] = rows.get(i)[column];
-					columnCells = columnCells2;
-				}
-			}
-		}
-		
-		return columnCells;
-	}
-	
-	/**
 	 * @param columnsToLookIn - Which columns the cellValuesToMatch will be looked for in. Ex: new int[] {2, 5}
 	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in
 	 *            columnsToLookIn. Ex: new String[] {"Euro", "Pages"}
@@ -391,15 +358,17 @@ public class DataHandler {
 				}
 			}
 			if (success) {
-				for (int b : desiredColumns) {
-					String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
-					System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
-					arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
-					arrayListIndex = arrayListIndex2;
-				}
-				if (desiredColumns.length > 1 && (allowDuplicates || !alreadyAdded(toReturn, arrayListIndex))) {
-					toReturn.add(arrayListIndex);
-					arrayListIndex = new String[] {};
+				if (allowDuplicates || (desiredColumns.length > 1 ? !alreadyAdded(toReturn, arrayListIndex) : !alreadyAdded(arrayListIndex, dataSheet.get(i)[desiredColumns[0]]))) {
+					for (int b : desiredColumns) {
+						String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
+						System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
+						arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
+						arrayListIndex = arrayListIndex2;
+					}
+					if (desiredColumns.length > 1) {
+						toReturn.add(arrayListIndex);
+						arrayListIndex = new String[] {};
+					}
 				}
 
 			}
