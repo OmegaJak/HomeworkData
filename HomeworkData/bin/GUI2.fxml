@@ -244,9 +244,9 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                  <Tab closable="false" text="Graphs">
+                  <Tab fx:id="graphTab" closable="false" text="Graphs">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane fx:id="graphTabPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <Label layoutX="14.0" layoutY="14.0" text="Graph to Display:">
                                  <font>
@@ -254,7 +254,7 @@
                                  </font>
                               </Label>
                               <ChoiceBox fx:id="graphPicker" layoutX="148.0" layoutY="14.0" prefWidth="200.0" />
-                              <AnchorPane layoutX="14.0" layoutY="49.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                              <AnchorPane fx:id="graphDisplay" layoutX="14.0" layoutY="49.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
                            </children>
                         </AnchorPane>
                     </content>

@@ -91,6 +91,8 @@ public class DataHandler {
 			}
 			System.out.println(addTimes(timesToAdd));
 			
+			getClassTotalTimes(csvDir, csvName);
+			
 			//multiplyTime(averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages"), 4);
 
 			/*for (int i = 0; i < rows.size(); i++) {
@@ -408,6 +410,27 @@ public class DataHandler {
 		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
 		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
 		return result;
+	}
+	
+	public ArrayList<String[]> getClassTotalTimes(String csvDir, String csvName) {
+		String[] valuesToMatch = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
+		
+		ArrayList<ArrayList<String[]>> superList = new ArrayList<ArrayList<String[]>>();
+		ArrayList<String[]> relevantColumns;
+		for (int i = 0; i < valuesToMatch.length; i++) {
+			relevantColumns = getCellsMeetingCriteria(new int[] {1}, new String[] {valuesToMatch[i]}, "Or", new int[] {1, 6, 8}, true, csvDir, csvName);
+			superList.add(relevantColumns);
+		}
+		
+		ArrayList<String[]> toReturn = new ArrayList<String[]>();
+		for (int i = 0; i < relevantColumns.size(); i++) {
+			String[] subtractedColumn = new String[relevantColumns.size()];
+			for (int k = 0; k < subtractedColumn.length; k++) {
+				subtractedColumn[k] = subtractTime(relevantColumns.get(i)[1], relevantColumns.get(i)[2]);
+			}
+		}
+		
+		return null;
 	}
 	
 	//------------------------------------------------------------------------------------//

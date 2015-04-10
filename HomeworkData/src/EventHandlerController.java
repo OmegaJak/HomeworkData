@@ -30,13 +30,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -63,6 +66,8 @@ public class EventHandlerController {
 	@FXML private TextArea consoleLog;
 	@FXML private Button newRowButton;
 	@FXML private Button saveRowButton;
+	@FXML private ChoiceBox graphPicker;
+	@FXML private AnchorPane graphDisplay;
 
 	private DataHandler handler;
 	private Control[] inputFields = new Control[16];
@@ -199,7 +204,8 @@ public class EventHandlerController {
 				}
 			}
 		});
-		
+	
+		new GraphTabListener(graphDisplay, graphPicker, handler);		
 		
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);
