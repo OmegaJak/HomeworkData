@@ -1,15 +1,12 @@
 import java.util.ArrayList;
 
 import javafx.animation.PathTransition;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -59,7 +56,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					}
 					ObservableList<PieChart.Data> pieChartData = obsArr;
 					
-					final PieChart chart = new PieChart(pieChartData);
+					final CustomPieChart chart = new CustomPieChart(pieChartData);
 					chart.setTitle(graphNames[newValue.intValue()]);
 					
 					for (PieChart.Data data : pieChartData) {
@@ -132,7 +129,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
 				path.getElements().add(new MoveTo(xCenter + n.getTranslateX(), yCenter + n.getTranslateY())); // Where it's starting
 				path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
-
+				
 				PathTransition pathTransition = new PathTransition();
 				pathTransition.setDuration(ANIMATION_DURATION);
 				pathTransition.setNode(n);
@@ -141,6 +138,29 @@ public class GraphTabListener implements ChangeListener<Number> {
 				pathTransition.setAutoReverse(false);
 
 				pathTransition.play();
+				
+				Path drawnPath = ((CustomPieChart)n.getParent().getParent()).getLabelLinePath();
+				Path labelPath = new Path();
+				xCenter = ((MoveTo)drawnPath.getElements().get(0)).getX();
+				yCenter = ((MoveTo)drawnPath.getElements().get(0)).getY();
+				labelPath.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
+				labelPath.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+				
+				PathTransition pathTransition2 = new PathTransition();
+				pathTransition2.setDuration(ANIMATION_DURATION);
+				pathTransition2.setNode(drawnPath);
+				pathTransition2.setPath(labelPath);
+				pathTransition2.setCycleCount(1);
+				pathTransition2.setAutoReverse(false);
+
+				pathTransition2.play();
+				
+				for (Node chartNode : ((CustomPieChart)n.getParent().getParent()).getChartChildren()) {
+					System.out.println(chartNode.toString());
+				}
+				System.out.println("-------------------------------");
+				
+				((CustomPieChart)n.getParent().getParent()).parseChildren();
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
 				Node n = (Node)event.getSource();
 

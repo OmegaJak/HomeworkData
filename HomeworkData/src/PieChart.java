@@ -23,9 +23,8 @@
  *
  */
 
-package javafx.scene.chart;
-
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,6 +50,11 @@ import javafx.beans.value.WritableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableDoubleProperty;
+import javafx.css.StyleableProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
@@ -72,17 +76,8 @@ import javafx.util.Duration;
 import com.sun.javafx.charts.Legend;
 import com.sun.javafx.charts.Legend.LegendItem;
 import com.sun.javafx.collections.NonIterableChange;
-
-import javafx.css.StyleableBooleanProperty;
-import javafx.css.StyleableDoubleProperty;
-import javafx.css.CssMetaData;
-
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.SizeConverter;
-import java.util.BitSet;
-
-import javafx.css.Styleable;
-import javafx.css.StyleableProperty;
 
 /**
  * Displays a PieChart. The chart content is populated by pie slices based on
@@ -104,7 +99,7 @@ public class PieChart extends Chart {
     private double centerY;
     private double pieRadius;
     private Data begin = null;
-    private final Path labelLinePath = new Path() {
+    final Path labelLinePath = new Path() {
         @Override public boolean usesMirroring() {
             return false;
         }
@@ -725,7 +720,7 @@ public class PieChart extends Chart {
         return (fuzzyCompare(o1, o2) == -1) ? true : false;
     }
 
-    private void drawLabelLinePath(LabelLayoutInfo info) {
+    public void drawLabelLinePath(LabelLayoutInfo info) {
         info.text.setLayoutX(info.textX);
         info.text.setLayoutY(info.textY);
         labelLinePath.getElements().add(new MoveTo(info.startX, info.startY));
