@@ -412,25 +412,42 @@ public class DataHandler {
 		return result;
 	}
 	
+	/**\
+	 * Get the total amount of time spent on each class
+	 * @param csvDir - The directory of the properly formatted csv to analyze
+	 * @param csvName - The name of the properly formatted csv to analyze
+	 * @return An ArrayList of String arrays for each class, in the format of String{"Class", "Total Time"}
+	 */
 	public ArrayList<String[]> getClassTotalTimes(String csvDir, String csvName) {
-		String[] valuesToMatch = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
+		String[] classNames = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
 		
 		ArrayList<ArrayList<String[]>> superList = new ArrayList<ArrayList<String[]>>();
-		ArrayList<String[]> relevantColumns;
-		for (int i = 0; i < valuesToMatch.length; i++) {
-			relevantColumns = getCellsMeetingCriteria(new int[] {1}, new String[] {valuesToMatch[i]}, "Or", new int[] {1, 6, 8}, true, csvDir, csvName);
+		//Looks something like this:
+		//ArrayList{ArrayList{String{"Euro"}, String{"1:23", "2:34"}}, ArrayList{String{"Lit"}, String{"5:34", 6:21"}}}
+		
+		ArrayList<String[]> relevantColumns = new ArrayList<String[]>();
+		for (String className : classNames) {
+			relevantColumns = getCellsMeetingCriteria(new int[] {1}, new String[] {className}, "Or", new int[] {6, 8}, true, csvDir, csvName);
+			relevantColumns.add(0, new String[] {className});
 			superList.add(relevantColumns);
 		}
 		
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
-		for (int i = 0; i < relevantColumns.size(); i++) {
-			String[] subtractedColumn = new String[relevantColumns.size()];
-			for (int k = 0; k < subtractedColumn.length; k++) {
-				subtractedColumn[k] = subtractTime(relevantColumns.get(i)[1], relevantColumns.get(i)[2]);
+		for (int i = 0; i < superList.size(); i++) { // Which class we're dealing with
+			String[] subtractedClass = new String[superList.get(i).size() - 1]; // Will end up being something like: {"Euro", "2:45", "1:23"}
+			for (int k = 1; k < superList.get(i).size(); k++) { // The String array in the class that we're dealing with
+				subtractedClass[k - 1] = subtractTime(superList.get(i).get(k)[0], superList.get(i).get(k)[1]);
 			}
+			toReturn.add(subtractedClass);
 		}
 		
-		return null;
+		for (int i = 0; i < toReturn.size(); i++) {
+			String tempTotal = addTimes(toReturn.get(i));
+			toReturn.remove(i);
+			toReturn.add(i, new String[] {classNames[i], tempTotal});
+		}
+
+		return toReturn;
 	}
 	
 	//------------------------------------------------------------------------------------//
