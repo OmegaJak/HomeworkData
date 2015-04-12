@@ -158,7 +158,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				double yCenter = 0;
 				double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
 				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
-				path.getElements().add(new MoveTo(xCenter + n.getTranslateX(), yCenter + n.getTranslateY()));
+				path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY())));
 				path.getElements().add(new LineTo(xCenter, yCenter));
 
 				PathTransition pathTransition = new PathTransition();
