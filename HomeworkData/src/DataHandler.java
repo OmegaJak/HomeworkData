@@ -91,7 +91,7 @@ public class DataHandler {
 			}
 			System.out.println(addTimes(timesToAdd));
 			
-			getClassTotalTimes(csvDir, csvName);
+			//getClassTotalTimes(csvDir, csvName);
 			
 			//multiplyTime(averageTimeSpent(readFile(csvDir, csvName, false), "Euro", "Textbook Reading", "Pages"), 4);
 
@@ -416,7 +416,7 @@ public class DataHandler {
 	 * Get the total amount of time spent on each class
 	 * @param csvDir - The directory of the properly formatted csv to analyze
 	 * @param csvName - The name of the properly formatted csv to analyze
-	 * @return An ArrayList of String arrays for each class, in the format of String{"Class", "Total Time"}
+	 * @return An ArrayList of String arrays for each class, in the format of String{"Class", "Total Time (format of HH:MM)"}
 	 */
 	public ArrayList<String[]> getClassTotalTimes(String csvDir, String csvName) {
 		String[] classNames = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
@@ -444,7 +444,7 @@ public class DataHandler {
 		for (int i = 0; i < toReturn.size(); i++) {
 			String tempTotal = addTimes(toReturn.get(i));
 			toReturn.remove(i);
-			toReturn.add(i, new String[] {classNames[i], tempTotal});
+			toReturn.add(i, new String[] {classNames[i], tempTotal.substring(2)});
 		}
 
 		return toReturn;
