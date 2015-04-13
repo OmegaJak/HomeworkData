@@ -19,6 +19,10 @@ public class CustomPieChart extends PieChart{
 		return super.labelLinePath;
 	}
 	
+	/**
+	 * Categorizes the children of the chart into nice groupings
+	 * @return An ArrayList formatted as such: ArrayList{ArrayList{Region, Text, ArrayList<PathElement>}, ...}
+	 */
 	public ArrayList<ArrayList<Object>> parseChildren() {
 		ArrayList<ArrayList<Object>> toReturn = new ArrayList<ArrayList<Object>>();
 		ObservableList<Node> children = this.getChartChildren();
@@ -32,19 +36,7 @@ public class CustomPieChart extends PieChart{
 			}
 
 			if (child instanceof Path) {
-				ObservableList<PathElement> pathElements = ((Path)child).getElements();
-
-				categorizedElements.add(new ArrayList<PathElement>());
-				int categoryCounter = 0;
-				for (int k = 0; k < pathElements.size(); k++) {
-					PathElement element = pathElements.get(k);
-					categorizedElements.get(categoryCounter).add(element);
-					
-					if (element instanceof ClosePath && k != pathElements.size() - 1) {
-						categorizedElements.add(new ArrayList<PathElement>());
-						categoryCounter++;
-					}
-				}
+				categorizedElements = getCategorizedPathElements(((Path)child).getElements());
 			}
 		}
 		
@@ -62,6 +54,35 @@ public class CustomPieChart extends PieChart{
 			}
 		}
 		
+		int pathCounter = 0;
+		for (ArrayList<PathElement> elementArray : categorizedElements) {
+			toReturn.get(pathCounter).add(elementArray);
+			pathCounter++;
+		}
+		
 		return toReturn;
+	}
+	
+	/**
+	 * Each sub-ArrayList represents a Path
+	 * @param pathElements
+	 * @return
+	 */
+	public ArrayList<ArrayList<PathElement>> getCategorizedPathElements(ObservableList<PathElement> pathElements) {
+		ArrayList<ArrayList<PathElement>> categorizedElements = new ArrayList<ArrayList<PathElement>>();
+		
+		categorizedElements.add(new ArrayList<PathElement>());
+		int categoryCounter = 0;
+		for (int k = 0; k < pathElements.size(); k++) {
+			PathElement element = pathElements.get(k);
+			categorizedElements.get(categoryCounter).add(element);
+			
+			if (element instanceof ClosePath && k != pathElements.size() - 1) {
+				categorizedElements.add(new ArrayList<PathElement>());
+				categoryCounter++;
+			}
+		}
+		
+		return categorizedElements;
 	}
 }

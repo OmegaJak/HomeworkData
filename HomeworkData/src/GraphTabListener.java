@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 
@@ -139,6 +140,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 				pathTransition.play();
 				
+				
 				Path drawnPath = ((CustomPieChart)n.getParent().getParent()).getLabelLinePath();
 				Path labelPath = new Path();
 				xCenter = ((MoveTo)drawnPath.getElements().get(0)).getX();
@@ -160,7 +162,14 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 				System.out.println("-------------------------------");
 				
-				((CustomPieChart)n.getParent().getParent()).parseChildren();
+				ArrayList<ArrayList<Object>> chartChildren = ((CustomPieChart)n.getParent().getParent()).parseChildren();
+				for (int i = 0; i < chartChildren.size(); i++) {
+					ArrayList<Object> list = chartChildren.get(i);
+					
+					if (list.get(0).equals(n)) {
+						System.out.println(((Text)list.get(1)).getText());
+					}
+				}
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
 				Node n = (Node)event.getSource();
 
