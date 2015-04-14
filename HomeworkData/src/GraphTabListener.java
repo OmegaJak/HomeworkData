@@ -107,9 +107,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 		static final double ANIMATION_DISTANCE = 0.1;
 		private double cos;
 		private double sin;
-		private PieChart chart;
+		private CustomPieChart chart;
 
-		public MouseHoverAnimation(PieChart.Data d, PieChart chart) {
+		public MouseHoverAnimation(PieChart.Data d, CustomPieChart chart) {
 			this.chart = chart;
 			double start = 0;
 			double angle = calcAngle(d); // Figures out how many degrees wide the slice is
@@ -136,54 +136,18 @@ public class GraphTabListener implements ChangeListener<Number> {
 					minX = Math.min(minX, d.getNode().getBoundsInParent().getMinX());
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
-
-				double diameter = maxX - minX; // Just the difference between the right edge and the left edge
-				Path path = new Path();
-				double xCenter = 0;
-				double yCenter = 0;
-				double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
-				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
-				path.getElements().add(new MoveTo(xCenter + n.getTranslateX(), yCenter + n.getTranslateY())); // Where it's starting
-				path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
-				
-				PathTransition pathTransition = new PathTransition();
-				pathTransition.setDuration(ANIMATION_DURATION);
-				pathTransition.setNode(n);
-				pathTransition.setPath(path);
-				pathTransition.setCycleCount(1);
-				pathTransition.setAutoReverse(false);
-
-				pathTransition.play();
 				
 				
 				ArrayList<LabelLayoutInfo> fullPieLabels = ((CustomPieChart)n.getParent().getParent()).getFullPieLabels();
 				ArrayList<Region> fullPieRegions  = ((CustomPieChart)n.getParent().getParent()).getFullPieRegions();
 				
 				int sliceIndex = 0;
-				for (int i = 0; i < fullPieRegions.size() / 2; i++) {
+				for (int i = 0; i < fullPieRegions.size(); i++) {
 					if (fullPieRegions.get(i).equals(n)) {
 						sliceIndex = i;
 						System.out.println("i is " + i);
 					}
 				}
-				//System.out.println(fullPieRegions.toString());
-				
-				
-				
-				
-				/*for (Node chartNode : ((CustomPieChart)n.getParent().getParent()).getChartChildren()) {
-					System.out.println(chartNode.toString());
-				}
-				System.out.println("-------------------------------");*/
-				
-				/*ArrayList<ArrayList<Object>> chartChildren = ((CustomPieChart)n.getParent().getParent()).parseChildren();
-				for (int i = 0; i < chartChildren.size(); i++) {
-					ArrayList<Object> list = chartChildren.get(i);
-					
-					if (list.get(0).equals(n)) {
-						System.out.println(((Text)list.get(1)).getText());
-					}
-				}*/
 				
 				ArrayList<ArrayList<PathElement>> drawnPathElements = ((CustomPieChart)n.getParent().getParent()).getCategorizedPathElements(((CustomPieChart)n.getParent().getParent()).getLabelLinePath().getElements());
 
@@ -212,25 +176,39 @@ public class GraphTabListener implements ChangeListener<Number> {
 					}
 				}
 				
-				Path relevantPath = paths.get(sliceIndex);
-				Path pathPath = new Path();
-				xCenter = ((MoveTo)relevantPath.getElements().get(0)).getX();
-				yCenter = ((MoveTo)relevantPath.getElements().get(0)).getY();
-				double xDiff = (((MoveTo)relevantPath.getElements().get(2)).getX() - ((MoveTo)relevantPath.getElements().get(0)).getX()) / 2.0;
-				double yDiff = (((MoveTo)relevantPath.getElements().get(2)).getY() - ((MoveTo)relevantPath.getElements().get(0)).getY()) / 2.0;
-				xCenter += xDiff;
-				yCenter += yDiff;
-				pathPath.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
-				pathPath.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+				//---Actually animating now
+				double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
+				double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
+				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
+				double xCenter = 0;
+				double yCenter = 0;
 				
-				PathTransition pathTransition2 = new PathTransition();
-				pathTransition2.setDuration(ANIMATION_DURATION);
-				pathTransition2.setNode(relevantPath);
-				pathTransition2.setPath(pathPath);
-				pathTransition2.setCycleCount(1);
-				pathTransition2.setAutoReverse(false);
+				for (int i = 0; i < 3; i++) {
+					Path path = new Path();
+					PathTransition pathTransition = new PathTransition();
+					if (i == 0) { // Animating the slice (Region)
+						xCenter = 0;
+						yCenter = 0;
+						path.getElements().add(new MoveTo(xCenter + n.getTranslateX(), yCenter + n.getTranslateY())); // Where it's starting
+						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+						pathTransition.setNode(n);
+					} else if (i == 1) { // Animating the line
+						Path relevantPath = paths.get(sliceIndex);
+						xCenter = ((MoveTo)relevantPath.getElements().get(0)).getX() + ((((MoveTo)relevantPath.getElements().get(2)).getX() - ((MoveTo)relevantPath.getElements().get(0)).getX()) / 2.0);
+						yCenter = ((MoveTo)relevantPath.getElements().get(0)).getY() + ((((MoveTo)relevantPath.getElements().get(2)).getY() - ((MoveTo)relevantPath.getElements().get(0)).getY()) / 2.0);
+						path.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
+						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+						pathTransition.setNode(relevantPath);
+					} else if (i == 2) { // Animating the label
+						
+					}
+					pathTransition.setDuration(ANIMATION_DURATION);
+					pathTransition.setPath(path);
+					pathTransition.setCycleCount(1);
+					pathTransition.setAutoReverse(false);
 
-				pathTransition2.play();
+					pathTransition.play();
+				}
 
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
 				Node n = (Node)event.getSource();

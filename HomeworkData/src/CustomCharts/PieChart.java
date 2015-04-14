@@ -529,6 +529,9 @@ public class PieChart extends Chart {
 
     /** @inheritDoc */
     @Override protected void layoutChartChildren(double top, double left, double contentWidth, double contentHeight) {
+    	fullPieRegions = new ArrayList<Region>();
+    	fullPiePathEndPoints = new ArrayList<ArrayList<Double>>();
+    	
         centerX = contentWidth/2 + left;
         centerY = contentHeight/2 + top;
         double total = 0.0;
