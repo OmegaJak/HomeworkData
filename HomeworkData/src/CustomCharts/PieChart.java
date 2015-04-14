@@ -1,3 +1,4 @@
+package CustomCharts;
 /*
  * Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
@@ -91,6 +92,10 @@ import com.sun.javafx.css.converters.SizeConverter;
 public class PieChart extends Chart {
 
     // -------------- PRIVATE FIELDS -----------------------------------------------------------------------------------
+	public ArrayList<LabelLayoutInfo> fullPieLabels = null;
+	public ArrayList<Region> fullPieRegions = new ArrayList<Region>();
+	public ArrayList<ArrayList<Double>> fullPiePathEndPoints = new ArrayList<ArrayList<Double>>();
+	
     private static final int MIN_PIE_RADIUS = 25;
     private static final double LABEL_TICK_GAP = 6;
     private static final double LABEL_BALL_RADIUS = 2;
@@ -619,6 +624,13 @@ public class PieChart extends Chart {
                     // do the line (Path)for labels
                     double lineEndX = sliceCenterEdgeX +labelsX[index];
                     double lineEndY = sliceCenterEdgeY +labelsY[index];
+                    
+                    ArrayList<Double> pathPoints = new ArrayList<Double>();
+                    pathPoints.add(lineEndX);
+                    pathPoints.add(lineEndY);
+                    
+                    this.fullPiePathEndPoints.add(pathPoints);
+                    
                     LabelLayoutInfo info = new LabelLayoutInfo(sliceCenterEdgeX,
                             sliceCenterEdgeY,lineEndX, lineEndY, xval, yval, item.textNode, Math.abs(size));
                     fullPie.add(info);
@@ -660,6 +672,7 @@ public class PieChart extends Chart {
                         arcRegion.setScaleShape(false);
                         arcRegion.setCenterShape(false);
                         arcRegion.setCacheShape(false);
+                        this.fullPieRegions.add(arcRegion);
                     }
                 }
                 double size = (isClockwise()) ? (-scale * Math.abs(item.getCurrentPieValue())) : (scale * Math.abs(item.getCurrentPieValue()));
@@ -679,6 +692,8 @@ public class PieChart extends Chart {
                     if (info.text.isVisible()) drawLabelLinePath(info);
                 }
             }
+            
+            this.fullPieLabels = fullPie;
         }
     }
 
@@ -789,15 +804,15 @@ public class PieChart extends Chart {
     // -------------- INNER CLASSES --------------------------------------------
 
     // Class holding label line layout info for collision detection and removal
-    final static class LabelLayoutInfo {
-        double startX;
-        double startY;
-        double endX;
-        double endY;
-        double textX;
-        double textY;
-        Text text;
-        double size;
+    public final static class LabelLayoutInfo {
+        public double startX;
+        public double startY;
+        public double endX;
+        public double endY;
+        public double textX;
+        public double textY;
+        public Text text;
+        public double size;
 
         public LabelLayoutInfo(double startX, double startY, double endX, double endY,
                 double textX, double textY, Text text, double size) {

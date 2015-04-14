@@ -1,3 +1,4 @@
+package CustomCharts;
 /*
  * Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
@@ -260,7 +261,7 @@ public abstract class Chart extends Region {
      *
      * @return Observable list of plot children
      */
-    protected ObservableList<Node> getChartChildren() {
+    public ObservableList<Node> getChartChildren() {
         return chartContent.getChildren();
     }
 

@@ -10,11 +10,16 @@ import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import CustomCharts.CustomPieChart;
+import CustomCharts.PieChart;
+import CustomCharts.PieChart.LabelLayoutInfo;
 
 
 public class GraphTabListener implements ChangeListener<Number> {
@@ -141,35 +146,82 @@ public class GraphTabListener implements ChangeListener<Number> {
 				pathTransition.play();
 				
 				
-				Path drawnPath = ((CustomPieChart)n.getParent().getParent()).getLabelLinePath();
-				Path labelPath = new Path();
-				xCenter = ((MoveTo)drawnPath.getElements().get(0)).getX();
-				yCenter = ((MoveTo)drawnPath.getElements().get(0)).getY();
-				labelPath.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
-				labelPath.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+				ArrayList<LabelLayoutInfo> fullPieLabels = ((CustomPieChart)n.getParent().getParent()).getFullPieLabels();
+				ArrayList<Region> fullPieRegions  = ((CustomPieChart)n.getParent().getParent()).getFullPieRegions();
 				
-				PathTransition pathTransition2 = new PathTransition();
-				pathTransition2.setDuration(ANIMATION_DURATION);
-				pathTransition2.setNode(drawnPath);
-				pathTransition2.setPath(labelPath);
-				pathTransition2.setCycleCount(1);
-				pathTransition2.setAutoReverse(false);
-
-				pathTransition2.play();
+				int sliceIndex = 0;
+				for (int i = 0; i < fullPieRegions.size() / 2; i++) {
+					if (fullPieRegions.get(i).equals(n)) {
+						sliceIndex = i;
+						System.out.println("i is " + i);
+					}
+				}
+				//System.out.println(fullPieRegions.toString());
 				
-				for (Node chartNode : ((CustomPieChart)n.getParent().getParent()).getChartChildren()) {
+				
+				
+				
+				/*for (Node chartNode : ((CustomPieChart)n.getParent().getParent()).getChartChildren()) {
 					System.out.println(chartNode.toString());
 				}
-				System.out.println("-------------------------------");
+				System.out.println("-------------------------------");*/
 				
-				ArrayList<ArrayList<Object>> chartChildren = ((CustomPieChart)n.getParent().getParent()).parseChildren();
+				/*ArrayList<ArrayList<Object>> chartChildren = ((CustomPieChart)n.getParent().getParent()).parseChildren();
 				for (int i = 0; i < chartChildren.size(); i++) {
 					ArrayList<Object> list = chartChildren.get(i);
 					
 					if (list.get(0).equals(n)) {
 						System.out.println(((Text)list.get(1)).getText());
 					}
+				}*/
+				
+				ArrayList<ArrayList<PathElement>> drawnPathElements = ((CustomPieChart)n.getParent().getParent()).getCategorizedPathElements(((CustomPieChart)n.getParent().getParent()).getLabelLinePath().getElements());
+
+				((CustomPieChart)n.getParent().getParent()).getLabelLinePath().setOpacity(0.0);
+				
+				ObservableList<Node> chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
+				if (!(chartChildrenList.get(chartChildrenList.size() - 1) instanceof Path)) { // Ensure that we don;t just endlessly add Paths to the chart
+					for (int i = 0; i < drawnPathElements.size(); i++) {
+						Path newPath = new Path();
+						for (PathElement element : drawnPathElements.get(i)) {
+							if (element instanceof PathElement) { // Should always be true
+								newPath.getElements().add((PathElement)element);
+								newPath.getStyleClass().add("chart-pie-label-line");
+							}
+						}
+						chart.getChartChildren().add(newPath);
+					}
 				}
+				
+				chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
+				
+				ArrayList<Path> paths = new ArrayList<Path>();
+				for (int i = 1; i < chartChildrenList.size(); i++) {
+					if (chartChildrenList.get(i) instanceof Path) {
+						paths.add((Path)chartChildrenList.get(i));
+					}
+				}
+				
+				Path relevantPath = paths.get(sliceIndex);
+				Path pathPath = new Path();
+				xCenter = ((MoveTo)relevantPath.getElements().get(0)).getX();
+				yCenter = ((MoveTo)relevantPath.getElements().get(0)).getY();
+				double xDiff = (((MoveTo)relevantPath.getElements().get(2)).getX() - ((MoveTo)relevantPath.getElements().get(0)).getX()) / 2.0;
+				double yDiff = (((MoveTo)relevantPath.getElements().get(2)).getY() - ((MoveTo)relevantPath.getElements().get(0)).getY()) / 2.0;
+				xCenter += xDiff;
+				yCenter += yDiff;
+				pathPath.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
+				pathPath.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
+				
+				PathTransition pathTransition2 = new PathTransition();
+				pathTransition2.setDuration(ANIMATION_DURATION);
+				pathTransition2.setNode(relevantPath);
+				pathTransition2.setPath(pathPath);
+				pathTransition2.setCycleCount(1);
+				pathTransition2.setAutoReverse(false);
+
+				pathTransition2.play();
+
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
 				Node n = (Node)event.getSource();
 

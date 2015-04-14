@@ -1,3 +1,4 @@
+package CustomCharts;
 import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
@@ -11,7 +12,7 @@ import javafx.scene.text.Text;
 
 public class CustomPieChart extends PieChart{
 	
-	CustomPieChart(ObservableList<PieChart.Data> data) {
+	public CustomPieChart(ObservableList<PieChart.Data> data) {
 		super(data);
 	}
 	
@@ -84,5 +85,17 @@ public class CustomPieChart extends PieChart{
 		}
 		
 		return categorizedElements;
+	}
+	
+	public ArrayList<LabelLayoutInfo> getFullPieLabels() {
+		return super.fullPieLabels;
+	}
+	
+	public ArrayList<Region> getFullPieRegions() {
+		return super.fullPieRegions;
+	}
+	
+	public ArrayList<ArrayList<Double>> getFullPiePathEndPoints() {
+		return super.fullPiePathEndPoints;
 	}
 }
