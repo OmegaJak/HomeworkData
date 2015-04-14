@@ -34,6 +34,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -68,7 +69,11 @@ public class EventHandlerController {
 	@FXML private Button saveRowButton;
 	@FXML private ChoiceBox graphPicker;
 	@FXML private AnchorPane graphDisplay;
-
+	@FXML private Tab inputTab;
+	@FXML private Tab consoleTab;
+	@FXML private Tab graphTab;
+	@FXML private TabPane tabPane;
+	
 	private DataHandler handler;
 	private Control[] inputFields = new Control[16];
 
@@ -204,8 +209,21 @@ public class EventHandlerController {
 				}
 			}
 		});
-	
-		new GraphTabListener(graphDisplay, graphPicker, handler);		
+		
+		
+		tabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			GraphTabListener graphListener = null;
+			
+			@Override
+			public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+				System.out.println(newValue.intValue());
+				if (newValue.intValue() == 2) { // Changed to graphTab
+					graphListener = new GraphTabListener(graphDisplay, graphPicker, handler);
+				} else if (oldValue.intValue() == 2) { // Just left the graphTab
+					graphListener.unload();
+				}
+			}
+		});	
 		
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);

@@ -54,9 +54,9 @@
     </MenuBar>
       <AnchorPane VBox.vgrow="ALWAYS">
          <children>
-            <TabPane minHeight="375.0" minWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <TabPane fx:id="tabPane" minHeight="375.0" minWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
-                <Tab text="Data Collection">
+                <Tab fx:id="inputTab" text="Data Collection">
                   <content>
                     <AnchorPane minHeight="317.0" minWidth="595.0">
                            <children>
@@ -235,7 +235,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Console Output">
+                <Tab fx:id="consoleTab" text="Console Output">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -253,7 +253,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <ChoiceBox fx:id="graphPicker" layoutX="148.0" layoutY="14.0" prefWidth="200.0"/>
+                              <ChoiceBox fx:id="graphPicker" layoutX="148.0" layoutY="14.0" prefWidth="200.0" />
                               <AnchorPane fx:id="graphDisplay" layoutX="14.0" layoutY="49.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
                            </children>
                         </AnchorPane>

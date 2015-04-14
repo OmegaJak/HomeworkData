@@ -54,9 +54,9 @@
     </MenuBar>
       <AnchorPane VBox.vgrow="ALWAYS">
          <children>
-            <TabPane minHeight="375.0" minWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <TabPane fx:id="tabPane" minHeight="375.0" minWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
-                <Tab text="Data Collection">
+                <Tab fx:id="inputTab" text="Data Collection">
                   <content>
                     <AnchorPane minHeight="317.0" minWidth="595.0">
                            <children>
@@ -235,7 +235,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Console Output">
+                <Tab fx:id="consoleTab" text="Console Output">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -246,7 +246,7 @@
                 </Tab>
                   <Tab fx:id="graphTab" closable="false" text="Graphs">
                     <content>
-                      <AnchorPane fx:id="graphTabPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <Label layoutX="14.0" layoutY="14.0" text="Graph to Display:">
                                  <font>

@@ -28,6 +28,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 	//private ChoiceBox graphPicker;
 	private DataHandler handler;
 	String[] graphNames;
+	private ChoiceBox graphPicker;
 	
 	public GraphTabListener(AnchorPane graphDisplay, ChoiceBox graphPicker, DataHandler handler) {
 		this.graphDisplay = graphDisplay;
@@ -39,53 +40,62 @@ public class GraphTabListener implements ChangeListener<Number> {
 		graphPicker.setItems(graphOptions);
 		
 		graphPicker.getSelectionModel().selectedIndexProperty().addListener(GraphTabListener.this);
+		this.graphPicker = graphPicker;
 	}
 
 	@Override
 	public void changed(ObservableValue<? extends Number> obsValue, Number oldValue, Number newValue) {
-		switch (graphNames[newValue.intValue()]) {
-			case "Spent Time Pie Chart":
-				try {
-					System.out.println("Displaying \"Spent Time Pie Chart\"");
-					ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
+		if (newValue.intValue() != -1) { // -1 is given when unloaded
+			switch (graphNames[newValue.intValue()]) {
+				case "Spent Time Pie Chart":
+					try {
+						System.out.println("Displaying \"Spent Time Pie Chart\"");
+						ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
 
-					for (int i = 0; i < totalTimes.size(); i++) {
-						String className = totalTimes.get(i)[0];
-						String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS");
-						totalTimes.remove(i);
-						totalTimes.add(i, new String[] {className, totalSeconds});
-					}
-
-					ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
-					for (int i = 0; i < totalTimes.size(); i++) {
-						obsArr.add(new PieChart.Data(totalTimes.get(i)[0], Integer.parseInt(totalTimes.get(i)[1])));
-					}
-					ObservableList<PieChart.Data> pieChartData = obsArr;
-					
-					final CustomPieChart chart = new CustomPieChart(pieChartData);
-					chart.setTitle(graphNames[newValue.intValue()]);
-					
-					for (PieChart.Data data : pieChartData) {
-						MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart);
-						data.getNode().setOnMouseEntered(hoverAnim);
-						data.getNode().setOnMouseExited(hoverAnim);
-					}
-					
-					/*graphDisplay.setOnMouseMoved(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent event) {
-							System.out.println("(X: " + event.getSceneX() + ", Y: " + event.getSceneY() + ")");
+						for (int i = 0; i < totalTimes.size(); i++) {
+							String className = totalTimes.get(i)[0];
+							String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS");
+							totalTimes.remove(i);
+							totalTimes.add(i, new String[] {className, totalSeconds});
 						}
-					});*/
-					
-					graphDisplay.getChildren().add(chart);
-				} catch (NumberFormatException e) {
-					System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
-					handler.showErrorDialogue(e);
-				}
-				break;
+
+						ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
+						for (int i = 0; i < totalTimes.size(); i++) {
+							obsArr.add(new PieChart.Data(totalTimes.get(i)[0], Integer.parseInt(totalTimes.get(i)[1])));
+						}
+						ObservableList<PieChart.Data> pieChartData = obsArr;
+
+						final CustomPieChart chart = new CustomPieChart(pieChartData);
+						chart.setTitle(graphNames[newValue.intValue()]);
+
+						for (PieChart.Data data : pieChartData) {
+							MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart);
+							data.getNode().setOnMouseEntered(hoverAnim);
+							data.getNode().setOnMouseExited(hoverAnim);
+						}
+
+						/*graphDisplay.setOnMouseMoved(new EventHandler<MouseEvent>() {
+							@Override
+							public void handle(MouseEvent event) {
+								System.out.println("(X: " + event.getSceneX() + ", Y: " + event.getSceneY() + ")");
+							}
+						});*/
+
+						graphDisplay.getChildren().add(chart);
+					} catch (NumberFormatException e) {
+						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
+						handler.showErrorDialogue(e);
+					}
+					break;
+			}
 		}
 		
+	}
+	
+	public void unload() {
+		graphDisplay.getChildren().clear();
+		graphPicker.getSelectionModel().clearSelection();
+		graphPicker.getSelectionModel().selectedIndexProperty().removeListener(GraphTabListener.this);
 	}
 	
 	/**
