@@ -171,7 +171,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				
 				ArrayList<Path> paths = new ArrayList<Path>();
 				for (int i = 1; i < chartChildrenList.size(); i++) {
-					if (chartChildrenList.get(i) instanceof Path) {
+					if (chartChildrenList.get(i) instanceof Path) {						
 						paths.add((Path)chartChildrenList.get(i));
 					}
 				}
@@ -194,8 +194,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						pathTransition.setNode(n);
 					} else if (i == 1) { // Animating the line
 						Path relevantPath = paths.get(sliceIndex);
-						xCenter = ((MoveTo)relevantPath.getElements().get(0)).getX() + ((((MoveTo)relevantPath.getElements().get(2)).getX() - ((MoveTo)relevantPath.getElements().get(0)).getX()) / 2.0);
-						yCenter = ((MoveTo)relevantPath.getElements().get(0)).getY() + ((((MoveTo)relevantPath.getElements().get(2)).getY() - ((MoveTo)relevantPath.getElements().get(0)).getY()) / 2.0);
+						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
+						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY- fullPieLabels.get(sliceIndex).startY) / 2);
 						path.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
 						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
 						pathTransition.setNode(relevantPath);
