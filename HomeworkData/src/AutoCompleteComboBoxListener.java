@@ -4,6 +4,8 @@
  * I've, of course, modified it some
  */
 
+import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -89,23 +91,32 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
         try {
             sb.delete(ir.getStart(), sb.length());
         } catch (Exception e) { }
-            
-        ObservableList items = comboBox.getItems();
-        for (int i=0; i<items.size(); i++) {
-            if (items.get(i).toString().toLowerCase().startsWith(comboBox.getEditor().getText().toLowerCase())
-                )
-            {
-                try {
-                    comboBox.getEditor().setText(sb.toString() + items.get(i).toString().substring(sb.toString().length()));
-                } catch (Exception e) {
-                    comboBox.getEditor().setText(sb.toString());
-                }
-                comboBox.getEditor().positionCaret(sb.toString().length());
-                comboBox.getEditor().selectEnd();
-                break;
-            }
-        }
-    }
+
+        ArrayList<String> toIgnore = new ArrayList<String>();
+		ObservableList items = comboBox.getItems();
+		for (int i = 0; i < items.size(); i++) {
+			toIgnore.add("Psych");
+			boolean didSucceed = true;
+			int k = 0;
+			while (didSucceed && k < toIgnore.size()) {
+				if (items.get(i).toString().equals(toIgnore.get(k))) didSucceed = false;
+				k++;
+			}
+			
+			if (didSucceed) {
+				if (items.get(i).toString().toLowerCase().startsWith(comboBox.getEditor().getText().toLowerCase())) {
+					try {
+						comboBox.getEditor().setText(sb.toString() + items.get(i).toString().substring(sb.toString().length()));
+					} catch (Exception e) {
+						comboBox.getEditor().setText(sb.toString());
+					}
+					comboBox.getEditor().positionCaret(sb.toString().length());
+					comboBox.getEditor().selectEnd();
+					break;
+				}
+			}
+		}
+	}
 
     /**
      * selectClosestResultBasedOnTextFieldValue() - selects the item and scrolls to it when
