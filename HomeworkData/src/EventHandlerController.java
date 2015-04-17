@@ -14,10 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javafx.application.Platform;
+import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -44,6 +42,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class EventHandlerController {
 
@@ -357,32 +356,13 @@ public class EventHandlerController {
 				// Save confirmation stuff
 				System.out.println("Saved");
 
-				long period = 1;
-				TimerTask task = new TimerTask() {
-					int timesToRun = 201;
-
-					public void run() {
-						if (timesToRun == 0) {
-							cancel();
-						} else {
-							Platform.runLater(new Runnable() {
-								@Override
-								public void run() {
-									saveRowButton.setOpacity(opacityEaseFunction(timesToRun - 201));
-								}
-							});
-
-							timesToRun -= 1;
-						}
-					}
-
-					public double opacityEaseFunction(double x) {
-						double result = 0.5 * Math.cos((Math.PI * x) / 100) + 0.5;
-						return result;
-					}
-				};
-				Timer timer = new Timer();
-				timer.schedule(task, 0, period);
+				FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
+				transition.setFromValue(1.0);
+				transition.setToValue(0.0);
+				transition.setCycleCount(2);
+				transition.setAutoReverse(true);
+				
+				transition.play();
 			}
 			
 		} catch (IOException e) {
