@@ -354,15 +354,40 @@ public class EventHandlerController {
 				handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
 
 				// Save confirmation stuff
-				System.out.println("Saved");
-
-				FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
-				transition.setFromValue(1.0);
-				transition.setToValue(0.0);
-				transition.setCycleCount(2);
-				transition.setAutoReverse(true);
 				
-				transition.play();
+				boolean didSave = true;
+				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
+				for (int i = 0; i < inputFields.length; i++) {
+					String inputText = "";
+					if (inputFields[i] instanceof TextField) {
+						inputText = ((TextField)inputFields[i]).getText();
+					} else if (inputFields[i] instanceof ComboBox) {
+						inputText = ((ComboBox)inputFields[i]).getEditor().getText();
+					}
+					
+					if (!data.get(data.size() - 1)[i].equals(inputText)) {
+						didSave = false;
+						break;
+					}
+				}
+				
+				if (!didSave) {
+					System.out.println("Saved");
+					
+					FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
+					transition.setFromValue(1.0);
+					transition.setToValue(0.0);
+					transition.setCycleCount(2);
+					transition.setAutoReverse(true);
+					transition.play();
+				} else {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Save Failure!");
+					alert.setHeaderText("Your data was not saved!");
+					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+					
+					alert.showAndWait();
+				}
 			}
 			
 		} catch (IOException e) {
