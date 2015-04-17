@@ -11,12 +11,16 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
@@ -84,10 +88,25 @@ public class DataHandler {
 			String date = dateFormat.format(new Date());
 			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8}, true, csvDir, csvName);
 			for (int i = 0; i < matchingCells.size(); i++) {
-				String[] timesToAdd2 = new String[timesToAdd.length + 1];
-				System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
-				timesToAdd2[timesToAdd.length] = subtractTime(matchingCells.get(i)[0], matchingCells.get(i)[1]);
-				timesToAdd = timesToAdd2;
+				if (matchingCells.get(i)[0].contains(":") && matchingCells.get(i)[1].contains(":")) {
+					String[] timesToAdd2 = new String[timesToAdd.length + 1];
+					System.arraycopy(timesToAdd, 0, timesToAdd2, 0, timesToAdd.length);
+					timesToAdd2[timesToAdd.length] = subtractTime(matchingCells.get(i)[0], matchingCells.get(i)[1]);
+					timesToAdd = timesToAdd2;
+				} else {
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Format issue");
+					alert.setHeaderText("Something is wrong with line " + i + " of \"" + csvName + "\".");
+					alert.setContentText("When checking it, I found no colon in the cells for time started and time ended.\nWould you like me to remove this line for you, or should I add blank times to it?");
+
+					ButtonType buttonTypeOne = new ButtonType("Remove Line");
+					ButtonType buttonTypeTwo = new ButtonType("Add Blank Data");
+					ButtonType buttonTypeCancel = new ButtonType("I'll take care of it", ButtonData.CANCEL_CLOSE);
+
+					alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+					showColonError(alert, i, buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+				}
 			}
 			System.out.println(addTimes(timesToAdd));
 			
@@ -844,6 +863,48 @@ public class DataHandler {
 		alert.getDialogPane().setExpandableContent(expContent);
 
 		alert.showAndWait();
+	}
+	
+	public void showColonError(Alert alert, int i, ButtonType... elements) {
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == elements[0]) { // elements[0] should be buttonType1
+		    Alert doubleCheck = new Alert(AlertType.CONFIRMATION);
+		    doubleCheck.setTitle("Are you sure?");
+		    doubleCheck.setHeaderText("Think about it");
+		    doubleCheck.setContentText("This will permanently erase this line from the data sheet! (there is always a backup somewhere). Are you sure you want to do this?");
+		    
+		    ButtonType yes = new ButtonType("Yes");
+			ButtonType cancel = new ButtonType("Cancel");
+
+			doubleCheck.getButtonTypes().setAll(yes, cancel);
+
+			Optional<ButtonType> doubleCheckResult = doubleCheck.showAndWait();
+			if (doubleCheckResult.get() == yes) {
+				ArrayList<String[]> data = readFile(csvDir, csvName, true);
+				System.out.println("Removing line " + i + " from \"" + csvName + "\", it used to say: " + Arrays.toString(data.get(i)));
+				data.remove(i);
+				try {
+					writeStringArray(data, csvDir, csvName);
+				} catch (IOException e) {
+					showErrorDialogue(e);
+					System.out.println("You know things are bad when there's an error dialog showing an error. (1)");
+					showColonError(alert, i, elements);
+				}
+		    } else {
+		    	showColonError(alert, i, elements); // go back to the original error dialog
+		    }
+		} else if (result.get() == elements[1]) { // elements[1] should be buttonType2
+			try {
+				writeCell(i, 0, "0:00", csvDir, csvName);
+				writeCell(i, 1, "0:00", csvDir, csvName);
+			} catch (IOException e) {
+				showErrorDialogue(e);
+				System.out.println("You know things are bad when there's an error dialog showing an error. (2)");
+				showColonError(alert, i, elements);
+			}
+		} else {
+		    // ... user chose CANCEL or closed the dialog
+		}
 	}
 	
 
