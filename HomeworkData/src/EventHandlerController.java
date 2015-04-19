@@ -371,7 +371,7 @@ public class EventHandlerController {
 					}
 				}
 				
-				if (!didSave) {
+				if (didSave) {
 					System.out.println("Saved");
 					
 					FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
