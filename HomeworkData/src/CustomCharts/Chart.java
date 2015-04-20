@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.sun.javafx.scene.control.skin.Utils;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.application.Platform;
@@ -41,6 +39,11 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
 import javafx.beans.value.WritableValue;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.Styleable;
+import javafx.css.StyleableBooleanProperty;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -50,16 +53,9 @@ import javafx.scene.layout.Region;
 
 import com.sun.javafx.charts.ChartLayoutAnimator;
 import com.sun.javafx.charts.Legend;
-
-import javafx.css.StyleableBooleanProperty;
-import javafx.css.StyleableObjectProperty;
-import javafx.css.CssMetaData;
-
 import com.sun.javafx.css.converters.BooleanConverter;
 import com.sun.javafx.css.converters.EnumConverter;
-
-import javafx.css.Styleable;
-import javafx.css.StyleableProperty;
+import com.sun.javafx.scene.control.skin.Utils;
 
 /**
  * Base class for all charts. It has 3 parts the title, legend and chartContent. The chart content is populated by the
