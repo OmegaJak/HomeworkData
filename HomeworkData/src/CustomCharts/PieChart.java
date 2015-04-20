@@ -62,6 +62,8 @@ import javafx.geometry.NodeOrientation;
 import javafx.geometry.Side;
 import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcTo;

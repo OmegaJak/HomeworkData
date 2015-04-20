@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
@@ -15,7 +16,6 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 import CustomCharts.CustomPieChart;
 import CustomCharts.PieChart;
@@ -82,6 +82,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						});*/
 
 						graphDisplay.getChildren().add(chart);
+						
+						
 					} catch (NumberFormatException e) {
 						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
 						handler.showErrorDialogue(e);
@@ -128,7 +130,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 		public void handle(MouseEvent event) {
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
 				Node n = (Node)event.getSource();
-
+				System.out.println(n.toString());
+				
 				double minX = Double.MAX_VALUE; // Just temporarily
 				double maxX = Double.MAX_VALUE * -1;
 
@@ -221,12 +224,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
 
-				double diameter = maxX - minX;
+				//double diameter = maxX - minX;
 				Path path = new Path();
 				double xCenter = 0;
 				double yCenter = 0;
-				double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
-				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
+				//double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
+				//double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
 				path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY())));
 				path.getElements().add(new LineTo(xCenter, yCenter));
 
