@@ -183,7 +183,7 @@ public class CustomPieChart extends PieChart{
 							};
 
 							Timer closingTimer = new Timer();
-							closingTimer.schedule(closingTask, 500, 2000);
+							closingTimer.schedule(closingTask, 300, 2000);
 						} else {
 							cancel();
 						}
@@ -195,7 +195,7 @@ public class CustomPieChart extends PieChart{
 		};
 
 		Timer timer = new Timer();
-		timer.schedule(task, 0, 75);
+		timer.schedule(task, 0, 60);
 	}
 
 	public ArrayList<LabelLayoutInfo> getFullPieLabels() {

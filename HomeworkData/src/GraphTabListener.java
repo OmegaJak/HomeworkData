@@ -67,6 +67,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 						final CustomPieChart chart = new CustomPieChart(pieChartData);
 						chart.setTitle(graphNames[newValue.intValue()]);
+						chart.scaleShapeProperty().set(true);
 
 						for (PieChart.Data data : pieChartData) {
 							MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart);
@@ -105,7 +106,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 	 * @author Tom Schindl Took the origins of this from here: http://tomsondev.bestsolution.at/2012/11/21/animating-the-javafx-piechart-a-bit/
 	 */
 	static class MouseHoverAnimation implements EventHandler<MouseEvent> {
-		static final Duration ANIMATION_DURATION = new Duration(500);
+		static final Duration ANIMATION_DURATION = new Duration(300);
 		static final double ANIMATION_DISTANCE = 0.1;
 		private double cos;
 		private double sin;
@@ -185,7 +186,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double xCenter = 0;
 			double yCenter = 0;
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
-				
+
 				for (int i = 0; i < 3; i++) {
 					Path path = new Path();
 					PathTransition pathTransition = new PathTransition();
