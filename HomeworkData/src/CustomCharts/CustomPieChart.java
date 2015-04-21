@@ -2,6 +2,8 @@ package CustomCharts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -13,8 +15,6 @@ import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
-
-import javax.swing.Timer;
 
 
 public class CustomPieChart extends PieChart{
@@ -97,7 +97,7 @@ public class CustomPieChart extends PieChart{
 	@Override protected void layoutChartChildren(double top, double left, double contentWidth, double contentHeight) {
 		super.layoutChartChildren(top, left, contentWidth, contentHeight);
 		//Timer timer = new Timer();
-		for (Region region : fullPieRegions) {
+		//for (Region region : fullPieRegions) {
 			/*long period = 500;
 			TimerTask task = new TimerTask() {
 				int timesToRun = 2;
@@ -127,30 +127,74 @@ public class CustomPieChart extends PieChart{
 			
 			timer.schedule(task, 0, period);*/
 			/*Timer timer = new Timer(500, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
-					MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+				MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
 
-					System.out.println("Test");
-					region.fireEvent(event1);
-					
-					Timer innerTimer = new Timer(500, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
-							MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+				System.out.println("Test");
+				region.fireEvent(event1);
+				
+				Timer innerTimer = new Timer(500, new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+						MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
 
-							System.out.println("Test");
-							region.fireEvent(event1);
+						System.out.println("Test");
+						region.fireEvent(event1);
+						
+					}
+				});
+				innerTimer.start();
+			}
+		});
+		timer.start();*/
+		
+		MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+		MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
+
+		TimerTask task = new TimerTask() {
+			int timesToRun = fullPieRegions.size() - 1;
+
+			@Override
+			public void run() {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						if (timesToRun != -1) {
+							fullPieRegions.get(fullPieRegions.size() - 1 - timesToRun).fireEvent(event1);
 							
+							TimerTask closingTask = new TimerTask() {		
+								int closingTimesToRun = timesToRun;
+								
+								@Override
+								public void run() {
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											fullPieRegions.get(fullPieRegions.size() - 1 - closingTimesToRun).fireEvent(event2);
+											cancel();
+										}
+									});
+								}
+							};
+							
+							Timer closingTimer = new Timer();
+							closingTimer.schedule(closingTask, 500, 2000);
+						} else {
+							cancel();
 						}
-					});
-					innerTimer.start();
-				}
-			});
-			timer.start();*/
-		} 
+
+						timesToRun--;
+					}
+				});
+			}
+		};
+
+			Timer timer = new Timer();
+			timer.schedule(task, 0, 75);
+		//} 
 	}
 	
 	public ArrayList<LabelLayoutInfo> getFullPieLabels() {
