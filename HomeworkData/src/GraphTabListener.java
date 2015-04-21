@@ -83,8 +83,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						});*/
 
 						graphDisplay.getChildren().add(chart);
-						graphDisplay.setTopAnchor(chart, 0.0);
-						graphDisplay.setBottomAnchor(chart, 0.0);
+						//graphDisplay.setTopAnchor(chart, 0.0);
+						//graphDisplay.setBottomAnchor(chart, 0.0);
 						
 					} catch (NumberFormatException e) {
 						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
@@ -198,12 +198,26 @@ public class GraphTabListener implements ChangeListener<Number> {
 					} else if (i == 1) { // Animating the line
 						Path relevantPath = paths.get(sliceIndex);
 						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
-						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY- fullPieLabels.get(sliceIndex).startY) / 2);
+						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY - fullPieLabels.get(sliceIndex).startY) / 2);
+						System.out.println("Line xCenter: " + xCenter);
+						System.out.println("Line yCenter: " + yCenter);
 						path.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
 						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
 						pathTransition.setNode(relevantPath);
 					} else if (i == 2) { // Animating the label
-						
+						/*xCenter = fullPieLabels.get(sliceIndex).textX;
+						//yCenter = fullPieLabels.get(sliceIndex).textY;
+						//xCenter = (fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX);
+						//yCenter = (fullPieLabels.get(sliceIndex).endY - fullPieLabels.get(sliceIndex).startY);
+						//xCenter = fullPieLabels.get(sliceIndex).text.getBoundsInLocal().getWidth();
+						//yCenter = fullPieLabels.get(sliceIndex).text.getBoundsInLocal().getHeight();
+						xCenter = 0;
+						yCenter = 0;
+						System.out.println("Text xCenter: " + xCenter);
+						System.out.println("Text yCenter: " + yCenter);
+						path.getElements().add(new MoveTo(xCenter, yCenter));
+						path.getElements().add(new LineTo(xCenter + .01, yCenter + .01));
+						pathTransition.setNode(fullPieLabels.get(sliceIndex).text);*/
 					}
 					pathTransition.setDuration(ANIMATION_DURATION);
 					pathTransition.setPath(path);
