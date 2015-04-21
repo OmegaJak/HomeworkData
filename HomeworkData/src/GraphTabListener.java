@@ -128,63 +128,63 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 		@Override
 		public void handle(MouseEvent event) {
-			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
-				Node n = (Node)event.getSource();
-				System.out.println(n.toString());
-				
-				double minX = Double.MAX_VALUE; // Just temporarily
-				double maxX = Double.MAX_VALUE * -1;
+			Node n = (Node)event.getSource();
+			System.out.println(n.toString());
+			
+			double minX = Double.MAX_VALUE; // Just temporarily
+			double maxX = Double.MAX_VALUE * -1;
 
-				for (PieChart.Data d : chart.getData()) { // Loops through, finding the max of the max x's (rightmost edge) and the min of the min x's (left edge)
-					minX = Math.min(minX, d.getNode().getBoundsInParent().getMinX());
-					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
+			for (PieChart.Data d : chart.getData()) { // Loops through, finding the max of the max x's (rightmost edge) and the min of the min x's (left edge)
+				minX = Math.min(minX, d.getNode().getBoundsInParent().getMinX());
+				maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
+			}
+			
+			
+			ArrayList<LabelLayoutInfo> fullPieLabels = ((CustomPieChart)n.getParent().getParent()).getFullPieLabels();
+			ArrayList<Region> fullPieRegions  = ((CustomPieChart)n.getParent().getParent()).getFullPieRegions();
+			
+			int sliceIndex = 0;
+			for (int i = 0; i < fullPieRegions.size(); i++) {
+				if (fullPieRegions.get(i).equals(n)) {
+					sliceIndex = i;
+					System.out.println("i is " + i);
 				}
-				
-				
-				ArrayList<LabelLayoutInfo> fullPieLabels = ((CustomPieChart)n.getParent().getParent()).getFullPieLabels();
-				ArrayList<Region> fullPieRegions  = ((CustomPieChart)n.getParent().getParent()).getFullPieRegions();
-				
-				int sliceIndex = 0;
-				for (int i = 0; i < fullPieRegions.size(); i++) {
-					if (fullPieRegions.get(i).equals(n)) {
-						sliceIndex = i;
-						System.out.println("i is " + i);
-					}
-				}
-				
-				ArrayList<ArrayList<PathElement>> drawnPathElements = ((CustomPieChart)n.getParent().getParent()).getCategorizedPathElements(((CustomPieChart)n.getParent().getParent()).getLabelLinePath().getElements());
+			}
+			
+			ArrayList<ArrayList<PathElement>> drawnPathElements = ((CustomPieChart)n.getParent().getParent()).getCategorizedPathElements(((CustomPieChart)n.getParent().getParent()).getLabelLinePath().getElements());
 
-				((CustomPieChart)n.getParent().getParent()).getLabelLinePath().setOpacity(0.0);
-				
-				ObservableList<Node> chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
-				if (!(chartChildrenList.get(chartChildrenList.size() - 1) instanceof Path)) { // Ensure that we don;t just endlessly add Paths to the chart
-					for (int i = 0; i < drawnPathElements.size(); i++) {
-						Path newPath = new Path();
-						for (PathElement element : drawnPathElements.get(i)) {
-							if (element instanceof PathElement) { // Should always be true
-								newPath.getElements().add((PathElement)element);
-								newPath.getStyleClass().add("chart-pie-label-line");
-							}
+			((CustomPieChart)n.getParent().getParent()).getLabelLinePath().setOpacity(0.0);
+			
+			ObservableList<Node> chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
+			if (!(chartChildrenList.get(chartChildrenList.size() - 1) instanceof Path)) { // Ensure that we don;t just endlessly add Paths to the chart
+				for (int i = 0; i < drawnPathElements.size(); i++) {
+					Path newPath = new Path();
+					for (PathElement element : drawnPathElements.get(i)) {
+						if (element instanceof PathElement) { // Should always be true
+							newPath.getElements().add((PathElement)element);
+							newPath.getStyleClass().add("chart-pie-label-line");
 						}
-						chart.getChartChildren().add(newPath);
 					}
+					chart.getChartChildren().add(newPath);
 				}
-				
-				chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
-				
-				ArrayList<Path> paths = new ArrayList<Path>();
-				for (int i = 1; i < chartChildrenList.size(); i++) {
-					if (chartChildrenList.get(i) instanceof Path) {						
-						paths.add((Path)chartChildrenList.get(i));
-					}
+			}
+			
+			chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
+			
+			ArrayList<Path> paths = new ArrayList<Path>();
+			for (int i = 1; i < chartChildrenList.size(); i++) {
+				if (chartChildrenList.get(i) instanceof Path) {						
+					paths.add((Path)chartChildrenList.get(i));
 				}
-				
-				//---Actually animating now
-				double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
-				double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
-				double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
-				double xCenter = 0;
-				double yCenter = 0;
+			}
+			
+			//---Actually animating now
+			double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
+			double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
+			double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
+			double xCenter = 0;
+			double yCenter = 0;
+			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
 				
 				for (int i = 0; i < 3; i++) {
 					Path path = new Path();
@@ -214,33 +214,36 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
-				Node n = (Node)event.getSource();
-
-				double minX = Double.MAX_VALUE;
-				double maxX = Double.MAX_VALUE * -1;
-
+				
 				for (PieChart.Data d : chart.getData()) {
 					minX = Math.min(minX, d.getNode().getBoundsInParent().getMinX());
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
-
-				//double diameter = maxX - minX;
-				Path path = new Path();
-				double xCenter = 0;
-				double yCenter = 0;
-				//double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
-				//double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
-				path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY())));
-				path.getElements().add(new LineTo(xCenter, yCenter));
-
-				PathTransition pathTransition = new PathTransition();
-				pathTransition.setDuration(ANIMATION_DURATION);
-				pathTransition.setNode(n);
-				pathTransition.setPath(path);
-				pathTransition.setCycleCount(1);
-				pathTransition.setAutoReverse(false);
 				
-				pathTransition.play();
+				for (int i = 0; i < 3; i++) {
+					Path path = new Path();
+					PathTransition pathTransition = new PathTransition();
+					if (i == 0) { // Animating the slice (Region)
+						xCenter = 0;
+						yCenter = 0;
+						pathTransition.setNode(n);
+					} else if (i == 1) { // Animating the line
+						Path relevantPath = paths.get(sliceIndex);
+						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
+						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY- fullPieLabels.get(sliceIndex).startY) / 2);
+						pathTransition.setNode(relevantPath);
+					} else if (i == 2) { // Animating the label
+						
+					}
+					path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY()))); // Starting point
+					path.getElements().add(new LineTo(xCenter, yCenter)); // Where it'll animate to
+					pathTransition.setDuration(ANIMATION_DURATION);
+					pathTransition.setPath(path);
+					pathTransition.setCycleCount(1);
+					pathTransition.setAutoReverse(false);
+
+					pathTransition.play();
+				}
 			}
 		}
 
