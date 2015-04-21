@@ -83,7 +83,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						});*/
 
 						graphDisplay.getChildren().add(chart);
-						
+						graphDisplay.setTopAnchor(chart, 0.0);
+						graphDisplay.setBottomAnchor(chart, 0.0);
 						
 					} catch (NumberFormatException e) {
 						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
