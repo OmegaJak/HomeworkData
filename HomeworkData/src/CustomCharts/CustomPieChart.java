@@ -154,6 +154,8 @@ public class CustomPieChart extends PieChart{
 		MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
 		MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
 
+		//(long)((dataProperty().get().get(fullPieRegions.size() - 1 - timesToRun).getPieValue() / totalValue2) * duration)
+		
 		TimerTask task = new TimerTask() {
 			int timesToRun = fullPieRegions.size() - 1;
 
@@ -164,10 +166,10 @@ public class CustomPieChart extends PieChart{
 					public void run() {
 						if (timesToRun != -1) {
 							fullPieRegions.get(fullPieRegions.size() - 1 - timesToRun).fireEvent(event1);
-							
-							TimerTask closingTask = new TimerTask() {		
+
+							TimerTask closingTask = new TimerTask() {
 								int closingTimesToRun = timesToRun;
-								
+
 								@Override
 								public void run() {
 									Platform.runLater(new Runnable() {
@@ -179,7 +181,7 @@ public class CustomPieChart extends PieChart{
 									});
 								}
 							};
-							
+
 							Timer closingTimer = new Timer();
 							closingTimer.schedule(closingTask, 500, 2000);
 						} else {
@@ -192,11 +194,10 @@ public class CustomPieChart extends PieChart{
 			}
 		};
 
-			Timer timer = new Timer();
-			timer.schedule(task, 0, 75);
-		//} 
+		Timer timer = new Timer();
+		timer.schedule(task, 0, 75);
 	}
-	
+
 	public ArrayList<LabelLayoutInfo> getFullPieLabels() {
 		return super.fullPieLabels;
 	}
