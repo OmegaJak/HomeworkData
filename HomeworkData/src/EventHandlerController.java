@@ -172,6 +172,8 @@ public class EventHandlerController {
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (newPropertyValue && spentField.getText().equals("")) {
 							autoFillWasted();
+						} else if (!newPropertyValue) {
+							checkForTimePerUnit();
 						}
 					}
 				});
@@ -280,9 +282,9 @@ public class EventHandlerController {
 
 	private void checkForTimePerUnit() { // This is a different methodology than timePerUnit in DataHandler, but it produces the same result. Might as well leave this in.
 		try {
-			TextField[] neededInputs = { numUnitField, startedField, endedField };
+			TextField[] neededInputs = {numUnitField, startedField, endedField, spentField};
 			if (checkIfAllFilled(neededInputs)) {
-				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(startedField.getText(), endedField.getText()), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS"));
+				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS"));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");

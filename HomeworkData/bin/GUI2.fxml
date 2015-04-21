@@ -159,7 +159,7 @@
                                     <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                        <children>
                                           <Label alignment="CENTER" text="Time Wasted" />
-                                          <TextField fx:id="spentField">
+                                          <TextField fx:id="spentField" text="0:00">
                                              <VBox.margin>
                                                 <Insets left="12.5" right="12.5" />
                                              </VBox.margin></TextField>
