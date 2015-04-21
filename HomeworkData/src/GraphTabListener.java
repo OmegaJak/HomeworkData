@@ -130,7 +130,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 		@Override
 		public void handle(MouseEvent event) {
 			Node n = (Node)event.getSource();
-			System.out.println(n.toString());
 			
 			double minX = Double.MAX_VALUE; // Just temporarily
 			double maxX = Double.MAX_VALUE * -1;
@@ -148,7 +147,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 			for (int i = 0; i < fullPieRegions.size(); i++) {
 				if (fullPieRegions.get(i).equals(n)) {
 					sliceIndex = i;
-					System.out.println("i is " + i);
 				}
 			}
 			
