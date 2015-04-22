@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 import javafx.animation.PathTransition;
+import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -8,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
@@ -70,7 +70,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 						chart.scaleShapeProperty().set(true);
 
 						for (PieChart.Data data : pieChartData) {
-							MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart);
+							MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart, pieChartData.size());
 							data.getNode().setOnMouseEntered(hoverAnim);
 							data.getNode().setOnMouseExited(hoverAnim);
 						}
@@ -107,13 +107,14 @@ public class GraphTabListener implements ChangeListener<Number> {
 	 * @author Tom Schindl Took the origins of this from here: http://tomsondev.bestsolution.at/2012/11/21/animating-the-javafx-piechart-a-bit/
 	 */
 	static class MouseHoverAnimation implements EventHandler<MouseEvent> {
-		static final Duration ANIMATION_DURATION = new Duration(300);
+		Duration animationDuration = new Duration(500);
 		static final double ANIMATION_DISTANCE = 0.1;
 		private double cos;
 		private double sin;
 		private CustomPieChart chart;
-
-		public MouseHoverAnimation(PieChart.Data d, CustomPieChart chart) {
+		public ArrayList<ArrayList<TranslateTransition>> transitions; // The first arrayList is for Region transitions, then linePaths, then Labels
+		
+		public MouseHoverAnimation(PieChart.Data d, CustomPieChart chart, int numberOfData) {
 			this.chart = chart;
 			double start = 0;
 			double angle = calcAngle(d); // Figures out how many degrees wide the slice is
@@ -126,6 +127,16 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 			cos = Math.cos(Math.toRadians(0 - start - angle / 2)); // The horizontal leg of the triangle
 			sin = Math.sin(Math.toRadians(0 + start + angle / 2)); // The vertical leg of the triangle
+			
+			transitions = new ArrayList<ArrayList<TranslateTransition>>();
+			transitions.add(new ArrayList<TranslateTransition>());
+			transitions.add(new ArrayList<TranslateTransition>());
+			transitions.add(new ArrayList<TranslateTransition>());
+			for (ArrayList<TranslateTransition> innerList : transitions) {
+				for (int i = 0; i < numberOfData; i++) {
+					innerList.add(null); // I realize this is dangerous, but I just want the indexes to be there and accessible
+				}
+			}
 		}
 
 		@Override
@@ -185,46 +196,31 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double xCenter = 0;
 			double yCenter = 0;
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
-
 				for (int i = 0; i < 3; i++) {
-					Path path = new Path();
-					PathTransition pathTransition = new PathTransition();
+					boolean isFirstTime = transitions.get(i).get(sliceIndex) == null;
+					TranslateTransition translateTransition = new TranslateTransition();
+					
 					if (i == 0) { // Animating the slice (Region)
-						xCenter = 0;
-						yCenter = 0;
-						path.getElements().add(new MoveTo(xCenter + n.getTranslateX(), yCenter + n.getTranslateY())); // Where it's starting
-						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
-						pathTransition.setNode(n);
+						translateTransition = new TranslateTransition(animationDuration, n);
 					} else if (i == 1) { // Animating the line
 						Path relevantPath = paths.get(sliceIndex);
-						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
-						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY - fullPieLabels.get(sliceIndex).startY) / 2);
-						System.out.println("Line xCenter: " + xCenter);
-						System.out.println("Line yCenter: " + yCenter);
-						path.getElements().add(new MoveTo(xCenter, yCenter)); // Where it's starting
-						path.getElements().add(new LineTo(xCenter + xTranslate, yCenter + yTranslate)); // Where it'll animate to
-						pathTransition.setNode(relevantPath);
+						translateTransition = new TranslateTransition(animationDuration, relevantPath);
 					} else if (i == 2) { // Animating the label
-						/*xCenter = fullPieLabels.get(sliceIndex).textX;
-						//yCenter = fullPieLabels.get(sliceIndex).textY;
-						//xCenter = (fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX);
-						//yCenter = (fullPieLabels.get(sliceIndex).endY - fullPieLabels.get(sliceIndex).startY);
-						//xCenter = fullPieLabels.get(sliceIndex).text.getBoundsInLocal().getWidth();
-						//yCenter = fullPieLabels.get(sliceIndex).text.getBoundsInLocal().getHeight();
-						xCenter = 0;
-						yCenter = 0;
-						System.out.println("Text xCenter: " + xCenter);
-						System.out.println("Text yCenter: " + yCenter);
-						path.getElements().add(new MoveTo(xCenter, yCenter));
-						path.getElements().add(new LineTo(xCenter + .01, yCenter + .01));
-						pathTransition.setNode(fullPieLabels.get(sliceIndex).text);*/
+						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
 					}
-					pathTransition.setDuration(ANIMATION_DURATION);
-					pathTransition.setPath(path);
-					pathTransition.setCycleCount(1);
-					pathTransition.setAutoReverse(false);
-
-					pathTransition.play();
+					
+					translateTransition.setByX(xTranslate);
+					translateTransition.setByY(yTranslate);
+					if (isFirstTime) {
+						translateTransition.setCycleCount(2);
+						translateTransition.setAutoReverse(true);
+					} else {
+						translateTransition.setCycleCount(1);
+						translateTransition.setAutoReverse(false);
+					}
+					
+					translateTransition.play();
+					transitions.get(i).set(sliceIndex, translateTransition);
 				}
 
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
@@ -235,28 +231,36 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 				
 				for (int i = 0; i < 3; i++) {
-					Path path = new Path();
-					PathTransition pathTransition = new PathTransition();
+					/*Path path = new Path();
+					PathTransition pathTransition = new PathTransition();*/
 					if (i == 0) { // Animating the slice (Region)
-						xCenter = 0;
+						/*xCenter = 0;
 						yCenter = 0;
-						pathTransition.setNode(n);
+						pathTransition.setNode(n);*/
 					} else if (i == 1) { // Animating the line
-						Path relevantPath = paths.get(sliceIndex);
+						/*Path relevantPath = paths.get(sliceIndex);
 						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
 						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY- fullPieLabels.get(sliceIndex).startY) / 2);
-						pathTransition.setNode(relevantPath);
+						pathTransition.setNode(relevantPath);*/
 					} else if (i == 2) { // Animating the label
 						
 					}
-					path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY()))); // Starting point
+					/*path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY()))); // Starting point
 					path.getElements().add(new LineTo(xCenter, yCenter)); // Where it'll animate to
 					pathTransition.setDuration(ANIMATION_DURATION);
 					pathTransition.setPath(path);
 					pathTransition.setCycleCount(1);
 					pathTransition.setAutoReverse(false);
 
-					pathTransition.play();
+					pathTransition.play();*/
+					
+					TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
+					relevantTransition.pause();
+					relevantTransition.setByX((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX() * -1.0);
+					relevantTransition.setByY((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY() * -1.0);
+					relevantTransition.setAutoReverse(false);
+					relevantTransition.setCycleCount(1);
+					relevantTransition.playFromStart();
 				}
 			}
 		}
