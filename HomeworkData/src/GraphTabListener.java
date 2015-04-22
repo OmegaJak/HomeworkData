@@ -230,30 +230,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
 				
-				for (int i = 0; i < 3; i++) {
-					/*Path path = new Path();
-					PathTransition pathTransition = new PathTransition();*/
-					if (i == 0) { // Animating the slice (Region)
-						/*xCenter = 0;
-						yCenter = 0;
-						pathTransition.setNode(n);*/
-					} else if (i == 1) { // Animating the line
-						/*Path relevantPath = paths.get(sliceIndex);
-						xCenter = fullPieLabels.get(sliceIndex).startX + ((fullPieLabels.get(sliceIndex).endX - fullPieLabels.get(sliceIndex).startX) / 2);
-						yCenter = fullPieLabels.get(sliceIndex).startY + ((fullPieLabels.get(sliceIndex).endY- fullPieLabels.get(sliceIndex).startY) / 2);
-						pathTransition.setNode(relevantPath);*/
-					} else if (i == 2) { // Animating the label
-						
-					}
-					/*path.getElements().add(new MoveTo(xCenter + (n.getTranslateX() == 0 ? 0.01 : n.getTranslateX()), yCenter + (n.getTranslateY() == 0 ? 0.01 : n.getTranslateY()))); // Starting point
-					path.getElements().add(new LineTo(xCenter, yCenter)); // Where it'll animate to
-					pathTransition.setDuration(ANIMATION_DURATION);
-					pathTransition.setPath(path);
-					pathTransition.setCycleCount(1);
-					pathTransition.setAutoReverse(false);
-
-					pathTransition.play();*/
-					
+				for (int i = 0; i < 3; i++) {					
 					TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
 					relevantTransition.pause();
 					relevantTransition.setByX((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX() * -1.0);
