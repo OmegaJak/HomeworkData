@@ -427,28 +427,7 @@ public class DataHandler {
 		String[] timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}, true, csvDir, csvName).get(0);
 		
 		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
-		System.out.println("Using the old method, I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
-		
-		ArrayList<String[]> relevantTimes = getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {6, 8}, true, csvDir, csvName);
-			// This will be an ArrayList like so: {String[Time Started, Time Ended], String[Time Started, Time Ended], ...}
-		String[] timeSpents = {};
-		for (int i = 0; i < relevantTimes.size(); i++) { // Go through the relevant times, create a new array with the time spend for each of those 
-			String[] timeSpents2 = new String[timeSpents.length + 1];
-			System.arraycopy(timeSpents, 0, timeSpents2, 0, timeSpents.length);
-			timeSpents2[timeSpents.length] = subtractTime(relevantTimes.get(i)[0], relevantTimes.get(i)[1]);
-			timeSpents = timeSpents2;
-		}
-		
-		for (int i = 0; i < timeSpents.length; i++) {
-			timeSpents[i] = convertTime(timeSpents[i], "HH:MM", "MM:SS", false);
-		}
-		String totalTimeSpent = addTimes(timeSpents);
-		String[] numUnits = getCellsMeetingCriteria(new int[] {1, 2, 3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {4}, true, csvDir, csvName).get(0);
-		double totalUnitsDone = addStrings(numUnits);
-		result = divideTime(totalTimeSpent, (int)totalUnitsDone);
-		result = convertTime("" + (Double.parseDouble(convertTime(totalTimeSpent, "HH:MM:SS", "SS", true)) / totalUnitsDone), "SS", "H:MM:SS", true);
-		
-		System.out.println("Using the new method, I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ". (The total time spent was: " + totalTimeSpent + " and the total number of units was " + totalUnitsDone + ")");
+		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
 		return result;
 	}
 	
@@ -595,22 +574,6 @@ public class DataHandler {
 		return hoursReturn + ":" + minutesReturn + ":" + secondsReturn;
 	}
 	
-	public double addStrings(String[] numbers) {
-		double result = 0.0;
-		
-		try {
-			for (String number : numbers) {
-				result += Double.parseDouble(number);
-			}
-		} catch (NumberFormatException e) {
-			System.out.println("There was an issue parsing the numbers in addStrings");
-			showErrorDialogue(e);
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
-	
 	/**
 	 * The times must be in the format of HH:MM, military time
 	 * 
@@ -731,11 +694,7 @@ public class DataHandler {
 	 * @return
 	 */
 	public double round(double num, int decimalPlaces) {
-		//if (num >= 1) {
-			return (int)(num * (int)Math.pow(10, decimalPlaces)) / (int)Math.pow(10, decimalPlaces);
-		//} else {
-		//	return (int)(num * (int)Math.pow(10, decimalPlaces)) / (double)Math.pow(10, decimalPlaces);
-		//}
+		return ((int)(num * (int)Math.pow(10, decimalPlaces)) / (int)Math.pow(10, decimalPlaces));
 	}
 	
 	/**
@@ -761,22 +720,7 @@ public class DataHandler {
 			}
 			return convertedTo;
 		} catch (NumberFormatException e) {
-			try {
-				double[] doubleConvertedTo = new double[toConvert.length];
-				for (int i = 0; i < toConvert.length; i++) {
-					doubleConvertedTo[i] = Double.parseDouble(toConvert[i]);
-				}
-				int[] finalIntConvertedTo = new int[toConvert.length];
-				for (int i = 0; i < doubleConvertedTo.length; i++) {
-					finalIntConvertedTo[i] = (int)doubleConvertedTo[i];
-				}
-				return finalIntConvertedTo;
-			} catch (NumberFormatException e2) {
-				System.out.println("There was an error while converting a string to ints (2)");
-				e.printStackTrace();
-			}
 			System.out.println("There was an error while converting a string to ints");
-			e.printStackTrace();
 		}
 		int[] blank = {};
 		return blank;
