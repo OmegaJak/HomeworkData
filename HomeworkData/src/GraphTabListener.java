@@ -53,7 +53,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 						for (int i = 0; i < totalTimes.size(); i++) {
 							String className = totalTimes.get(i)[0];
-							String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS");
+							String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
 							totalTimes.remove(i);
 							totalTimes.add(i, new String[] {className, totalSeconds});
 						}

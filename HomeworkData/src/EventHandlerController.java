@@ -284,7 +284,7 @@ public class EventHandlerController {
 		try {
 			TextField[] neededInputs = {numUnitField, startedField, endedField, spentField};
 			if (checkIfAllFilled(neededInputs)) {
-				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS"));
+				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS", true));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");

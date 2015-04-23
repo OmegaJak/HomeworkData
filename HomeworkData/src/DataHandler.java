@@ -412,9 +412,9 @@ public class DataHandler {
 
 	public ArrayList<String[]> timePerUnit(ArrayList<String[]> dataSheet, int row) throws IOException { // This is a different methodology than checkForTimePerUnit in EventHandlerController, but it produces the same result. Might as well leave this in.
 		try {
-			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS")) / Double.parseDouble(dataSheet.get(row)[4]);
+			double calculatedResult = Double.parseDouble(convertTime(subtractTime(dataSheet.get(row)[6], dataSheet.get(row)[8]), "H:MM", "SS", true)) / Double.parseDouble(dataSheet.get(row)[4]);
 			System.out.println("The calculated result was " + calculatedResult);
-			String formattedResult = convertTime(addZeroes("" + (int)(calculatedResult + 0.5), 2), "SS", "M:SS"); // The "+ 0.5" is for rounding to the nearest integer, rather than just rounding down
+			String formattedResult = convertTime(addZeroes("" + (int)(calculatedResult + 0.5), 2), "SS", "M:SS", true); // The "+ 0.5" is for rounding to the nearest integer, rather than just rounding down
 			writeCell(row, 5, formattedResult, csvDir, csvName);
 		} catch (NumberFormatException e) {
 			System.out.println("What are numbers!?");
@@ -537,7 +537,7 @@ public class DataHandler {
 	 * @param outputFormat Same as above, like HH:MM:SS
 	 * @return The total minutes in the time provided
 	 */
-	public String convertTime(String input, String inputFormat, String outputFormat) {
+	public String convertTime(String input, String inputFormat, String outputFormat, boolean isVerbose) {
 		
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
