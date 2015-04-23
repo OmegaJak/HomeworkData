@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-import javafx.animation.PathTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -12,8 +12,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
@@ -113,6 +112,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 		private double sin;
 		private CustomPieChart chart;
 		public ArrayList<ArrayList<TranslateTransition>> transitions; // The first arrayList is for Region transitions, then linePaths, then Labels
+		double lineStartX = 500;
+		double lineStartY = 300;
 		
 		public MouseHoverAnimation(PieChart.Data d, CustomPieChart chart, int numberOfData) {
 			this.chart = chart;
@@ -196,6 +197,10 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double xCenter = 0;
 			double yCenter = 0;
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
+				double startTime = 2000;
+				if (transitions.get(0).get(sliceIndex) != null) {
+					startTime =  transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
+				}
 				for (int i = 0; i < 3; i++) {
 					boolean isFirstTime = transitions.get(i).get(sliceIndex) == null;
 					TranslateTransition translateTransition = new TranslateTransition();
@@ -209,18 +214,66 @@ public class GraphTabListener implements ChangeListener<Number> {
 						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
 					}
 					
-					translateTransition.setByX(xTranslate);
-					translateTransition.setByY(yTranslate);
 					if (isFirstTime) {
-						translateTransition.setCycleCount(2);
-						translateTransition.setAutoReverse(true);
-					} else {
+						translateTransition.setByX(xTranslate);
+						translateTransition.setByY(yTranslate);
 						translateTransition.setCycleCount(1);
 						translateTransition.setAutoReverse(false);
+						translateTransition.setInterpolator(Interpolator.LINEAR);
+						translateTransition.play();
+						transitions.get(i).set(sliceIndex, translateTransition);
+						
+						if (i == 1) {
+							Line line = new Line();
+							line.setStartX(lineStartX);
+							line.setStartY(lineStartY);
+							line.setEndX(lineStartX + translateTransition.getByX());
+							line.setEndY(lineStartY + translateTransition.getByY());
+							lineStartY += 40;
+							((AnchorPane)n.getParent().getParent().getParent()).getChildren().add(line);
+						}
+					} else {
+						TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
+						relevantTransition.pause();
+						//if (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis() == 1) {
+							//relevantTransition.setByX(xTranslate);
+							//relevantTransition.setByY(yTranslate);
+						//} else {
+							//relevantTransition.setByX(xTranslate + (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX());
+							//relevantTransition.setByY(yTranslate + (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY());
+							//relevantTransition.setByX(xTranslate - (xTranslate + relevantTransition.getByX()));
+							//relevantTransition.setByY(yTranslate - (yTranslate + relevantTransition.getByY()));
+						if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
+							System.out.println("Went in: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
+						}
+						if (relevantTransition.getByX() != xTranslate * -1) {
+							relevantTransition.setByX(xTranslate - Math.abs(Math.abs(relevantTransition.getByX()) - Math.abs((startTime / animationDuration.toMillis()) * relevantTransition.getByX())));
+							relevantTransition.setByY(yTranslate - Math.abs(Math.abs(relevantTransition.getByY()) - Math.abs((startTime / animationDuration.toMillis()) * relevantTransition.getByY())));
+						} else {
+							System.out.println("Else");
+							relevantTransition.setByX(xTranslate - Math.abs(relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX()));
+							relevantTransition.setByY(yTranslate - Math.abs(relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY()));
+						}
+						relevantTransition.setCycleCount(1);
+						relevantTransition.setAutoReverse(false);
+						relevantTransition.setInterpolator(Interpolator.LINEAR);
+						relevantTransition.playFromStart();
+
+						if (i == 1) {
+							System.out.println("Going out: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
+							Line line = new Line();
+							line.setStartX(lineStartX);
+							line.setStartY(lineStartY);
+							line.setEndX(lineStartX + relevantTransition.getByX());
+							line.setEndY(lineStartY + relevantTransition.getByY());
+							lineStartY += 40;
+							((AnchorPane)n.getParent().getParent().getParent()).getChildren().add(line);
+						}
+						
+						transitions.get(i).set(sliceIndex, relevantTransition);
 					}
 					
-					translateTransition.play();
-					transitions.get(i).set(sliceIndex, translateTransition);
+					
 				}
 
 			} else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
@@ -229,14 +282,25 @@ public class GraphTabListener implements ChangeListener<Number> {
 					minX = Math.min(minX, d.getNode().getBoundsInParent().getMinX());
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
-				
-				for (int i = 0; i < 3; i++) {					
+
+				double startTime =  transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
+				for (int i = 0; i < 3; i++) {
 					TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
 					relevantTransition.pause();
-					relevantTransition.setByX((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX() * -1.0);
-					relevantTransition.setByY((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY() * -1.0);
+					//if (relevantTransition.getByX() != xTranslate) {
+						//relevantTransition.setByX((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX() * -1.0);
+						//relevantTransition.setByY((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY() * -1.0);
+					//} else {
+						if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
+							System.out.println("Went out: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
+						}
+						relevantTransition.setByX((xTranslate - (relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX())) * -1);
+						relevantTransition.setByY((yTranslate - (relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY())) * -1);
+					//}
+					if (i == 1) System.out.println("Going in: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
 					relevantTransition.setAutoReverse(false);
 					relevantTransition.setCycleCount(1);
+					relevantTransition.setInterpolator(Interpolator.LINEAR);
 					relevantTransition.playFromStart();
 				}
 			}

@@ -102,7 +102,7 @@ public class CustomPieChart extends PieChart{
 
 		//(long)((dataProperty().get().get(fullPieRegions.size() - 1 - timesToRun).getPieValue() / totalValue2) * duration)
 		
-		TimerTask task = new TimerTask() {
+		/*TimerTask task = new TimerTask() {
 			int timesToRun = fullPieRegions.size() - 1;
 
 			@Override
@@ -110,7 +110,7 @@ public class CustomPieChart extends PieChart{
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-						if (timesToRun != -1) {
+						if (timesToRun > -1) {
 							fullPieRegions.get(fullPieRegions.size() - 1 - timesToRun).fireEvent(event1);
 							
 							TimerTask closingTask = new TimerTask() {
@@ -141,7 +141,7 @@ public class CustomPieChart extends PieChart{
 		};
 
 		Timer timer = new Timer();
-		timer.schedule(task, 0, 60);
+		timer.schedule(task, 0, 60);*/
 	}
 
 	public ArrayList<LabelLayoutInfo> getFullPieLabels() {
