@@ -345,6 +345,8 @@ public class DataHandler {
 	 * @param file - The name of the file to read from
 	 * @return All of the cells that meet the specified criteria in an Arraylist of String arrays from the desired column
 	 */
+	// TODO: Modify so that if cellValuesToMatch is just one index, then it matches all the columns to that one value. As it is, if cellValuesToMatch is a different length from desiredColumns, it will fail.
+	// TODO: Add option to ignore first line. Or just make it default. Probably that.
 	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, String dir, String file) {
 		ArrayList<String[]> dataSheet = readFile(dir, file, false);
 
@@ -468,6 +470,54 @@ public class DataHandler {
 
 		return toReturn;
 	}
+
+	public ArrayList<DataPoint> getLineChartData(String timeUnit) {
+		ArrayList<DataPoint> toReturn = new ArrayList<DataPoint>();
+		switch (timeUnit.toLowerCase()) {
+			case "day":
+				ArrayList<String> dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true, this.csvDir, this.csvName)
+						.get(0)));
+				// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
+
+				ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
+				ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
+				
+				if (dates.size() != secondsSpents.size()) {
+					System.out.println("The sizes didn't match up when getting the LineChartData. This will cause issues.");
+					
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("LineChartData Error");
+					alert.setHeaderText("Size Mismatch");
+					alert.setContentText("The sizes didn't match up when getting the LineChartData. This will cause issues.");
+					alert.showAndWait();
+					
+					break;
+				}
+				
+				for (int i = 1; i < dates.size(); i++) {
+					if (dates.get(i).equals(dates.get(i - 1))) {
+						int tempSeconds = secondsSpents.get(i) + secondsSpents.get(i - 1);
+						dates.remove(i);
+						secondsSpents.set(i - 1, tempSeconds);
+						secondsSpents.remove(i);
+						i--;
+					}
+				}
+				
+				DataPoint currentPoint;
+				for (int i = 0; i < dates.size(); i++) {
+					currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
+					toReturn.add(currentPoint);
+				}
+
+				break;
+			case "week":
+				break;
+			case "month":
+				break;
+		}
+		return toReturn;
+	}
 	
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
@@ -517,12 +567,12 @@ public class DataHandler {
 	 * @return The total minutes in the time provided
 	 */
 	public String convertTime(String input, String inputFormat, String outputFormat, boolean isVerbose) {
-		
+
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
 		int[] numberInputsInBetween = convertStringsToInts(inputInBetweens); // Just converting inputInBetweens to integers, so now it's {5,32,50}
 		String[] outputFormatInBetweens = findInBetween(outputFormat, ':'); //Same as inputFormatInBetweens, but for the output
-		
+
 		String outputString = "";
 		if (!outputFormat.contains("H") && !outputFormat.contains("M")) { // Check whether this helps at some point.... it might...
 			outputString = "" + convertTimeToSeconds(inputFormatInBetweens, numberInputsInBetween);
@@ -532,7 +582,7 @@ public class DataHandler {
 		}
 
 		System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\". The result is: " + outputString);
-		
+
 		return outputString;
 	}
 	
@@ -724,6 +774,33 @@ public class DataHandler {
 		}
 		int[] blank = {};
 		return blank;
+	}
+	
+	/**
+	 * Converts the given ArrayList of times to a corresponding ArrayList of those times in seconds
+	 * @param spentTimes - ArrayList of the times spent, in the format of ArrayList["timeString", "anotherTimeString"]
+	 * @param timeFormat - The format of the times in spentTimes
+	 * @return An ArrayList of the spentTimes converted to seconds. In the format of ArrayList[seconds, anotherSeconds]
+	 */
+	public ArrayList<Integer> convertTimesToSeconds(ArrayList<String> spentTimes, String timeFormat) {
+		ArrayList<Integer> secondsSpent = new ArrayList<Integer>();
+		for (String spentTime : spentTimes) {
+			secondsSpent.add(convertTimeToSeconds(findInBetween(timeFormat, ':'), convertStringsToInts(findInBetween(spentTime, ':'))));
+		}
+		return secondsSpent;
+	}
+	
+	/**
+	 * Converts an ArrayList of the starting and stopping times to a combined ArrayList of the individual time spent strings
+	 * @param startStopTimes - ArrayList representing the starting and stopping times. In the format of ArrayList[String{"HH:MM", "HH:MM"}, String{"HH:MM", "HH:MM"}].
+	 * @return Arraylist in the form of ArrayList["HH:MM", "HH:MM"], with each string being the time spent
+	 */
+	public ArrayList<String> convertToSpentTime(ArrayList<String[]> startStopTimes) {
+		ArrayList<String> spentTimes = new ArrayList<String>();
+		for (String[] startStopTime : startStopTimes) { // Creates an arrayList of the time spent based off of the start and stop times.
+			spentTimes.add(subtractTime(startStopTime[0], startStopTime[1]));
+		}
+		return spentTimes;
 	}
 	
 	// TODO Convert this to return a double

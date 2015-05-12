@@ -8,6 +8,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -16,6 +20,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+import javafx.util.converter.TimeStringConverter;
 import CustomCharts.CustomPieChart;
 import CustomCharts.PieChart;
 import CustomCharts.PieChart.LabelLayoutInfo;
@@ -32,7 +38,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 		this.graphDisplay = graphDisplay;
 		this.handler = handler;
 		
-		graphNames = new String[] {"Spent Time Pie Chart"};
+		graphNames = new String[] {"Total Spent Time Pie Chart", "Spent Time Line Chart"};
 		ObservableList<String> graphOptions = FXCollections.observableArrayList(graphNames);
 		graphPicker.setItems(graphOptions);
 		
@@ -42,11 +48,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 	@Override
 	public void changed(ObservableValue<? extends Number> obsValue, Number oldValue, Number newValue) {
+		graphDisplay.getChildren().clear();
 		if (newValue.intValue() != -1) { // -1 is given when unloaded
+			System.out.println("Displaying \"" + graphNames[newValue.intValue()] + "\"");
 			switch (graphNames[newValue.intValue()]) {
-				case "Spent Time Pie Chart":
+				case "Total Spent Time Pie Chart":
 					try {
-						System.out.println("Displaying \"Spent Time Pie Chart\"");
 						ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
 
 						for (int i = 0; i < totalTimes.size(); i++) {
@@ -75,9 +82,31 @@ public class GraphTabListener implements ChangeListener<Number> {
 						graphDisplay.getChildren().add(chart);
 						
 					} catch (NumberFormatException e) {
-						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
+						System.out.println("There was an error parsing some numbers when generating the \"Total Spent Time Pie Chart\"");
 						handler.showErrorDialogue(e);
 					}
+					break;
+				case "Spent Time Line Chart":
+					final CategoryAxis xAxis = new CategoryAxis();
+					final NumberAxis yAxis = new NumberAxis();
+					xAxis.setLabel("Date");
+					final LineChart<String, Number> lineChart = new LineChart<String, Number>(xAxis, yAxis);
+					lineChart.setTitle("Spent Time Line Chart");
+					
+					yAxis.setTickLabelFormatter(new NumberTimeStringConverter(handler));
+					
+					XYChart.Series series = new XYChart.Series();
+					series.setName("Time Spent");
+			        
+					ArrayList<DataPoint> dataPoints = handler.getLineChartData("day");
+					for (DataPoint dataPoint : dataPoints) {
+						series.getData().add(new XYChart.Data(dataPoint.getDate(), dataPoint.getSecondsSpent()));
+					}
+			        
+			        lineChart.getData().add(series);
+					
+					graphDisplay.getChildren().add(lineChart);
+					
 					break;
 			}
 		}
