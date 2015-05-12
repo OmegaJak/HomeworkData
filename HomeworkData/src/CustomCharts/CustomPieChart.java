@@ -99,49 +99,6 @@ public class CustomPieChart extends PieChart{
 		
 		MouseEvent event1 = new MouseEvent(MouseEvent.MOUSE_ENTERED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
 		MouseEvent event2 = new MouseEvent(MouseEvent.MOUSE_EXITED, 0, 0, 0, 0, MouseButton.NONE, 0, false, false, false, false, false, false, false, false, false, false, null);
-
-		//(long)((dataProperty().get().get(fullPieRegions.size() - 1 - timesToRun).getPieValue() / totalValue2) * duration)
-		
-		/*TimerTask task = new TimerTask() {
-			int timesToRun = fullPieRegions.size() - 1;
-
-			@Override
-			public void run() {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						if (timesToRun > -1) {
-							fullPieRegions.get(fullPieRegions.size() - 1 - timesToRun).fireEvent(event1);
-							
-							TimerTask closingTask = new TimerTask() {
-								int closingTimesToRun = timesToRun;
-
-								@Override
-								public void run() {
-									Platform.runLater(new Runnable() {
-										@Override
-										public void run() {
-											fullPieRegions.get(fullPieRegions.size() - 1 - closingTimesToRun).fireEvent(event2);
-											cancel();
-										}
-									});
-								}
-							};
-
-							Timer closingTimer = new Timer();
-							closingTimer.schedule(closingTask, 300, 2000);
-						} else {
-							cancel();
-						}
-
-						timesToRun--;
-					}
-				});
-			}
-		};
-
-		Timer timer = new Timer();
-		timer.schedule(task, 0, 60);*/
 	}
 
 	public ArrayList<LabelLayoutInfo> getFullPieLabels() {

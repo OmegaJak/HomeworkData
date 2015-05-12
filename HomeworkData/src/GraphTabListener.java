@@ -69,21 +69,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 						chart.scaleShapeProperty().set(true);
 
 						for (PieChart.Data data : pieChartData) {
-							MouseHoverAnimation hoverAnim = new MouseHoverAnimation(data, chart, pieChartData.size());
+							PieChartMouseHoverAnimation hoverAnim = new PieChartMouseHoverAnimation(data, chart, pieChartData.size());
 							data.getNode().setOnMouseEntered(hoverAnim);
 							data.getNode().setOnMouseExited(hoverAnim);
 						}
 
-						/*graphDisplay.setOnMouseMoved(new EventHandler<MouseEvent>() {
-							@Override
-							public void handle(MouseEvent event) {
-								System.out.println("(X: " + event.getSceneX() + ", Y: " + event.getSceneY() + ")");
-							}
-						});*/
-
 						graphDisplay.getChildren().add(chart);
-						//graphDisplay.setTopAnchor(chart, 0.0);
-						//graphDisplay.setBottomAnchor(chart, 0.0);
 						
 					} catch (NumberFormatException e) {
 						System.out.println("There was an error parsing some numbers when generating the \"Spent Time Pie Chart\"");
@@ -103,9 +94,10 @@ public class GraphTabListener implements ChangeListener<Number> {
 	
 	/**
 	 * 
-	 * @author Tom Schindl Took the origins of this from here: http://tomsondev.bestsolution.at/2012/11/21/animating-the-javafx-piechart-a-bit/
+	 * @author Tom Schindl
+	 * Took the origins of this from here: http://tomsondev.bestsolution.at/2012/11/21/animating-the-javafx-piechart-a-bit/
 	 */
-	static class MouseHoverAnimation implements EventHandler<MouseEvent> {
+	static class PieChartMouseHoverAnimation implements EventHandler<MouseEvent> {
 		Duration animationDuration = new Duration(500);
 		static final double ANIMATION_DISTANCE = 0.1;
 		private double cos;
@@ -115,7 +107,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 		double lineStartX = 500;
 		double lineStartY = 300;
 		
-		public MouseHoverAnimation(PieChart.Data d, CustomPieChart chart, int numberOfData) {
+		public PieChartMouseHoverAnimation(PieChart.Data d, CustomPieChart chart, int numberOfData) {
 			this.chart = chart;
 			double start = 0;
 			double angle = calcAngle(d); // Figures out how many degrees wide the slice is
@@ -194,8 +186,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
 			double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
 			double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
-			double xCenter = 0;
-			double yCenter = 0;
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
 				double startTime = 2000;
 				if (transitions.get(0).get(sliceIndex) != null) {
@@ -235,14 +225,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 					} else {
 						TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
 						relevantTransition.pause();
-						//if (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis() == 1) {
-							//relevantTransition.setByX(xTranslate);
-							//relevantTransition.setByY(yTranslate);
-						//} else {
-							//relevantTransition.setByX(xTranslate + (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX());
-							//relevantTransition.setByY(yTranslate + (relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY());
-							//relevantTransition.setByX(xTranslate - (xTranslate + relevantTransition.getByX()));
-							//relevantTransition.setByY(yTranslate - (yTranslate + relevantTransition.getByY()));
 						if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
 							System.out.println("Went in: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
 						}
@@ -283,21 +265,17 @@ public class GraphTabListener implements ChangeListener<Number> {
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
 
-				double startTime =  transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
+				double startTime = transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
 				for (int i = 0; i < 3; i++) {
 					TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
 					relevantTransition.pause();
-					//if (relevantTransition.getByX() != xTranslate) {
-						//relevantTransition.setByX((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByX() * -1.0);
-						//relevantTransition.setByY((relevantTransition.getCurrentTime().toMillis() / animationDuration.toMillis()) * relevantTransition.getByY() * -1.0);
-					//} else {
-						if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
-							System.out.println("Went out: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
-						}
-						relevantTransition.setByX((xTranslate - (relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX())) * -1);
-						relevantTransition.setByY((yTranslate - (relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY())) * -1);
-					//}
-					if (i == 1) System.out.println("Going in: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
+					if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
+						System.out.println("Went out: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
+					}
+					relevantTransition.setByX((xTranslate - (relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX())) * -1);
+					relevantTransition.setByY((yTranslate - (relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY())) * -1);
+					if (i == 1)
+						System.out.println("Going in: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
 					relevantTransition.setAutoReverse(false);
 					relevantTransition.setCycleCount(1);
 					relevantTransition.setInterpolator(Interpolator.LINEAR);
