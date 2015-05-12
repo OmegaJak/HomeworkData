@@ -24,14 +24,12 @@ import CustomCharts.PieChart.LabelLayoutInfo;
 public class GraphTabListener implements ChangeListener<Number> {
 	
 	private AnchorPane graphDisplay;
-	//private ChoiceBox graphPicker;
 	private DataHandler handler;
 	String[] graphNames;
 	private ChoiceBox graphPicker;
 	
 	public GraphTabListener(AnchorPane graphDisplay, ChoiceBox graphPicker, DataHandler handler) {
 		this.graphDisplay = graphDisplay;
-		//this.graphPicker = graphPicker;
 		this.handler = handler;
 		
 		graphNames = new String[] {"Spent Time Pie Chart"};
