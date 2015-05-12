@@ -9,9 +9,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
@@ -471,7 +473,8 @@ public class DataHandler {
 		return toReturn;
 	}
 
-	public ArrayList<DataPoint> getLineChartData(String timeUnit) {
+	@SuppressWarnings("static-access")
+	public ArrayList<DataPoint> getLineChartData(String timeUnit, boolean shouldShowBlanks) {
 		ArrayList<DataPoint> toReturn = new ArrayList<DataPoint>();
 		switch (timeUnit.toLowerCase()) {
 			case "day":
@@ -504,10 +507,38 @@ public class DataHandler {
 					}
 				}
 				
-				DataPoint currentPoint;
-				for (int i = 0; i < dates.size(); i++) {
-					currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
-					toReturn.add(currentPoint);
+				try {
+					DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+					Date lastDate = dateFormat.parse(dates.get(0));
+					Date currentDate;
+					Calendar lastCalendar = Calendar.getInstance();
+					Calendar currentCalendar = Calendar.getInstance();
+					DataPoint currentPoint;
+					for (int i = 0; i < dates.size(); i++) {
+						currentDate = dateFormat.parse(dates.get(i));
+						currentCalendar.setTime(currentDate);
+						
+						if (shouldShowBlanks && currentCalendar.get(Calendar.DAY_OF_YEAR) != lastCalendar.get(Calendar.DAY_OF_YEAR) + 1) {
+							Calendar workingCalendar = Calendar.getInstance();
+							workingCalendar.setTime(currentDate);
+							for (int k = lastCalendar.get(lastCalendar.DAY_OF_YEAR) + 1; k < currentCalendar.get(Calendar.DAY_OF_YEAR); k++) {
+								workingCalendar.set(Calendar.DAY_OF_YEAR, k);
+								currentPoint = new DataPoint(dateFormat.format(workingCalendar.getTime()), 0);
+								toReturn.add(currentPoint);
+							}
+							currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
+							toReturn.add(currentPoint);
+						} else {
+							currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
+							toReturn.add(currentPoint);
+						}
+						
+						lastDate = dateFormat.parse(dates.get(i));
+						lastCalendar.setTime(lastDate);
+					}
+				} catch (ParseException e) {
+					System.out.println("There was an issue parsing the date while getting the line chart data");
+					showErrorDialogue(e);
 				}
 
 				break;

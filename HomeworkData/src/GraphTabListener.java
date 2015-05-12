@@ -12,6 +12,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -20,8 +21,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
-import javafx.util.converter.TimeStringConverter;
 import CustomCharts.CustomPieChart;
 import CustomCharts.PieChart;
 import CustomCharts.PieChart.LabelLayoutInfo;
@@ -87,6 +86,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 					}
 					break;
 				case "Spent Time Line Chart":
+					CheckBox showBlanks = new CheckBox("Show Empty Days");
+					
 					final CategoryAxis xAxis = new CategoryAxis();
 					final NumberAxis yAxis = new NumberAxis();
 					xAxis.setLabel("Date");
@@ -95,22 +96,36 @@ public class GraphTabListener implements ChangeListener<Number> {
 					
 					yAxis.setTickLabelFormatter(new NumberTimeStringConverter(handler));
 					
-					XYChart.Series series = new XYChart.Series();
-					series.setName("Time Spent");
-			        
-					ArrayList<DataPoint> dataPoints = handler.getLineChartData("day");
-					for (DataPoint dataPoint : dataPoints) {
-						series.getData().add(new XYChart.Data(dataPoint.getDate(), dataPoint.getSecondsSpent()));
-					}
+					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue());
+					
+					showBlanks.selectedProperty().addListener(new ChangeListener<Boolean>() {
+						public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+							lineChart.getData().clear(); // Get rid of the old data
+							XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue()); // Get the new data
+							lineChart.getData().add(series); // Add that new data
+						}
+					});
 			        
 			        lineChart.getData().add(series);
-					
+			        
 					graphDisplay.getChildren().add(lineChart);
+					graphDisplay.getChildren().add(showBlanks);
 					
 					break;
 			}
 		}
-		
+	}
+	
+	private XYChart.Series getLineChartData(boolean shouldShowBlanks) {
+		XYChart.Series toReturn = new XYChart.Series();
+		toReturn.setName("Time Spent");
+
+		ArrayList<DataPoint> dataPoints = handler.getLineChartData("day", shouldShowBlanks);
+		for (DataPoint dataPoint : dataPoints) {
+			toReturn.getData().add(new XYChart.Data(dataPoint.getDate(), dataPoint.getSecondsSpent()));
+		}
+
+		return toReturn;
 	}
 	
 	public void unload() {
