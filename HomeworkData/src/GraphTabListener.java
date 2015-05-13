@@ -321,6 +321,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
 			double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
 			double yTranslate = (diameter * ANIMATION_DISTANCE) * sin;
+			double[] startingX = {0,0,0};
+			double[] startingY = {0,0,0};
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
 				double startTime = 2000;
 				if (transitions.get(0).get(sliceIndex) != null) {
@@ -332,64 +334,24 @@ public class GraphTabListener implements ChangeListener<Number> {
 					
 					if (i == 0) { // Animating the slice (Region)
 						translateTransition = new TranslateTransition(animationDuration, n);
+						startingX[0] = n.getTranslateX();
+						startingY[0] = n.getTranslateY();
 					} else if (i == 1) { // Animating the line
 						Path relevantPath = paths.get(sliceIndex);
 						translateTransition = new TranslateTransition(animationDuration, relevantPath);
+						startingX[1] = relevantPath.getTranslateX();
+						startingY[1] = relevantPath.getTranslateY();
 					} else if (i == 2) { // Animating the label
 						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
+						startingX[2] = fullPieLabels.get(sliceIndex).text.getTranslateX();
+						startingY[2] = fullPieLabels.get(sliceIndex).text.getTranslateY();
 					}
 					
-					if (isFirstTime) {
-						translateTransition.setByX(xTranslate);
-						translateTransition.setByY(yTranslate);
-						translateTransition.setCycleCount(1);
-						translateTransition.setAutoReverse(false);
-						translateTransition.setInterpolator(Interpolator.LINEAR);
-						translateTransition.play();
-						transitions.get(i).set(sliceIndex, translateTransition);
-						
-						if (i == 1) {
-							Line line = new Line();
-							line.setStartX(lineStartX);
-							line.setStartY(lineStartY);
-							line.setEndX(lineStartX + translateTransition.getByX());
-							line.setEndY(lineStartY + translateTransition.getByY());
-							lineStartY += 40;
-							((AnchorPane)n.getParent().getParent().getParent()).getChildren().add(line);
-						}
-					} else {
-						TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
-						relevantTransition.pause();
-						if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
-							System.out.println("Went in: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
-						}
-						if (relevantTransition.getByX() != xTranslate * -1) {
-							relevantTransition.setByX(xTranslate - Math.abs(Math.abs(relevantTransition.getByX()) - Math.abs((startTime / animationDuration.toMillis()) * relevantTransition.getByX())));
-							relevantTransition.setByY(yTranslate - Math.abs(Math.abs(relevantTransition.getByY()) - Math.abs((startTime / animationDuration.toMillis()) * relevantTransition.getByY())));
-						} else {
-							System.out.println("Else");
-							relevantTransition.setByX(xTranslate - Math.abs(relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX()));
-							relevantTransition.setByY(yTranslate - Math.abs(relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY()));
-						}
-						relevantTransition.setCycleCount(1);
-						relevantTransition.setAutoReverse(false);
-						relevantTransition.setInterpolator(Interpolator.LINEAR);
-						relevantTransition.playFromStart();
-
-						if (i == 1) {
-							System.out.println("Going out: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
-							Line line = new Line();
-							line.setStartX(lineStartX);
-							line.setStartY(lineStartY);
-							line.setEndX(lineStartX + relevantTransition.getByX());
-							line.setEndY(lineStartY + relevantTransition.getByY());
-							lineStartY += 40;
-							((AnchorPane)n.getParent().getParent().getParent()).getChildren().add(line);
-						}
-						
-						transitions.get(i).set(sliceIndex, relevantTransition);
-					}
-					
+					translateTransition.setFromX(n.getTranslateX());
+					translateTransition.setFromY(n.getTranslateY());
+					translateTransition.setToX(n.getTranslateX() + xTranslate);
+					translateTransition.setToY(n.getTranslateY() + yTranslate);
+					translateTransition.play();
 					
 				}
 
@@ -400,21 +362,24 @@ public class GraphTabListener implements ChangeListener<Number> {
 					maxX = Math.max(maxX, d.getNode().getBoundsInParent().getMaxX());
 				}
 
-				double startTime = transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
+				//double startTime = transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
 				for (int i = 0; i < 3; i++) {
-					TranslateTransition relevantTransition = transitions.get(i).get(sliceIndex);
-					relevantTransition.pause();
-					if (!(startTime / animationDuration.toMillis() >= 1) && i == 1) {
-						System.out.println("Went out: " + (startTime / animationDuration.toMillis()) * relevantTransition.getByX());
+					TranslateTransition translateTransition = new TranslateTransition();
+
+					if (i == 0) { // Animating the slice (Region)
+						translateTransition = new TranslateTransition(animationDuration, n);
+					} else if (i == 1) { // Animating the line
+						Path relevantPath = paths.get(sliceIndex);
+						translateTransition = new TranslateTransition(animationDuration, relevantPath);
+					} else if (i == 2) { // Animating the label
+						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
 					}
-					relevantTransition.setByX((xTranslate - (relevantTransition.getByX() - (startTime / animationDuration.toMillis()) * relevantTransition.getByX())) * -1);
-					relevantTransition.setByY((yTranslate - (relevantTransition.getByY() - (startTime / animationDuration.toMillis()) * relevantTransition.getByY())) * -1);
-					if (i == 1)
-						System.out.println("Going in: (" + relevantTransition.getByX() + ", " + relevantTransition.getByY() + ")");
-					relevantTransition.setAutoReverse(false);
-					relevantTransition.setCycleCount(1);
-					relevantTransition.setInterpolator(Interpolator.LINEAR);
-					relevantTransition.playFromStart();
+
+					translateTransition.setFromX(n.getTranslateX());
+					translateTransition.setFromY(n.getTranslateY());
+					translateTransition.setToX(startingX[i]);
+					translateTransition.setToY(startingY[i]);
+					translateTransition.play();
 				}
 			}
 		}
