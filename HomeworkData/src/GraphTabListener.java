@@ -175,6 +175,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						dialog.showAndWait();
 					}
 				});
+				
+				//Thanks to this blog http://www.jensd.de/wordpress/?p=54 for reminding me of this animation stuff
 				currentData.getNode().setOnMouseEntered(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {

@@ -473,6 +473,12 @@ public class DataHandler {
 		return toReturn;
 	}
 
+	/**
+	 * Gets the properly formatted and relevant data for the "Spent Time Line Chart"
+	 * @param timeUnit - Either day, week, or month. Controls how much time is lumped together in the data points.
+	 * @param shouldShowBlanks - Whether or not to include the days where no homework was done.
+	 * @return An ArrayList consisting of the relevant DataPoints, each with the String of the date and an int of the seconds spent.
+	 */
 	@SuppressWarnings("static-access")
 	public ArrayList<DataPoint> getLineChartData(String timeUnit, boolean shouldShowBlanks) {
 		ArrayList<DataPoint> toReturn = new ArrayList<DataPoint>();
