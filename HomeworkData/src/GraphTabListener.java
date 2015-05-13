@@ -109,57 +109,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 							lineChart.getData().clear(); // Get rid of the old data
 							XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue()); // Get the new data
 							lineChart.getData().add(series); // Add that new data
+							series = addSeriesListeners(series);
 						}
 					});
 					
 			        lineChart.getData().add(series);
-			        
-			        for (int i = 0; i < series.getData().size(); i++) {
-						Data<String, Number> currentData = (Data<String, Number>)series.getData().get(i);
-						if (currentData.getNode() != null) {
-							currentData.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-								@Override
-								public void handle(MouseEvent event) {
-									System.out.println("My X value is: " + currentData.getXValue() + ", and my Y value is: " + currentData.getYValue() + ".");
-									ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {currentData.getXValue()},
-											"And", new int[] {1, 2, 6, 8}, true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
-
-									ObservableList<Homework> data = FXCollections.observableArrayList();
-									for (String[] row : relevantData) {
-										data.add(new Homework(row));
-									}
-									
-									Dialog<ButtonType> dialog = new Dialog<>();
-									dialog.setTitle("Point Info");
-									dialog.setHeaderText(currentData.getXValue());
-
-									dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-									
-									AnchorPane anchorPane = new AnchorPane();
-
-									TableColumn classCol = new TableColumn("Class");
-									classCol.setCellValueFactory(new PropertyValueFactory("classProp"));
-									TableColumn homeworkTypeCol = new TableColumn("Homework Type");
-									homeworkTypeCol.setCellValueFactory(new PropertyValueFactory("homeworkType"));
-									TableColumn timeStartedCol = new TableColumn("Time Started");
-									timeStartedCol.setCellValueFactory(new PropertyValueFactory("timeStarted"));
-									TableColumn timeEndedCol = new TableColumn("Time Ended");
-									timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
-
-									TableViewWithVisibleRowCount tableView = new TableViewWithVisibleRowCount();
-									tableView.createDefaultSkin();
-									tableView.setItems(data);
-									tableView.getColumns().addAll(classCol, homeworkTypeCol, timeStartedCol, timeEndedCol);
-									tableView.setPrefWidth(357);
-									anchorPane.getChildren().add(tableView);
-									
-									dialog.getDialogPane().setContent(anchorPane);
-									
-									dialog.showAndWait();
-								}
-							});
-						}
-					}
+			        series = addSeriesListeners(series);
 			        
 					graphDisplay.getChildren().add(lineChart);
 					graphDisplay.getChildren().add(showBlanks);
@@ -167,6 +122,59 @@ public class GraphTabListener implements ChangeListener<Number> {
 					break;
 			}
 		}
+	}
+	
+	private XYChart.Series addSeriesListeners(XYChart.Series originalSeries) {
+		XYChart.Series series = originalSeries;
+		
+		for (int i = 0; i < series.getData().size(); i++) {
+			Data<String, Number> currentData = (Data<String, Number>)series.getData().get(i);
+			if (currentData.getNode() != null) {
+				currentData.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						System.out.println("My X value is: " + currentData.getXValue() + ", and my Y value is: " + currentData.getYValue() + ".");
+						ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {currentData.getXValue()},
+								"And", new int[] {1, 2, 6, 8}, true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
+
+						ObservableList<Homework> data = FXCollections.observableArrayList();
+						for (String[] row : relevantData) {
+							data.add(new Homework(row));
+						}
+						
+						Dialog<ButtonType> dialog = new Dialog<>();
+						dialog.setTitle("Point Info");
+						dialog.setHeaderText(currentData.getXValue());
+
+						dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+						
+						AnchorPane anchorPane = new AnchorPane();
+
+						TableColumn classCol = new TableColumn("Class");
+						classCol.setCellValueFactory(new PropertyValueFactory("classProp"));
+						TableColumn homeworkTypeCol = new TableColumn("Homework Type");
+						homeworkTypeCol.setCellValueFactory(new PropertyValueFactory("homeworkType"));
+						TableColumn timeStartedCol = new TableColumn("Time Started");
+						timeStartedCol.setCellValueFactory(new PropertyValueFactory("timeStarted"));
+						TableColumn timeEndedCol = new TableColumn("Time Ended");
+						timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
+
+						TableViewWithVisibleRowCount tableView = new TableViewWithVisibleRowCount();
+						tableView.createDefaultSkin();
+						tableView.setItems(data);
+						tableView.getColumns().addAll(classCol, homeworkTypeCol, timeStartedCol, timeEndedCol);
+						tableView.setPrefWidth(357);
+						anchorPane.getChildren().add(tableView);
+						
+						dialog.getDialogPane().setContent(anchorPane);
+						
+						dialog.showAndWait();
+					}
+				});
+			}
+		}
+		
+		return series;
 	}
 	
 	private XYChart.Series getLineChartData(boolean shouldShowBlanks) {
