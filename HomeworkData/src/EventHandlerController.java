@@ -40,6 +40,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -68,6 +69,7 @@ public class EventHandlerController {
 	@FXML private Button saveRowButton;
 	@FXML private ChoiceBox graphPicker;
 	@FXML private AnchorPane graphDisplay;
+	@FXML private HBox graphTabOptions;
 	@FXML private Tab inputTab;
 	@FXML private Tab consoleTab;
 	@FXML private Tab graphTab;
@@ -223,7 +225,7 @@ public class EventHandlerController {
 			public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
 				System.out.println(newValue.intValue());
 				if (newValue.intValue() == 2) { // Changed to graphTab
-					graphListener = new GraphTabListener(graphDisplay, graphPicker, handler);
+					graphListener = new GraphTabListener(graphDisplay, graphPicker, graphTabOptions, handler);
 				} else if (oldValue.intValue() == 2) { // Just left the graphTab
 					graphListener.unload();
 				}

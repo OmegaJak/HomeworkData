@@ -480,78 +480,100 @@ public class DataHandler {
 	 * @return An ArrayList consisting of the relevant DataPoints, each with the String of the date and an int of the seconds spent.
 	 */
 	@SuppressWarnings("static-access")
-	public ArrayList<DataPoint> getLineChartData(String timeUnit, boolean shouldShowBlanks) {
+	public ArrayList<DataPoint> getLineChartData(boolean shouldShowBlanks, int groupingRange) {
 		ArrayList<DataPoint> toReturn = new ArrayList<DataPoint>();
-		switch (timeUnit.toLowerCase()) {
-			case "day":
-				ArrayList<String> dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true, this.csvDir, this.csvName)
-						.get(0)));
-				// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
+		ArrayList<String> dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
+				this.csvDir, this.csvName).get(0)));
+		// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
 
-				ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
-				ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
+		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
+		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
+
+		if (dates.size() != secondsSpents.size()) { // Just as a double check. Most likely not at all worth the trouble.
+			System.out.println("The sizes didn't match up when getting the LineChartData. This will cause issues.");
+
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("LineChartData Error");
+			alert.setHeaderText("Size Mismatch");
+			alert.setContentText("The sizes didn't match up when getting the LineChartData. This will cause issues.");
+			alert.showAndWait();
+		}
+
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+			Date lastDate = dateFormat.parse(dates.get(0));
+			Date currentDate;
+			Calendar lastCalendar = Calendar.getInstance();
+			lastCalendar.setTime(dateFormat.parse(dates.get(1)));
+			Calendar currentCalendar = Calendar.getInstance();
+			for (int i = 1; i < dates.size(); i++) { // Combining things that should be combined.
+				currentDate = dateFormat.parse(dates.get(i));
+				currentCalendar.setTime(currentDate);
 				
-				if (dates.size() != secondsSpents.size()) {
-					System.out.println("The sizes didn't match up when getting the LineChartData. This will cause issues.");
-					
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("LineChartData Error");
-					alert.setHeaderText("Size Mismatch");
-					alert.setContentText("The sizes didn't match up when getting the LineChartData. This will cause issues.");
-					alert.showAndWait();
-					
-					break;
+				if (lastCalendar.get(Calendar.DAY_OF_YEAR) + groupingRange > currentCalendar.get(Calendar.DAY_OF_YEAR)) {
+					int tempSeconds = secondsSpents.get(i) + secondsSpents.get(i - 1);
+					dates.remove(i);
+					secondsSpents.set(i - 1, tempSeconds);
+					secondsSpents.remove(i);
+					i--;
 				}
 				
-				for (int i = 1; i < dates.size(); i++) {
-					if (dates.get(i).equals(dates.get(i - 1))) {
-						int tempSeconds = secondsSpents.get(i) + secondsSpents.get(i - 1);
-						dates.remove(i);
-						secondsSpents.set(i - 1, tempSeconds);
-						secondsSpents.remove(i);
+				lastDate = dateFormat.parse(dates.get(i));
+				lastCalendar.setTime(lastDate);
+			}
+
+			dateFormat = new SimpleDateFormat("d-MMM-yy");
+			dateFormat.parse(dates.get(0));
+			lastCalendar = Calendar.getInstance();
+			lastCalendar.setTime(dateFormat.parse(dates.get(1)));
+			currentCalendar = Calendar.getInstance();
+			DataPoint currentPoint;
+			for (int i = 0; i < dates.size(); i++) { // Convert the separate dates and secondsSpent values into DataPoints for the graph
+				currentDate = dateFormat.parse(dates.get(i));
+				currentCalendar.setTime(currentDate);
+
+				if (shouldShowBlanks && currentCalendar.get(Calendar.DAY_OF_YEAR) != lastCalendar.get(Calendar.DAY_OF_YEAR) + groupingRange) { // If we skipped a day
+					Calendar workingCalendar = Calendar.getInstance();
+					workingCalendar.setTime(currentDate);
+					for (int k = lastCalendar.get(lastCalendar.DAY_OF_YEAR) + 1; k < currentCalendar.get(Calendar.DAY_OF_YEAR); k++) { // Fill in all missed days
+						workingCalendar.set(Calendar.DAY_OF_YEAR, k);
+						currentPoint = new DataPoint(dateFormat.format(workingCalendar.getTime()), 0);
+						toReturn.add(currentPoint);
+					}
+					currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
+					toReturn.add(currentPoint);
+				} else {
+					currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
+					toReturn.add(currentPoint);
+				}
+
+				lastDate = dateFormat.parse(dates.get(i));
+				lastCalendar.setTime(lastDate);
+			}
+			
+			dateFormat = new SimpleDateFormat("d-MMM-yy");
+			dateFormat.parse(dates.get(0));
+			lastCalendar = Calendar.getInstance();
+			lastCalendar.setTime(dateFormat.parse(dates.get(1)));
+			currentCalendar = Calendar.getInstance();
+			for (int i = 0; i < toReturn.size(); i++) {
+				currentDate = dateFormat.parse(toReturn.get(i).getDate());
+				currentCalendar.setTime(currentDate);
+				
+				if (toReturn.get(i).getSecondsSpent() == 0) { // If it's an empty/filler DataPoint
+					//TODO: Improve this methodology. It kinda works, but not as intended. Just observe.
+					if (currentCalendar.get(Calendar.DAY_OF_YEAR) < lastCalendar.get(Calendar.DAY_OF_YEAR) + groupingRange) {// If it's within the grouping range of the last real DataPoint
+						toReturn.remove(i);
 						i--;
 					}
 				}
 				
-				try {
-					DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
-					Date lastDate = dateFormat.parse(dates.get(0));
-					Date currentDate;
-					Calendar lastCalendar = Calendar.getInstance();
-					Calendar currentCalendar = Calendar.getInstance();
-					DataPoint currentPoint;
-					for (int i = 0; i < dates.size(); i++) {
-						currentDate = dateFormat.parse(dates.get(i));
-						currentCalendar.setTime(currentDate);
-						
-						if (shouldShowBlanks && currentCalendar.get(Calendar.DAY_OF_YEAR) != lastCalendar.get(Calendar.DAY_OF_YEAR) + 1) {
-							Calendar workingCalendar = Calendar.getInstance();
-							workingCalendar.setTime(currentDate);
-							for (int k = lastCalendar.get(lastCalendar.DAY_OF_YEAR) + 1; k < currentCalendar.get(Calendar.DAY_OF_YEAR); k++) {
-								workingCalendar.set(Calendar.DAY_OF_YEAR, k);
-								currentPoint = new DataPoint(dateFormat.format(workingCalendar.getTime()), 0);
-								toReturn.add(currentPoint);
-							}
-							currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
-							toReturn.add(currentPoint);
-						} else {
-							currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
-							toReturn.add(currentPoint);
-						}
-						
-						lastDate = dateFormat.parse(dates.get(i));
-						lastCalendar.setTime(lastDate);
-					}
-				} catch (ParseException e) {
-					System.out.println("There was an issue parsing the date while getting the line chart data");
-					showErrorDialogue(e);
-				}
-
-				break;
-			case "week":
-				break;
-			case "month":
-				break;
+				lastDate = dateFormat.parse(toReturn.get(i).getDate());
+				lastCalendar.setTime(lastDate);
+			}
+		} catch (ParseException e) {
+			System.out.println("There was an issue parsing the date while getting the line chart data");
+			showErrorDialogue(e);
 		}
 		return toReturn;
 	}

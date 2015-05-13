@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import javafx.animation.Interpolator;
@@ -8,6 +9,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
@@ -24,8 +26,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.util.Duration;
@@ -38,12 +40,17 @@ public class GraphTabListener implements ChangeListener<Number> {
 	
 	private AnchorPane graphDisplay;
 	private DataHandler handler;
+	private HBox graphTabOptions;
+	private int startingNumGraphTabOptionsChildren;
 	String[] graphNames;
 	private ChoiceBox graphPicker;
 	
-	public GraphTabListener(AnchorPane graphDisplay, ChoiceBox graphPicker, DataHandler handler) {
+	public GraphTabListener(AnchorPane graphDisplay, ChoiceBox graphPicker, HBox graphTabOptions, DataHandler handler) {
 		this.graphDisplay = graphDisplay;
 		this.handler = handler;
+		this.graphTabOptions = graphTabOptions;
+		
+		startingNumGraphTabOptionsChildren = graphTabOptions.getChildren().size();
 		
 		graphNames = new String[] {"Total Spent Time Pie Chart", "Spent Time Line Chart"};
 		ObservableList<String> graphOptions = FXCollections.observableArrayList(graphNames);
@@ -56,6 +63,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 	@Override
 	public void changed(ObservableValue<? extends Number> obsValue, Number oldValue, Number newValue) {
 		graphDisplay.getChildren().clear();
+		clearGraphTabOptions();
 		if (newValue.intValue() != -1) { // -1 is given when unloaded
 			System.out.println("Displaying \"" + graphNames[newValue.intValue()] + "\"");
 			switch (graphNames[newValue.intValue()]) {
@@ -94,6 +102,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					}
 					break;
 				case "Spent Time Line Chart":
+					NumberSpinner groupingRangeSpinner = new NumberSpinner();
 					CheckBox showBlanks = new CheckBox("Show Empty Days");
 					
 					final CategoryAxis xAxis = new CategoryAxis();
@@ -104,26 +113,50 @@ public class GraphTabListener implements ChangeListener<Number> {
 					
 					yAxis.setTickLabelFormatter(new NumberTimeStringConverter(handler));
 					
-					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue());
+					groupingRangeSpinner.setNumber(new BigDecimal(1));
+					
+					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
 					
 					showBlanks.selectedProperty().addListener(new ChangeListener<Boolean>() {
 						public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
-							lineChart.getData().clear(); // Get rid of the old data
-							XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue()); // Get the new data
-							lineChart.getData().add(series); // Add that new data
-							series = addSeriesListeners(series);
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
+						}
+					});
+					
+					groupingRangeSpinner.getIncremementButton().setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							groupingRangeSpinner.increment();
+							event.consume();
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
+						}
+					});
+
+					groupingRangeSpinner.getDecrementButton().setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							groupingRangeSpinner.decrement();
+							event.consume();
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
 						}
 					});
 					
 			        lineChart.getData().add(series);
 			        series = addSeriesListeners(series);
 			        
-					graphDisplay.getChildren().add(lineChart);
-					graphDisplay.getChildren().add(showBlanks);
+			        graphDisplay.getChildren().add(lineChart);
+			        graphTabOptions.getChildren().add(groupingRangeSpinner);
+			        graphTabOptions.getChildren().add(showBlanks);
 					
 					break;
 			}
 		}
+	}
+	
+	private void updateChartData(LineChart lineChart, boolean shouldShowBlanks, int groupingRange) {
+		lineChart.getData().clear(); // Get rid of the old data
+		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange); // Get the new data
+		lineChart.getData().add(series); // Add that new data
 	}
 	
 	private XYChart.Series addSeriesListeners(XYChart.Series originalSeries) {
@@ -209,11 +242,11 @@ public class GraphTabListener implements ChangeListener<Number> {
 		return series;
 	}
 	
-	private XYChart.Series getLineChartData(boolean shouldShowBlanks) {
+	private XYChart.Series getLineChartData(boolean shouldShowBlanks, int groupingRange) {
 		XYChart.Series toReturn = new XYChart.Series();
 		toReturn.setName("Time Spent");
 
-		ArrayList<DataPoint> dataPoints = handler.getLineChartData("day", shouldShowBlanks);
+		ArrayList<DataPoint> dataPoints = handler.getLineChartData(shouldShowBlanks, groupingRange);
 		for (DataPoint dataPoint : dataPoints) {
 			toReturn.getData().add(new XYChart.Data(dataPoint.getDate(), dataPoint.getSecondsSpent()));
 		}
@@ -225,8 +258,16 @@ public class GraphTabListener implements ChangeListener<Number> {
 		graphDisplay.getChildren().clear();
 		graphPicker.getSelectionModel().clearSelection();
 		graphPicker.getSelectionModel().selectedIndexProperty().removeListener(GraphTabListener.this);
+		clearGraphTabOptions();
 	}
 	
+	public void clearGraphTabOptions() {
+		int currentNumGraphTabOptionsChildren = graphTabOptions.getChildren().size();
+		for (int i = startingNumGraphTabOptionsChildren; i < currentNumGraphTabOptionsChildren; i++) { // Clear out any options that were added
+			graphTabOptions.getChildren().remove(startingNumGraphTabOptionsChildren);
+		}
+	}
+
 	/**
 	 * 
 	 * @author Tom Schindl
