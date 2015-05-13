@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 import javafx.animation.Interpolator;
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -8,7 +9,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -173,6 +173,32 @@ public class GraphTabListener implements ChangeListener<Number> {
 						dialog.getDialogPane().setContent(anchorPane);
 						
 						dialog.showAndWait();
+					}
+				});
+				currentData.getNode().setOnMouseEntered(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						ScaleTransition transition = new ScaleTransition(Duration.millis(500), currentData.getNode());
+						transition.setFromX(currentData.getNode().getScaleX());
+						transition.setFromX(currentData.getNode().getScaleY());
+						transition.setToX(1.5);
+						transition.setToY(1.5);
+						transition.setInterpolator(Interpolator.EASE_BOTH);
+						
+						transition.play();
+					}
+				});
+				currentData.getNode().setOnMouseExited(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						ScaleTransition transition = new ScaleTransition(Duration.millis(500), currentData.getNode());
+						transition.setFromX(currentData.getNode().getScaleX());
+						transition.setFromX(currentData.getNode().getScaleY());
+						transition.setToX(1);
+						transition.setToY(1);
+						transition.setInterpolator(Interpolator.EASE_BOTH);
+						
+						transition.play();
 					}
 				});
 			}
