@@ -2,11 +2,13 @@ import java.util.ArrayList;
 
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -159,11 +161,13 @@ public class GraphTabListener implements ChangeListener<Number> {
 						TableColumn timeEndedCol = new TableColumn("Time Ended");
 						timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
 
-						TableViewWithVisibleRowCount tableView = new TableViewWithVisibleRowCount();
-						tableView.createDefaultSkin();
+						TableView tableView = new TableView();
 						tableView.setItems(data);
 						tableView.getColumns().addAll(classCol, homeworkTypeCol, timeStartedCol, timeEndedCol);
-						tableView.setPrefWidth(357);
+						//tableView.setPrefWidth(357);
+						tableView.setFixedCellSize(25);
+						tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
+						tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 						anchorPane.getChildren().add(tableView);
 						
 						dialog.getDialogPane().setContent(anchorPane);
