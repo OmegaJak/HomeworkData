@@ -351,6 +351,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					translateTransition.setFromY(n.getTranslateY());
 					translateTransition.setToX(n.getTranslateX() + xTranslate);
 					translateTransition.setToY(n.getTranslateY() + yTranslate);
+					translateTransition.setInterpolator(Interpolator.EASE_BOTH);
 					translateTransition.play();
 					
 				}
@@ -379,6 +380,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					translateTransition.setFromY(n.getTranslateY());
 					translateTransition.setToX(startingX[i]);
 					translateTransition.setToY(startingY[i]);
+					translateTransition.setInterpolator(Interpolator.EASE_BOTH);
 					translateTransition.play();
 				}
 			}
