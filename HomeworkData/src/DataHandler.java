@@ -546,7 +546,7 @@ public class DataHandler {
 					Calendar throughCalendar = currentCalendar;
 					if (groupingRange > 1) {
 						throughCalendar.add(Calendar.DATE, groupingRange);
-						currentPoint = new DataPoint(dates.get(i) + " - " + dateFormat.format(throughCalendar.getTime()), secondsSpents.get(i));
+						currentPoint = new DataPoint(dates.get(i) + " ~ " + dateFormat.format(throughCalendar.getTime()), secondsSpents.get(i));
 					} else {
 						currentPoint = new DataPoint(dates.get(i), secondsSpents.get(i));
 					}

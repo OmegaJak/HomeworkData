@@ -1,5 +1,12 @@
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
@@ -195,14 +202,36 @@ public class GraphTabListener implements ChangeListener<Number> {
 						TableColumn timeEndedCol = new TableColumn("Time Ended");
 						timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
 
-						TableView tableView = new TableView();
-						tableView.setItems(data);
-						tableView.getColumns().addAll(classCol, homeworkTypeCol, timeStartedCol, timeEndedCol);
-						//tableView.setPrefWidth(357);
-						tableView.setFixedCellSize(25);
-						tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
-						tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-						anchorPane.getChildren().add(tableView);
+						if (currentData.getXValue().contains("~")) {
+							try {
+							String[] startEndDays = handler.findInBetween(currentData.getXValue().replaceAll("\\s", ""), '~');
+							System.out.println(Arrays.toString(startEndDays));
+							
+							//----Date Crap----//
+							DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+							Date startingDate = dateFormat.parse(startEndDays[0]);
+							Calendar startingCalendar = Calendar.getInstance();
+							startingCalendar.setTime(startingDate);
+							Date endingDate = dateFormat.parse(startEndDays[1]);
+							Calendar endingCalendar = Calendar.getInstance();
+							endingCalendar.setTime(endingDate);
+							int daysInBetween = endingCalendar.get(Calendar.DAY_OF_YEAR) - startingCalendar.get(Calendar.DAY_OF_YEAR);
+							
+							
+							} catch (ParseException e) {
+								handler.showErrorDialogue(e);
+								e.printStackTrace();
+							}
+						} else { // This DataPoint is only for one day
+							TableView tableView = new TableView();
+							tableView.setItems(data);
+							tableView.getColumns().addAll(classCol, homeworkTypeCol, timeStartedCol, timeEndedCol);
+							//tableView.setPrefWidth(357);
+							tableView.setFixedCellSize(25);
+							tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
+							tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+							anchorPane.getChildren().add(tableView);
+						}
 						
 						dialog.getDialogPane().setContent(anchorPane);
 						
