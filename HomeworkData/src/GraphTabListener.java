@@ -157,6 +157,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 		lineChart.getData().clear(); // Get rid of the old data
 		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange); // Get the new data
 		lineChart.getData().add(series); // Add that new data
+		addSeriesListeners(series); // Set animation & click listeners for the new chart data
 	}
 	
 	private XYChart.Series addSeriesListeners(XYChart.Series originalSeries) {
