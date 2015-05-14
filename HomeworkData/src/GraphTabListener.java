@@ -180,7 +180,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 						
 						Dialog<ButtonType> dialog = new Dialog<>();
 						dialog.setTitle("Point Info");
-						dialog.setHeaderText(currentData.getXValue());
+						dialog.setHeaderText(currentData.getXValue() + "  |  " + currentData.getYValue() + " seconds  |  " + handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), currentData.getYValue().intValue()));
 
 						dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 						
