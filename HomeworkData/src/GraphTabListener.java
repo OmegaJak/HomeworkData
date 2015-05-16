@@ -3,7 +3,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,6 +32,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -184,6 +184,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 												
 						Dialog<ButtonType> dialog = new Dialog<>();
 						dialog.setTitle("Point Info");
+						dialog.setResizable(true);
 						//dialog.setHeaderText(currentData.getXValue() + "  |  " + currentData.getYValue() + " seconds  |  " + handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), currentData.getYValue().intValue()));
 						
 						String[] startingEndingDays = handler.findInBetween(currentData.getXValue().replaceAll("\\s", ""), '~');
@@ -201,9 +202,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 						headerBox.setAlignment(Pos.CENTER);
 						headerBox.setSpacing(13);
 						
-						ArrowButton leftArrow = new ArrowButton(12);
-						leftArrow.setArrowDirection(ArrowDirection.LEFT);
-						
 						Label date = new Label(startingDay);
 						date.setFont(labelFont);
 						
@@ -219,14 +217,32 @@ public class GraphTabListener implements ChangeListener<Number> {
 						
 						Label timeSpent = new Label(handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), secondsSpentOnDay));
 						timeSpent.fontProperty().bind(date.fontProperty());
-						
+
+						headerBox.getChildren().addAll(date, separatorOne, secondsSpent, separatorTwo, timeSpent);
+						//~~//
+
+						AnchorPane headerAnchor = new AnchorPane();
+
+						ArrowButton leftArrow = new ArrowButton(12);
+						leftArrow.setArrowDirection(ArrowDirection.LEFT);
+
 						ArrowButton rightArrow = new ArrowButton(12);
 						rightArrow.setArrowDirection(ArrowDirection.RIGHT);
-						
-						headerBox.getChildren().addAll(leftArrow.getStackPane(), date, separatorOne, secondsSpent, separatorTwo, timeSpent, rightArrow.getStackPane());
+
+						headerAnchor.getChildren().add(leftArrow.getStackPane());
+						headerAnchor.setLeftAnchor(leftArrow.getStackPane(), 0.0);
+
+						headerAnchor.getChildren().add(rightArrow.getStackPane());
+						headerAnchor.setRightAnchor(rightArrow.getStackPane(), 0.0);
+
+						headerAnchor.getChildren().add(headerBox);
+						headerAnchor.setBottomAnchor(headerBox, 0.0);
+						headerAnchor.setTopAnchor(headerBox, 0.0);
+						headerAnchor.setLeftAnchor(headerBox, 20.0);
+						headerAnchor.setRightAnchor(headerBox, 20.0);
+
+						dialog.getDialogPane().setHeader(headerAnchor);
 						//--------//
-						
-						dialog.getDialogPane().setHeader(headerBox);
 						
 						dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
 						
