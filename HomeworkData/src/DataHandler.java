@@ -584,6 +584,18 @@ public class DataHandler {
 		return toReturn;
 	}
 	
+	public int getSecondsSpentOnDay(String date) {
+		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8}, true, this.csvDir, this.csvName);
+		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
+		
+		int totalSeconds = 0;
+		for (Integer integer : secondsSpents) {
+			totalSeconds += integer.intValue();
+		}
+		
+		return totalSeconds;
+	}
+	
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//

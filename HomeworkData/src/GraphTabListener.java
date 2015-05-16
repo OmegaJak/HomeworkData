@@ -186,6 +186,14 @@ public class GraphTabListener implements ChangeListener<Number> {
 						dialog.setTitle("Point Info");
 						//dialog.setHeaderText(currentData.getXValue() + "  |  " + currentData.getYValue() + " seconds  |  " + handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), currentData.getYValue().intValue()));
 						
+						String[] startingEndingDays = handler.findInBetween(currentData.getXValue().replaceAll("\\s", ""), '~');
+						String startingDay = startingEndingDays[0];
+						String endingDay;
+						if (startingEndingDays.length > 1) 
+							endingDay = startingEndingDays[1]; 
+						else
+							endingDay = startingEndingDays[0];
+						
 						//----Header Contents----//
 						final Font labelFont = new Font(16);
 						
@@ -196,19 +204,20 @@ public class GraphTabListener implements ChangeListener<Number> {
 						ArrowButton leftArrow = new ArrowButton(12);
 						leftArrow.setArrowDirection(ArrowDirection.LEFT);
 						
-						Label date = new Label(currentData.getXValue());
+						Label date = new Label(startingDay);
 						date.setFont(labelFont);
 						
 						Separator separatorOne = new Separator();
 						separatorOne.setOrientation(Orientation.VERTICAL);
 						
-						Label secondsSpent = new Label(currentData.getYValue().toString() + " seconds");
+						int secondsSpentOnDay = handler.getSecondsSpentOnDay(startingDay);
+						Label secondsSpent = new Label(secondsSpentOnDay + " seconds");
 						secondsSpent.fontProperty().bind(date.fontProperty());
 						
 						Separator separatorTwo = new Separator();
 						separatorTwo.setOrientation(Orientation.VERTICAL);
 						
-						Label timeSpent = new Label(handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), currentData.getYValue().intValue()));
+						Label timeSpent = new Label(handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), secondsSpentOnDay));
 						timeSpent.fontProperty().bind(date.fontProperty());
 						
 						ArrowButton rightArrow = new ArrowButton(12);
@@ -216,15 +225,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 						
 						headerBox.getChildren().addAll(leftArrow.getStackPane(), date, separatorOne, secondsSpent, separatorTwo, timeSpent, rightArrow.getStackPane());
 						//--------//
-						
-						leftArrow.setOnAction(new EventHandler<ActionEvent>() {
-							@Override
-							public void handle(ActionEvent event) {
-								// TODO Auto-generated method stub
-								
-							}
-							
-						});
 						
 						dialog.getDialogPane().setHeader(headerBox);
 						
@@ -240,21 +240,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 						timeStartedCol.setCellValueFactory(new PropertyValueFactory("timeStarted"));
 						TableColumn timeEndedCol = new TableColumn("Time Ended");
 						timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
-
-						/*String[] startEndDays = handler.findInBetween(currentData.getXValue().replaceAll("\\s", ""), '~');
-						System.out.println(Arrays.toString(startEndDays));
 						
-						//----Date Crap----//
-						DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
-						Date startingDate = dateFormat.parse(startEndDays[0]);
-						Calendar startingCalendar = Calendar.getInstance();
-						startingCalendar.setTime(startingDate);
-						Date endingDate = dateFormat.parse(startEndDays[1]);
-						Calendar endingCalendar = Calendar.getInstance();
-						endingCalendar.setTime(endingDate);
-						int daysInBetween = endingCalendar.get(Calendar.DAY_OF_YEAR) - startingCalendar.get(Calendar.DAY_OF_YEAR);*/
-						
-						ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {currentData.getXValue()}, "And",
+						ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {startingDay}, "And",
 								new int[] {1, 2, 6, 8}, true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
 
 						ObservableList<Homework> data = FXCollections.observableArrayList();
@@ -269,6 +256,20 @@ public class GraphTabListener implements ChangeListener<Number> {
 						tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
 						tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 						anchorPane.getChildren().add(tableView);
+						
+						leftArrow.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								handlePopupButtons("left", date, secondsSpent, timeSpent, tableView, startingDay, endingDay);
+							}
+						});
+						
+						rightArrow.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								handlePopupButtons("right", date, secondsSpent, timeSpent, tableView, startingDay, endingDay);
+							}
+						});
 
 						dialog.getDialogPane().setContent(anchorPane);
 
@@ -307,6 +308,54 @@ public class GraphTabListener implements ChangeListener<Number> {
 		}
 		
 		return series;
+	}
+	
+	private void handlePopupButtons(String type, Label date, Label secondsSpent, Label timeSpent, TableView tableView, String startingDay, String endingDay) {
+		try {
+			//----Updating the header----//
+			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
+			Date currentDate = dateFormat.parse(date.getText());
+			Calendar currentCalendar = Calendar.getInstance();
+			currentCalendar.setTime(currentDate);
+			Date startingDate = dateFormat.parse(startingDay);
+			Calendar startingCalendar = Calendar.getInstance();
+			startingCalendar.setTime(startingDate);
+			Date endingDate = dateFormat.parse(endingDay);
+			Calendar endingCalendar = Calendar.getInstance();
+			endingCalendar.setTime(endingDate);
+			
+			if (type.toLowerCase().equals("right")) {
+				if (currentCalendar.get(Calendar.DAY_OF_YEAR) >= endingCalendar.get(Calendar.DAY_OF_YEAR)) return; // Keeps it from going above the range
+				currentCalendar.add(Calendar.DAY_OF_YEAR, 1);// Increment by a day
+			} else if (type.toLowerCase().equals("left")) {
+				if (currentCalendar.get(Calendar.DAY_OF_YEAR) <= startingCalendar.get(Calendar.DAY_OF_YEAR)) return; // Keeps it from going below the range
+				currentCalendar.add(Calendar.DAY_OF_YEAR, -1);// Decrement by a day
+			}
+
+			date.setText(dateFormat.format(currentCalendar.getTime()));
+			int secondsSpentOnDay = handler.getSecondsSpentOnDay(date.getText());
+			secondsSpent.setText(secondsSpentOnDay + " seconds");
+			timeSpent.setText(handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), secondsSpentOnDay));
+			//--------//
+
+			//----Updating the Data Table----//
+			ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {date.getText()}, "And", new int[] {1, 2, 6, 8},
+					true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
+
+			ObservableList<Homework> data = FXCollections.observableArrayList();
+			for (String[] row : relevantData) {
+				data.add(new Homework(row));
+			}
+
+			tableView.setItems(data);
+			tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
+			tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+			//--------//
+		} catch (ParseException e) {
+			System.out.println("There was an error parsing the string after the left arrow was clicked.");
+			handler.showErrorDialogue(e);
+			e.printStackTrace();
+		}
 	}
 	
 	private XYChart.Series getLineChartData(boolean shouldShowBlanks, int groupingRange) {
