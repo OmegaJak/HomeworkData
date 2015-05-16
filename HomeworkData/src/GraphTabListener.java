@@ -230,10 +230,10 @@ public class GraphTabListener implements ChangeListener<Number> {
 						rightArrow.setArrowDirection(ArrowDirection.RIGHT);
 
 						headerAnchor.getChildren().add(leftArrow.getStackPane());
-						headerAnchor.setLeftAnchor(leftArrow.getStackPane(), 0.0);
+						headerAnchor.setLeftAnchor(leftArrow.getStackPane(), 10.0);
 
 						headerAnchor.getChildren().add(rightArrow.getStackPane());
-						headerAnchor.setRightAnchor(rightArrow.getStackPane(), 0.0);
+						headerAnchor.setRightAnchor(rightArrow.getStackPane(), 10.0);
 
 						headerAnchor.getChildren().add(headerBox);
 						headerAnchor.setBottomAnchor(headerBox, 0.0);
@@ -272,6 +272,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 						tableView.prefHeightProperty().bind(Bindings.size(tableView.getItems()).multiply(tableView.getFixedCellSize()).add(26));
 						tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 						anchorPane.getChildren().add(tableView);
+						
+						anchorPane.setLeftAnchor(tableView, 0.0);
+						anchorPane.setRightAnchor(tableView, 0.0);
 						
 						leftArrow.setOnAction(new EventHandler<ActionEvent>() {
 							@Override
