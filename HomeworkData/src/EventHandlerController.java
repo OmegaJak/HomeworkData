@@ -251,7 +251,9 @@ public class EventHandlerController {
 		PrintStream ps = System.out;
 		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
 		
-		System.out.println("Hello World");
+		DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy @ KK:mm a");
+		Date date = new Date();
+		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
 	}
 
 	@FXML
