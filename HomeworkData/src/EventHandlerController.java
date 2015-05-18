@@ -249,7 +249,7 @@ public class EventHandlerController {
 		
 		
 		PrintStream ps = System.out;
-		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps)));
+		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
 		
 		System.out.println("Hello World");
 	}
