@@ -258,9 +258,8 @@ public class EventHandlerController {
 	private void newRow() {
 		try {
 			this.handler.insertNewRow(-2, 16, handler.csvDir, handler.csvName);
-			//			clearInputs(); // I decided this was too dangerous
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			handler.showErrorDialogue(e);
 			e.printStackTrace();
 		}
 	}
@@ -268,7 +267,6 @@ public class EventHandlerController {
 	private void checkForTimePrediction() {
 		TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
 		if (checkIfAllFilled(neededInputs)) {
-			//System.out.println("The right things were filled");
 			String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(), unitField.getEditor().getText());
 			String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
 			predictedField.setText(predictedTimeSpent);
@@ -399,7 +397,7 @@ public class EventHandlerController {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			handler.showErrorDialogue(e);
 			e.printStackTrace();
 			System.out.println("The data did not save! Shit... Outputting data to console(hopefully)...");
 			System.out.print("[");
