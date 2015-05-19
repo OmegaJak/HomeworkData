@@ -161,14 +161,6 @@ public class NumberSpinner extends HBox {
 	public final void setNumber(BigDecimal value) {
 		numberField.setNumber(value);
 	}
-	
-	public Button getIncremementButton() {
-		return incrementButton;
-	}
-	
-	public Button getDecrementButton() {
-		return decrementButton;
-	}
 
 	public ObjectProperty<BigDecimal> numberProperty() {
 		return numberField.numberProperty();

@@ -134,20 +134,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 						}
 					});
 					
-					groupingRangeSpinner.getIncremementButton().setOnAction(new EventHandler<ActionEvent>() {
+					groupingRangeSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {
 						@Override
-						public void handle(ActionEvent event) {
-							groupingRangeSpinner.increment();
-							event.consume();
-							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
-						}
-					});
-
-					groupingRangeSpinner.getDecrementButton().setOnAction(new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent event) {
-							groupingRangeSpinner.decrement();
-							event.consume();
+						public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
 							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
 						}
 					});
