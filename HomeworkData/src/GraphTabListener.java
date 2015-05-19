@@ -482,6 +482,16 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 			}
 			
+			int[] invisibleText = {};
+			for (int i = 0; i < fullPieLabels.size(); i++) {
+				if (!fullPieLabels.get(i).text.isVisible()) {
+					int[] invisibleText2 = new int[invisibleText.length + 1];
+					System.arraycopy(invisibleText, 0, invisibleText2, 0, invisibleText.length);
+					invisibleText2[invisibleText.length] = i;
+					invisibleText = invisibleText2;
+				}
+			}
+			
 			//---Actually animating now
 			double diameter = maxX - minX; // Just the difference between the right edge and the left edge of the pie
 			double xTranslate = (diameter * ANIMATION_DISTANCE) * cos;
@@ -502,10 +512,19 @@ public class GraphTabListener implements ChangeListener<Number> {
 						startingX[0] = n.getTranslateX();
 						startingY[0] = n.getTranslateY();
 					} else if (i == 1) { // Animating the line
-						Path relevantPath = paths.get(sliceIndex);
-						translateTransition = new TranslateTransition(animationDuration, relevantPath);
-						startingX[1] = relevantPath.getTranslateX();
-						startingY[1] = relevantPath.getTranslateY();
+						int numMissing = 0;
+						for (int k = 0; k < invisibleText.length; k++) {
+							if (sliceIndex > invisibleText[k]) {
+								numMissing++;
+							}
+						}
+						
+						if (fullPieLabels.get(sliceIndex).text.isVisible()) {
+							Path relevantPath = paths.get(sliceIndex - numMissing);
+							translateTransition = new TranslateTransition(animationDuration, relevantPath);
+							startingX[1] = relevantPath.getTranslateX();
+							startingY[1] = relevantPath.getTranslateY();
+						}
 					} else if (i == 2) { // Animating the label
 						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
 						startingX[2] = fullPieLabels.get(sliceIndex).text.getTranslateX();
@@ -535,8 +554,17 @@ public class GraphTabListener implements ChangeListener<Number> {
 					if (i == 0) { // Animating the slice (Region)
 						translateTransition = new TranslateTransition(animationDuration, n);
 					} else if (i == 1) { // Animating the line
-						Path relevantPath = paths.get(sliceIndex);
-						translateTransition = new TranslateTransition(animationDuration, relevantPath);
+						int numMissing = 0;
+						for (int k = 0; k < invisibleText.length; k++) {
+							if (sliceIndex > invisibleText[k]) {
+								numMissing++;
+							}
+						}
+						
+						if (fullPieLabels.get(sliceIndex).text.isVisible()) {
+							Path relevantPath = paths.get(sliceIndex - numMissing);
+							translateTransition = new TranslateTransition(animationDuration, relevantPath);
+						}
 					} else if (i == 2) { // Animating the label
 						translateTransition = new TranslateTransition(animationDuration, fullPieLabels.get(sliceIndex).text);
 					}
