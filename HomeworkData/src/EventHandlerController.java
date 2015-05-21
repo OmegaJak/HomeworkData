@@ -470,4 +470,9 @@ public class EventHandlerController {
 			e.printStackTrace();
 		}
 	}
+	
+	@FXML
+	private void quit() {
+		System.exit(0);
+	}
 }
