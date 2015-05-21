@@ -839,7 +839,7 @@ public class DataHandler {
 		return input;
 	}
 	
-	public static int[] convertStringsToInts(String[] toConvert) {
+	public int[] convertStringsToInts(String[] toConvert) throws NumberFormatException {
 		try {
 			int[] convertedTo = new int[toConvert.length];
 			for (int i = 0; i < toConvert.length; i++) {
@@ -848,9 +848,10 @@ public class DataHandler {
 			return convertedTo;
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error while converting a string to ints");
+			showErrorDialogue(e);
+			
+			throw e;
 		}
-		int[] blank = {};
-		return blank;
 	}
 	
 	/**

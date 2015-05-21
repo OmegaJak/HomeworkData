@@ -267,13 +267,18 @@ public class EventHandlerController {
 	}
 	
 	private void checkForTimePrediction() {
-		TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
-		if (checkIfAllFilled(neededInputs)) {
-			String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(), unitField.getEditor().getText());
-			String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
-			predictedField.setText(predictedTimeSpent);
-			Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
-			predictedField.setTooltip(averageTime);
+		try {
+			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
+			if (checkIfAllFilled(neededInputs)) {
+				String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(),
+						unitField.getEditor().getText());
+				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
+				predictedField.setText(predictedTimeSpent);
+				Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
+				predictedField.setTooltip(averageTime);
+			}
+		} catch (NumberFormatException e) {
+			handler.showErrorDialogue(e);
 		}
 	}
 	
