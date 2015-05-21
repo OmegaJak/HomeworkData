@@ -316,7 +316,12 @@ public class DataHandler {
 			String curLine[] = {};
 			while ((line = reader.readLine()) != null) {//Go through each line sequentially until there are no more
 				curLine = line.split(",", -1); //Creates an array of each element between the commas
-				if (allowEmptyLines || line.charAt(0) != ',') {//Ignore empty rows
+				boolean isEmpty = true;
+				for (String item : curLine) {
+					if (!item.equals(""))
+						isEmpty = false;
+				}
+				if (allowEmptyLines || !isEmpty) {//Ignore empty rows
 					rows.add(curLine);
 				}
 			}

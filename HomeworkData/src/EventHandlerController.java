@@ -324,23 +324,46 @@ public class EventHandlerController {
 
 	@FXML
 	private void saveRow() {
+		boolean didSave = saveData();
+		
+		if (didSave) {
+			System.out.println("Saved");
+
+			FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
+			transition.setFromValue(1.0);
+			transition.setToValue(0.0);
+			transition.setCycleCount(2);
+			transition.setAutoReverse(true);
+			transition.play();
+		} else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Save Failure!");
+			alert.setHeaderText("Your data was not saved!");
+			alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+
+			alert.showAndWait();
+		}			
+	}
+	
+	private boolean saveData() {
 		try {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true);// Get the current data sheet
 			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
 			boolean shouldSave = true;
-			
+
 			boolean isEmpty = true;
 			for (String item : currentRow) {
-				if (!item.equals("")) isEmpty = false;
+				if (!item.equals(""))
+					isEmpty = false;
 			}
-			
+
 			if (!isEmpty) {
-				Alert confirmationAlert  = new Alert(AlertType.CONFIRMATION); // Creates a confirmation alert, to ensure that you want to overwrite the data
+				Alert confirmationAlert = new Alert(AlertType.CONFIRMATION); // Creates a confirmation alert, to ensure that you want to overwrite the data
 				confirmationAlert.setTitle("Are You Sure?");
 				confirmationAlert.setHeaderText("Are you sure you want to save?");
 				confirmationAlert.setContentText("You will overwrite existing data:\n    " + Arrays.toString(currentRow));
-				
+
 				Optional<ButtonType> result = confirmationAlert.showAndWait();
 				if (result.get() != ButtonType.OK) { // If the user says no to the dialogue and cancels
 					shouldSave = false;
@@ -367,7 +390,7 @@ public class EventHandlerController {
 				handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
 
 				// Save confirmation stuff
-				
+
 				boolean didSave = true;
 				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
 				for (int i = 0; i < inputFields.length; i++) {
@@ -377,32 +400,18 @@ public class EventHandlerController {
 					} else if (inputFields[i] instanceof ComboBox) {
 						inputText = ((ComboBox)inputFields[i]).getEditor().getText();
 					}
-					
+
 					if (!data.get(data.size() - 1)[i].equals(inputText)) {
 						didSave = false;
 						break;
 					}
 				}
-				
-				if (didSave) {
-					System.out.println("Saved");
-					
-					FadeTransition transition = new FadeTransition(Duration.millis(80), saveRowButton);
-					transition.setFromValue(1.0);
-					transition.setToValue(0.0);
-					transition.setCycleCount(2);
-					transition.setAutoReverse(true);
-					transition.play();
-				} else {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Save Failure!");
-					alert.setHeaderText("Your data was not saved!");
-					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
-					
-					alert.showAndWait();
-				}
+
+				return didSave;
 			}
 			
+			return false; // TODO: When this returns like this, it'll show the error dialogue as if it failed critically
+
 		} catch (IOException e) {
 			handler.showErrorDialogue(e);
 			e.printStackTrace();
@@ -418,6 +427,7 @@ public class EventHandlerController {
 			}
 			System.out.print("]");
 		}
+		return false;
 	}
 
 	@FXML
@@ -473,6 +483,54 @@ public class EventHandlerController {
 	
 	@FXML
 	private void quit() {
-		System.exit(0);
+		boolean wasSaved = true;
+		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
+		for (int i = 0; i < inputFields.length; i++) {
+			String inputText = "";
+			if (inputFields[i] instanceof TextField) {
+				inputText = ((TextField)inputFields[i]).getText();
+			} else if (inputFields[i] instanceof ComboBox) {
+				inputText = ((ComboBox)inputFields[i]).getEditor().getText();
+			}
+			
+			if (!data.get(data.size() - 1)[i].equals(inputText)) {
+				wasSaved = false;
+				break;
+			}
+		}
+		
+		if (wasSaved) {
+			System.exit(0);
+		} else {
+			Alert quitWarning = new Alert(AlertType.WARNING);
+			
+			quitWarning.setTitle("Data Not Saved!");
+			quitWarning.setHeaderText("If you continue, you will lose this data.");
+			quitWarning.setContentText("The data currently contained in the input boxes does not match the last line of \"" + handler.csvName + "\". You may want to save this data.");
+			
+			ButtonType saveQuitButton = new ButtonType("Save and Quit");
+			ButtonType quitButton = new ButtonType("Quit Without Saving");
+			ButtonType cancelButton = new ButtonType("Cancel");
+			
+			quitWarning.getButtonTypes().setAll(saveQuitButton, quitButton, cancelButton);
+			
+			Optional<ButtonType> warningResult = quitWarning.showAndWait();
+			if (warningResult.get().equals(saveQuitButton)) {
+				boolean didSave = saveData();
+				if (didSave) { // This is basically the same as the saveRow() method above
+					System.out.println("Saved");
+					System.exit(0);
+				} else {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Save Failure!");
+					alert.setHeaderText("Your data was not saved!");
+					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+
+					alert.showAndWait();
+				}	
+			} else if (warningResult.get().equals(quitButton)) {
+				System.exit(0);
+			}
+		}
 	}
 }
