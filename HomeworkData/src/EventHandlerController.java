@@ -43,7 +43,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 public class EventHandlerController {
@@ -91,12 +90,6 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		mainGrid.getScene().getWindow().setOnCloseRequest(new EventHandler<WindowEvent>() { // Sets the close action
-			public void handle(WindowEvent we) {
-				quit();
-			}
-		});
-		
 		Control[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
 				postAlertField, preMoodField, postMoodField, focusField };//Ewwwwww
 		this.inputFields = inputFields;
@@ -488,8 +481,8 @@ public class EventHandlerController {
 		}
 	}
 	
-	@FXML
-	private void quit() {
+	@FXML 
+	void quit() {
 		boolean wasSaved = true;
 		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
 		for (int i = 0; i < inputFields.length; i++) {

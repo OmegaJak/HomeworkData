@@ -25,9 +25,11 @@ public class GUI extends Application {
 			primaryStage.show();
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				public void handle(WindowEvent we) {
-					System.exit(0);
+					((EventHandlerController)loader.getController()).quit();
 				}
 			});
+			
+			
 		} catch (IOException e) {
 			System.err.println("Error loading GUI2.fxml!");
 			e.printStackTrace();
