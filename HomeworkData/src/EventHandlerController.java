@@ -524,7 +524,7 @@ public class EventHandlerController {
 			quitWarning.setHeaderText("If you continue, you will lose this data.");
 			quitWarning.setContentText("The data currently contained in the input boxes does not match the last line of \"" + handler.csvName + "\". You may want to save this data.");
 			
-			ButtonType saveQuitButton = new ButtonType("Save and Quit");
+			ButtonType saveQuitButton = new ButtonType("New Row, Save, and Quit");
 			ButtonType quitButton = new ButtonType("Quit Without Saving");
 			ButtonType cancelButton = new ButtonType("Cancel");
 			
@@ -532,6 +532,7 @@ public class EventHandlerController {
 			
 			Optional<ButtonType> warningResult = quitWarning.showAndWait();
 			if (warningResult.get().equals(saveQuitButton)) {
+				newRow();
 				boolean didSave = saveData();
 				if (didSave) { // This is basically the same as the saveRow() method above
 					System.out.println("Saved");
