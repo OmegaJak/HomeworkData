@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -482,16 +483,25 @@ public class DataHandler {
 	 * Gets the properly formatted and relevant data for the "Spent Time Line Chart"
 	 * @param timeUnit - Either day, week, or month. Controls how much time is lumped together in the data points.
 	 * @param shouldShowBlanks - Whether or not to include the days where no homework was done.
+	 * @param classFilters 
 	 * @return An ArrayList consisting of the relevant DataPoints, each with the String of the date and an int of the seconds spent.
 	 */
 	@SuppressWarnings("static-access")
-	public ArrayList<DataPoint> getLineChartData(boolean shouldShowBlanks, int groupingRange) {
+	public ArrayList<DataPoint> getLineChartData(boolean shouldShowBlanks, int groupingRange, ObservableList<String> classFilters) {
 		ArrayList<DataPoint> toReturn = new ArrayList<DataPoint>();
-		ArrayList<String> dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
-				this.csvDir, this.csvName).get(0)));
+		ArrayList<String> dates = new ArrayList<String>();
+		ArrayList<String[]> startStopTimes = new ArrayList<String[]>();
+		if (classFilters.size() > 0) {
+			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {0}, true,
+					this.csvDir, this.csvName).get(0)));
+			startStopTimes = getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {6, 8}, true, this.csvDir, this.csvName);
+		} else {
+			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
+					this.csvDir, this.csvName).get(0)));
+			startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
+		}
 		// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
 
-		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
 		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
 
 		if (dates.size() != secondsSpents.size()) { // Just as a double check. Most likely not at all worth the trouble.

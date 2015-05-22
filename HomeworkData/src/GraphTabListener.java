@@ -13,6 +13,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,7 +33,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -42,6 +42,9 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+
+import org.controlsfx.control.CheckComboBox;
+
 import CustomCharts.CustomPieChart;
 import CustomCharts.PieChart;
 import CustomCharts.PieChart.LabelLayoutInfo;
@@ -115,6 +118,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				case "Spent Time Line Chart":
 					NumberSpinner groupingRangeSpinner = new NumberSpinner();
 					CheckBox showBlanks = new CheckBox("Show Empty Days");
+					CheckComboBox<String> classFilter = new CheckComboBox<String>();
 					
 					final CategoryAxis xAxis = new CategoryAxis();
 					final NumberAxis yAxis = new NumberAxis();
@@ -126,18 +130,28 @@ public class GraphTabListener implements ChangeListener<Number> {
 					
 					groupingRangeSpinner.setNumber(new BigDecimal(1));
 					
-					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
+					ObservableList<String> classOptions = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {"Class"}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0));
+					classFilter.getItems().addAll(classOptions);
+					
+					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue(), classFilter.getCheckModel().getCheckedItems());
 					
 					showBlanks.selectedProperty().addListener(new ChangeListener<Boolean>() {
 						public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
-							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue(), classFilter.getCheckModel().getCheckedItems());
 						}
 					});
 					
 					groupingRangeSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {
 						@Override
 						public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
-							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue());
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue(), classFilter.getCheckModel().getCheckedItems());
+						}
+					});
+					
+					classFilter.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+						@Override
+						public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
+							updateChartData(lineChart, showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue(), classFilter.getCheckModel().getCheckedItems());
 						}
 					});
 					
@@ -147,15 +161,16 @@ public class GraphTabListener implements ChangeListener<Number> {
 			        graphDisplay.getChildren().add(lineChart);
 			        graphTabOptions.getChildren().add(groupingRangeSpinner);
 			        graphTabOptions.getChildren().add(showBlanks);
-					
+					graphTabOptions.getChildren().add(classFilter);
+			        
 					break;
 			}
 		}
 	}
 	
-	private void updateChartData(LineChart lineChart, boolean shouldShowBlanks, int groupingRange) {
+	private void updateChartData(LineChart lineChart, boolean shouldShowBlanks, int groupingRange, ObservableList<String> classFilters) {
 		lineChart.getData().clear(); // Get rid of the old data
-		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange); // Get the new data
+		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange, classFilters); // Get the new data
 		lineChart.getData().add(series); // Add that new data
 		addSeriesListeners(series); // Set animation & click listeners for the new chart data
 	}
@@ -366,11 +381,11 @@ public class GraphTabListener implements ChangeListener<Number> {
 		}
 	}
 	
-	private XYChart.Series getLineChartData(boolean shouldShowBlanks, int groupingRange) {
+	private XYChart.Series getLineChartData(boolean shouldShowBlanks, int groupingRange, ObservableList<String> classFilters) {
 		XYChart.Series toReturn = new XYChart.Series();
 		toReturn.setName("Time Spent");
 
-		ArrayList<DataPoint> dataPoints = handler.getLineChartData(shouldShowBlanks, groupingRange);
+		ArrayList<DataPoint> dataPoints = handler.getLineChartData(shouldShowBlanks, groupingRange, classFilters);
 		for (DataPoint dataPoint : dataPoints) {
 			toReturn.getData().add(new XYChart.Data(dataPoint.getDate(), dataPoint.getSecondsSpent()));
 		}
