@@ -26,6 +26,7 @@ public class GUI extends Application {
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				public void handle(WindowEvent we) {
 					((EventHandlerController)loader.getController()).quit();
+					we.consume();
 				}
 			});
 			
