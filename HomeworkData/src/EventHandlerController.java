@@ -90,8 +90,8 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		Control[] inputFields = { dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
-				postAlertField, preMoodField, postMoodField, focusField };//Ewwwwww
+		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
+				postAlertField, preMoodField, postMoodField, focusField};//Ewwwwww
 		this.inputFields = inputFields;
 
 		dateField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the dateField comes into focus
@@ -173,7 +173,7 @@ public class EventHandlerController {
 			}
 		});
 
-		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the endedField comes into focus
+		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the Time Wasted comes into/out of focus
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 						if (newPropertyValue && spentField.getText().equals("")) {
@@ -498,6 +498,22 @@ public class EventHandlerController {
 				break;
 			}
 		}
+		
+		boolean isEmpty = true; // True until proven false
+		for (int i = 0; i < inputFields.length; i++) {
+			String inputText = "";
+			if (inputFields[i] instanceof TextField) {
+				inputText = ((TextField)inputFields[i]).getText();
+			} else if (inputFields[i] instanceof ComboBox) {
+				inputText = ((ComboBox)inputFields[i]).getEditor().getText();
+			}
+			
+			if ((i != 7 && !inputText.equals("")) || (i == 7 && !((TextField)inputFields[i]).getText().equals("0:00"))) {
+				isEmpty = false;
+			}
+		}
+		
+		if(isEmpty)  wasSaved = true;
 		
 		if (wasSaved) {
 			System.exit(0);
