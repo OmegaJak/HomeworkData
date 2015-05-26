@@ -60,177 +60,216 @@
                   <content>
                     <AnchorPane minHeight="317.0" minWidth="595.0">
                            <children>
-                              <GridPane fx:id="mainGrid" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
+                              <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <VBox alignment="CENTER">
+                                    <AnchorPane>
                                        <children>
-                                          <Label alignment="CENTER" text="Date" />
-                                          <TextField fx:id="dateField" onDragExited="#autoFillDate">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
+                                          <Button fx:id="leftArrow" mnemonicParsing="false" text="Left Arrow" AnchorPane.leftAnchor="12.5" />
+                                          <HBox fx:id="dateInfo" alignment="CENTER" spacing="20.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+                                             <children>
+                                                <Label fx:id="date" alignment="CENTER" text="Date" />
+                                             </children>
+                                          </HBox>
+                                          <Button fx:id="rightArrow" mnemonicParsing="false" text="Right Arrow" AnchorPane.rightAnchor="12.5" />
                                        </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="1">
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </AnchorPane>
+                                    <AnchorPane>
                                        <children>
-                                          <Label alignment="CENTER" text="Class" />
-                                          <ComboBox fx:id="classField" editable="true">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></ComboBox>
+                                          <GridPane fx:id="mainGrid" alignment="CENTER" vgap="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Date" />
+                                                      <TextField fx:id="dateField" onDragExited="#autoFillDate">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="1">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Class" />
+                                                      <ComboBox fx:id="classField" editable="true">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </ComboBox>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="2">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Type of Homework" />
+                                                      <ComboBox fx:id="typeField" editable="true">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </ComboBox>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="3">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Unit" />
+                                                      <ComboBox fx:id="unitField" editable="true">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </ComboBox>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.rowIndex="1">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Number of Unit" />
+                                                      <TextField fx:id="numUnitField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                              				  <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Pre-Alertness" />
+                                                      <TextField fx:id="preAlertField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                              				  <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Pre-Mood" />
+                                                      <TextField fx:id="preMoodField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time Started" />
+                                                      <TextField fx:id="startedField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time Ended" />
+                                                      <TextField fx:id="endedField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time Wasted" />
+                                                      <TextField fx:id="spentField" text="0:00">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Music Volume" />
+                                                      <TextField fx:id="musicField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Focus" />
+                                                      <TextField fx:id="focusField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.rowIndex="3">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time Per Unit" />
+                                                      <TextField fx:id="timeUnitField" editable="false" focusTraversable="false">
+                                                         <cursor>
+                                                            <Cursor fx:constant="DEFAULT" />
+                                                         </cursor>
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                              				  <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Post-Alertness" />
+                                                      <TextField fx:id="postAlertField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Post-Mood" />
+                                                      <TextField fx:id="postMoodField">
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time Predicted" />
+                                                      <TextField fx:id="predictedField" editable="false" focusTraversable="false">
+                                                         <cursor>
+                                                            <Cursor fx:constant="DEFAULT" />
+                                                         </cursor>
+                                                         <VBox.margin>
+                                                            <Insets left="12.5" right="12.5" />
+                                                         </VBox.margin>
+                                                      </TextField>
+                                                   </children>
+                                                </VBox>
+                                                <Button fx:id="newRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#newRow" text="New Row" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                                                <Button fx:id="saveRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveRow" text="Save Row" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="20.0" top="20.0" />
+                                             </padding>
+                                          </GridPane>
                                        </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="2">
-                                       <children>
-                                          <Label alignment="CENTER" text="Type of Homework" />
-                                          <ComboBox fx:id="typeField" editable="true">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></ComboBox>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="3">
-                                       <children>
-                                          <Label alignment="CENTER" text="Unit" />
-                                          <ComboBox fx:id="unitField" editable="true">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></ComboBox>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.rowIndex="1">
-                                       <children>
-                                          <Label alignment="CENTER" text="Number of Unit" />
-                                          <TextField fx:id="numUnitField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                  				  <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                       <children>
-                                          <Label alignment="CENTER" text="Pre-Alertness" />
-                                          <TextField fx:id="preAlertField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                  				  <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                       <children>
-                                          <Label alignment="CENTER" text="Pre-Mood" />
-                                          <TextField fx:id="preMoodField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="1">
-                                       <children>
-                                          <Label alignment="CENTER" text="Time Started" />
-                                          <TextField fx:id="startedField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.rowIndex="2">
-                                       <children>
-                                          <Label alignment="CENTER" text="Time Ended" />
-                                          <TextField fx:id="endedField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                       <children>
-                                          <Label alignment="CENTER" text="Time Wasted" />
-                                          <TextField fx:id="spentField" text="0:00">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                                       <children>
-                                          <Label alignment="CENTER" text="Music Volume" />
-                                          <TextField fx:id="musicField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                       <children>
-                                          <Label alignment="CENTER" text="Focus" />
-                                          <TextField fx:id="focusField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.rowIndex="3">
-                                       <children>
-                                          <Label alignment="CENTER" text="Time Per Unit" />
-                                          <TextField fx:id="timeUnitField" editable="false" focusTraversable="false">
-                                             <cursor>
-                                                <Cursor fx:constant="DEFAULT" />
-                                             </cursor>
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin>
-                                          </TextField>
-                                       </children>
-                                    </VBox>
-                  				  <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                       <children>
-                                          <Label alignment="CENTER" text="Post-Alertness" />
-                                          <TextField fx:id="postAlertField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="3">
-                                       <children>
-                                          <Label alignment="CENTER" text="Post-Mood" />
-                                          <TextField fx:id="postMoodField">
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin></TextField>
-                                       </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="3">
-                                       <children>
-                                          <Label alignment="CENTER" text="Time Predicted" />
-                                          <TextField fx:id="predictedField" editable="false" focusTraversable="false">
-                                             <cursor>
-                                                <Cursor fx:constant="DEFAULT" />
-                                             </cursor>
-                                             <VBox.margin>
-                                                <Insets left="12.5" right="12.5" />
-                                             </VBox.margin>
-                                          </TextField>
-                                       </children>
-                                    </VBox>
-                                    <Button fx:id="newRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#newRow" text="New Row" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                                    <Button fx:id="saveRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveRow" text="Save Row" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
+                                    </AnchorPane>
                                  </children>
-                              </GridPane>
+                              </VBox>
                            </children>
                         </AnchorPane>
                   </content>
