@@ -37,7 +37,8 @@ public class DataHandler {
 	public Preferences prefs;
 	public String[] prefKeys = {"csvDir", "csvName"}; // An array of the keys for all the preferences
 	public String[] prefDefs = {"C:/Users/JAK/Documents/Google Drive/", "HomeworkDataSem2"}; // An array of the defaults for all the preferences, corresponding indexes to the prefKeys
-
+	public int mostRecentYear = 0;
+	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
 		//csvDir = "C:\\Users\\JAK\\Programming\\Other Random Java\\HomeworkData\\HomeworkData";
@@ -53,7 +54,9 @@ public class DataHandler {
 
 	public void main() { //not the real and proper main method
 		try {
-			ArrayList<String[]> rows = readFile(csvDir, csvName, false);
+			mostRecentYear = getMostRecentYear(csvDir, csvName);
+			
+			ArrayList<String[]> rows = readFile(csvDir, csvName, false, mostRecentYear);
 
 			boolean switchBoolean = false;
 			if (switchBoolean) {
@@ -67,14 +70,14 @@ public class DataHandler {
 
 			System.out.println(rows.size());
 			
-			ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false);
+			ArrayList<String[]> dataSheet = readFile(csvDir, csvName, false, mostRecentYear);
 			for (int i = 0; i < dataSheet.size(); i++) {
 				if (dataSheet.get(i)[7].equals("0")) {
 					writeCell(i, 7, "0:00", csvDir, csvName);
 				}
 			}
 			
-			dataSheet = readFile(csvDir, csvName, false);
+			dataSheet = readFile(csvDir, csvName, false, mostRecentYear);
 			
 			for (int i = 1; i < dataSheet.size(); i++) {
 				if (dataSheet.get(i).equals("")) {
@@ -154,7 +157,7 @@ public class DataHandler {
 	public void writeCell(int row, int column, String fill, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
-		ArrayList<String[]> rows = readFile(dir, file, true);
+		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
 
 		PrintWriter pw = new PrintWriter(new File(dir + file));
 
@@ -215,7 +218,7 @@ public class DataHandler {
 	 */
 	public void makeBackup(String dir, String file) throws IOException {
 
-		ArrayList<String[]> rows = readFile(dir, file, true);
+		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
 
 		PrintWriter pw = new PrintWriter(new FileWriter("Backup-" + file));
 
@@ -247,7 +250,7 @@ public class DataHandler {
 	public void insertNewRow(int precedingRow, int columns, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 		
-		ArrayList<String[]> rows = readFile(dir, file, true);
+		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
 
 		PrintWriter pw = new PrintWriter(new File(dir + file));
 
@@ -303,9 +306,10 @@ public class DataHandler {
 	 * @param dir - The directory of the file to be read
 	 * @param file- The name of the file to be read
 	 * @param allowEmptyLines - If this is false, it will only add lines that have something in the first cell
+	 * @param year - The school year that the data should be taken from (0 = 2014-2015, 1 = 2015-2016). -1 means ignore years, return all data
 	 * @return An Arraylist of String arrays, with each String array being a row of the csv file, each index of each array a cell
 	 */
-	public ArrayList<String[]> readFile(String dir, String file, boolean allowEmptyLines) {
+	public ArrayList<String[]> readFile(String dir, String file, boolean allowEmptyLines, int year) {
 		
 		try {
 			Path path = FileSystems.getDefault().getPath(dir, file); //The path to the file, needed for newBufferedReader()
@@ -315,6 +319,7 @@ public class DataHandler {
 
 			ArrayList<String[]> rows = new ArrayList<String[]>();
 			String curLine[] = {};
+			int curYear = 0;
 			while ((line = reader.readLine()) != null) {//Go through each line sequentially until there are no more
 				curLine = line.split(",", -1); //Creates an array of each element between the commas
 				boolean isEmpty = true;
@@ -323,7 +328,11 @@ public class DataHandler {
 						isEmpty = false;
 				}
 				if (allowEmptyLines || !isEmpty) {//Ignore empty rows
-					rows.add(curLine);
+					if (curLine[0].equals("OTHER INFO") && curLine[1].equals("NEW SCHOOL YEAR")) // Marker of a new school year
+						curYear++;
+					
+					if (curLine[0].equals("Date") || year == -1 || curYear == year) // If it's either the first line, or if we're in the year we want to get data for. Override if year == -1
+						rows.add(curLine);
 				}
 			}
 
@@ -337,7 +346,7 @@ public class DataHandler {
 	}
 	
 	public int getNumberOfLines(String dir, String file, boolean allowEmptyLines) {
-		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines);
+		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines, mostRecentYear);
 		return temp.size();
 	}
 	
@@ -356,7 +365,7 @@ public class DataHandler {
 	// TODO: Modify so that if cellValuesToMatch is just one index, then it matches all the columns to that one value. As it is, if cellValuesToMatch is a different length from desiredColumns, it will fail.
 	// TODO: Add option to ignore first line. Or just make it default. Probably that.
 	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, String dir, String file) {
-		ArrayList<String[]> dataSheet = readFile(dir, file, false);
+		ArrayList<String[]> dataSheet = readFile(dir, file, false, mostRecentYear);
 
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
 		boolean success;
@@ -366,49 +375,51 @@ public class DataHandler {
 			success = true;
 		String[] arrayListIndex = {};
 		for (int i = 0; i < dataSheet.size(); i++) { // Loops 'top to bottom' through the whole data sheet
-			for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row
-				switch (operator) {
-					case "And":
-						if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-							success = false;
+			if (!dataSheet.get(i)[0].equals("OTHER INFO")) {
+				for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row
+					switch (operator) {
+						case "And":
+							if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+								success = false;
+								break;
+							}
 							break;
-						}
-						break;
-					case "Or":
-						if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-							success = true;
+						case "Or":
+							if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+								success = true;
+								break;
+							}
 							break;
-						}
-						break;
-					case "Not":
-						if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-							success = false;
+						case "Not":
+							if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+								success = false;
+								break;
+							}
 							break;
-						}
-						break;
-				}
-			}
-			if (success) {
-				if (allowDuplicates || (desiredColumns.length > 1 ? !alreadyAdded(toReturn, arrayListIndex) : !alreadyAdded(arrayListIndex, dataSheet.get(i)[desiredColumns[0]]))) {
-					for (int b : desiredColumns) {
-						String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
-						System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
-						arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
-						arrayListIndex = arrayListIndex2;
-					}
-					if (desiredColumns.length > 1) {
-						toReturn.add(arrayListIndex);
-						arrayListIndex = new String[] {};
 					}
 				}
+				if (success) {
+					if (allowDuplicates || (desiredColumns.length > 1 ? !alreadyAdded(toReturn, arrayListIndex) : !alreadyAdded(arrayListIndex, dataSheet.get(i)[desiredColumns[0]]))) {
+						for (int b : desiredColumns) {
+							String[] arrayListIndex2 = new String[arrayListIndex.length + 1];
+							System.arraycopy(arrayListIndex, 0, arrayListIndex2, 0, arrayListIndex.length);
+							arrayListIndex2[arrayListIndex.length] = dataSheet.get(i)[b];
+							arrayListIndex = arrayListIndex2;
+						}
+						if (desiredColumns.length > 1) {
+							toReturn.add(arrayListIndex);
+							arrayListIndex = new String[] {};
+						}
+					}
 
+				}
+				if (operator.equals("Or"))
+					success = false;
+				else
+					success = true;
 			}
-			if (operator.equals("Or"))
-				success = false;
-			else
-				success = true;
 		}
-		
+
 		if (desiredColumns.length == 1 && (allowDuplicates || !alreadyAdded(toReturn, arrayListIndex))) {
 			toReturn.add(arrayListIndex);
 		}
@@ -595,6 +606,8 @@ public class DataHandler {
 		} catch (ParseException e) {
 			System.out.println("There was an issue parsing the date while getting the line chart data");
 			showErrorDialogue(e);
+		} catch (IndexOutOfBoundsException e) {
+			System.out.println("There was an error getting line chart data. Most likely because there isn't any. (DataHandler.java:610)");
 		}
 		return toReturn;
 	}
@@ -614,6 +627,19 @@ public class DataHandler {
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//
+	
+	public int getMostRecentYear(String csvDir, String csvName) {
+		ArrayList<String[]> data = readFile(csvDir, csvName, false, -1);
+		int yearNum = 0;
+		
+		for (int i = 0; i < data.size(); i++) {
+			if (data.get(i)[0].equals("OTHER INFO") && data.get(i)[1].equals("NEW SCHOOL YEAR"))
+				yearNum++;
+		}
+		
+		
+		return yearNum;
+	}
 	
 	/**
 	 * Goes through given array and checks if the given string is already in the given array
@@ -1050,7 +1076,7 @@ public class DataHandler {
 
 			Optional<ButtonType> doubleCheckResult = doubleCheck.showAndWait();
 			if (doubleCheckResult.get() == yes) {
-				ArrayList<String[]> data = readFile(csvDir, csvName, true);
+				ArrayList<String[]> data = readFile(csvDir, csvName, true, mostRecentYear);
 				System.out.println("Removing line " + i + " from \"" + csvName + "\", it used to say: " + Arrays.toString(data.get(i)));
 				data.remove(i);
 				try {

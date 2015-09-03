@@ -8,6 +8,7 @@
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -232,6 +234,29 @@ public class EventHandlerController {
 			}
 		});	
 		
+		initAutoCompletes();
+		
+		NumberSpinner yearSpinner = new NumberSpinner();
+		yearSpinner.setNumber(new BigDecimal(handler.mostRecentYear));
+		mainGrid.add(yearSpinner, 0, 4);
+		mainGrid.setMargin(yearSpinner, new Insets(30.0, 11, 0.0, 12.5));
+		yearSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {
+			@Override
+			public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
+				handler.mostRecentYear = newValue.intValue();
+				initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
+			}
+		});
+		
+		PrintStream ps = System.out;
+		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
+		
+		DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy @ KK:mm a");
+		Date date = new Date();
+		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
+	}
+	
+	private void initAutoCompletes() {
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
@@ -246,14 +271,6 @@ public class EventHandlerController {
 		String[] units = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		unitField.setItems(unitOptions);
-		
-		
-		PrintStream ps = System.out;
-		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
-		
-		DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy @ KK:mm a");
-		Date date = new Date();
-		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
 	}
 
 	@FXML
@@ -270,7 +287,7 @@ public class EventHandlerController {
 		try {
 			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
 			if (checkIfAllFilled(neededInputs)) {
-				String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false), classField.getEditor().getText(), typeField.getEditor().getText(),
+				String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear), classField.getEditor().getText(), typeField.getEditor().getText(),
 						unitField.getEditor().getText());
 				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
 				predictedField.setText(predictedTimeSpent);
@@ -347,7 +364,7 @@ public class EventHandlerController {
 	
 	private boolean saveData() {
 		try {
-			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true);// Get the current data sheet
+			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, handler.mostRecentYear);// Get the current data sheet
 			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
 			boolean shouldSave = true;
@@ -392,7 +409,7 @@ public class EventHandlerController {
 				// Save confirmation stuff
 
 				boolean didSave = true;
-				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
+				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
 				for (int i = 0; i < inputFields.length; i++) {
 					String inputText = "";
 					if (inputFields[i] instanceof TextField) {
@@ -484,7 +501,7 @@ public class EventHandlerController {
 	@FXML 
 	void quit() {
 		boolean wasSaved = true;
-		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false);
+		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
 		for (int i = 0; i < inputFields.length; i++) {
 			String inputText = "";
 			if (inputFields[i] instanceof TextField) {
@@ -548,6 +565,32 @@ public class EventHandlerController {
 			} else if (warningResult.get().equals(quitButton)) {
 				System.exit(0);
 			}
+		}
+	}
+	
+	@FXML
+	void newSemester() {
+		addOtherInfo("NEW SEMESTER");
+	}
+	
+	@FXML
+	void newYear() {
+		addOtherInfo("NEW SCHOOL YEAR");
+		handler.mostRecentYear++;
+	}
+	
+	private void addOtherInfo(String infoText) {
+		this.newRow();
+		ArrayList<String[]> dataSheet =  handler.readFile(handler.csvDir, handler.csvName, true, handler.mostRecentYear);
+		int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1;
+		String[] currentRow = dataSheet.get(numLines);
+		
+		currentRow[0] = "OTHER INFO";
+		currentRow[1] = infoText;
+		try {
+			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName);
+		} catch (IOException e) {
+			handler.showErrorDialogue(e);
 		}
 	}
 }

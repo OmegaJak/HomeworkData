@@ -43,6 +43,9 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Select All" />
             <MenuItem mnemonicParsing="false" text="Unselect All" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#newSemester" text="Start New Semester" />
+                  <MenuItem mnemonicParsing="false" onAction="#newYear" text="Start New Year" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
@@ -261,6 +264,7 @@
                                                 </VBox>
                                                 <Button fx:id="newRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#newRow" text="New Row" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
                                                 <Button fx:id="saveRowButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveRow" text="Save Row" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
+                                                <Label alignment="CENTER" text="Current Year:" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="TOP" />
                                              </children>
                                              <padding>
                                                 <Insets bottom="20.0" top="20.0" />
