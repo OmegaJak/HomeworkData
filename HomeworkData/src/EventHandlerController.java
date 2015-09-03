@@ -483,7 +483,7 @@ public class EventHandlerController {
 	private void showPreferences() {
 		try {
 			Stage prefStage = new Stage();
-			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("Preferences.fxml"));
+			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("/view/Preferences.fxml"));
 			VBox page = (VBox)loader.load();
 			page.requestFocus(); // Just so it doesn't focus some textField by default
 			Scene scene = new Scene(page);

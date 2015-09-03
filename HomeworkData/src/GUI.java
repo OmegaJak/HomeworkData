@@ -18,7 +18,7 @@ public class GUI extends Application {
 		final long startTime = System.currentTimeMillis();
 		
 		try {
-			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("GUI2.fxml"));
+			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("/view/GUI2.fxml"));
 			VBox page = (VBox)loader.load();
 			Scene scene = new Scene(page);
 			primaryStage.setScene(scene);

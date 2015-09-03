@@ -305,7 +305,7 @@ public abstract class Chart extends Region {
      * is visible and in a scene.
      */
     protected final boolean shouldAnimate(){
-        return getAnimated() && impl_isTreeVisible() && getScene() != null;
+        return getAnimated() /*&& impl_isTreeVisible()*/ && getScene() != null;
     }
 
     /**

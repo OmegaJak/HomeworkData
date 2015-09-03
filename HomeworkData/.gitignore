@@ -1,0 +1,9 @@
+/bin/
+/build/deploy/
+/build/build/
+/build/externalLibs
+/build/dist/libs/
+/build/build.xml
+/build/project/
+/build/projectRefs/
+*.eclipse.jdt.core.prefs
