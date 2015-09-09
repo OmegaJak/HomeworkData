@@ -364,7 +364,7 @@ public class EventHandlerController {
 	
 	private boolean saveData() {
 		try {
-			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, handler.mostRecentYear);// Get the current data sheet
+			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, -1);// Get the current data sheet
 			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
 			boolean shouldSave = true;
@@ -501,7 +501,7 @@ public class EventHandlerController {
 	@FXML 
 	void quit() {
 		boolean wasSaved = true;
-		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
 		for (int i = 0; i < inputFields.length; i++) {
 			String inputText = "";
 			if (inputFields[i] instanceof TextField) {
@@ -581,7 +581,7 @@ public class EventHandlerController {
 	
 	private void addOtherInfo(String infoText) {
 		this.newRow();
-		ArrayList<String[]> dataSheet =  handler.readFile(handler.csvDir, handler.csvName, true, handler.mostRecentYear);
+		ArrayList<String[]> dataSheet =  handler.readFile(handler.csvDir, handler.csvName, true, -1);
 		int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1;
 		String[] currentRow = dataSheet.get(numLines);
 		

@@ -56,7 +56,7 @@ public class DataHandler {
 		try {
 			mostRecentYear = getMostRecentYear(csvDir, csvName);
 			
-			ArrayList<String[]> rows = readFile(csvDir, csvName, false, mostRecentYear);
+			ArrayList<String[]> rows = readFile(csvDir, csvName, false, -1);
 
 			boolean switchBoolean = false;
 			if (switchBoolean) {
@@ -157,7 +157,7 @@ public class DataHandler {
 	public void writeCell(int row, int column, String fill, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 
-		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
+		ArrayList<String[]> rows = readFile(dir, file, true, -1);
 
 		PrintWriter pw = new PrintWriter(new File(dir + file));
 
@@ -218,7 +218,7 @@ public class DataHandler {
 	 */
 	public void makeBackup(String dir, String file) throws IOException {
 
-		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
+		ArrayList<String[]> rows = readFile(dir, file, true, -1);
 
 		PrintWriter pw = new PrintWriter(new FileWriter("Backup-" + file));
 
@@ -250,7 +250,7 @@ public class DataHandler {
 	public void insertNewRow(int precedingRow, int columns, String dir, String file) throws IOException {
 		makeBackup(dir, file);
 		
-		ArrayList<String[]> rows = readFile(dir, file, true, mostRecentYear);
+		ArrayList<String[]> rows = readFile(dir, file, true, -1);
 
 		PrintWriter pw = new PrintWriter(new File(dir + file));
 
@@ -346,7 +346,7 @@ public class DataHandler {
 	}
 	
 	public int getNumberOfLines(String dir, String file, boolean allowEmptyLines) {
-		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines, mostRecentYear);
+		ArrayList<String[]> temp = readFile(dir, file, allowEmptyLines, -1);
 		return temp.size();
 	}
 	
@@ -1076,7 +1076,7 @@ public class DataHandler {
 
 			Optional<ButtonType> doubleCheckResult = doubleCheck.showAndWait();
 			if (doubleCheckResult.get() == yes) {
-				ArrayList<String[]> data = readFile(csvDir, csvName, true, mostRecentYear);
+				ArrayList<String[]> data = readFile(csvDir, csvName, true,-1);
 				System.out.println("Removing line " + i + " from \"" + csvName + "\", it used to say: " + Arrays.toString(data.get(i)));
 				data.remove(i);
 				try {
