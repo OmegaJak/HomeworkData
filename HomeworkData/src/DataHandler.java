@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -252,54 +253,63 @@ public class DataHandler {
 		
 		ArrayList<String[]> rows = readFile(dir, file, true, -1);
 
-		PrintWriter pw = new PrintWriter(new File(dir + file));
+		try {
+			PrintWriter pw = new PrintWriter(new File(dir + file));
 
-		System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file + " (directory of " + dir + ")");
+			System.out.println("Creating a new line after row " + precedingRow + " with " + columns + " columns in " + file + " (directory of " + dir + ")");
 
-		if (precedingRow == -1) { //Special case, in order to add a line before everything else
-			for (int comma = 1; comma <= columns - 1; comma++) {
-				if (comma == columns - 1) { //If this is the last comma to add
-					pw.write("," + "\n");
-				} else {
-					pw.write(",");
+			if (precedingRow == -1) { //Special case, in order to add a line before everything else
+				for (int comma = 1; comma <= columns - 1; comma++) {
+					if (comma == columns - 1) { //If this is the last comma to add
+						pw.write("," + "\n");
+					} else {
+						pw.write(",");
+					}
 				}
 			}
-		}
 
-		for (int i = 0; i < rows.size(); i++) {
-			for (int k = 0; k < rows.get(i).length; k++) {
-				if (i == precedingRow) { //If this is just after the preceding row
-					for (int comma = 1; comma <= columns - 1; comma++) {
-						if (comma == columns - 1) { //If this is the last comma to add
-							pw.write("," + "\n");
+			for (int i = 0; i < rows.size(); i++) {
+				for (int k = 0; k < rows.get(i).length; k++) {
+					if (i == precedingRow) { //If this is just after the preceding row
+						for (int comma = 1; comma <= columns - 1; comma++) {
+							if (comma == columns - 1) { //If this is the last comma to add
+								pw.write("," + "\n");
+							} else {
+								pw.write(",");
+							}
+						}
+						precedingRow = precedingRow - 1;
+						i = i - 1;
+						break;
+					} else {
+						if (k == rows.get(i).length - 1) { //If this is the last cell in the row
+							pw.write(rows.get(i)[k] + "\n");
 						} else {
-							pw.write(",");
+							pw.write(rows.get(i)[k] + ",");
 						}
 					}
-					precedingRow = precedingRow - 1;
-					i = i - 1;
-					break;
-				} else {
-					if (k == rows.get(i).length - 1) { //If this is the last cell in the row
-						pw.write(rows.get(i)[k] + "\n");
+				}
+			}
+
+			if (precedingRow == -2) { //Special case, in order to add a line to the end of the document
+				for (int comma = 1; comma <= columns - 1; comma++) {
+					if (comma == columns - 1) { //If this is the last comma to add
+						pw.write("," + "\n");
 					} else {
-						pw.write(rows.get(i)[k] + ",");
+						pw.write(",");
 					}
 				}
 			}
-		}
 
-		if (precedingRow == -2) { //Special case, in order to add a line to the end of the document
-			for (int comma = 1; comma <= columns - 1; comma++) {
-				if (comma == columns - 1) { //If this is the last comma to add
-					pw.write("," + "\n");
-				} else {
-					pw.write(",");
-				}
-			}
+			pw.close(); //Don't forget to close the PrintWriter
+		} catch (FileNotFoundException e){
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("PrintWriter Error");
+			alert.setHeaderText("File inaccessible");
+			alert.setContentText("HomeworkData does not have access to the \"" + csvName + "\" file. This is most likely because it is open in another program, such as Excel.\n\n"
+					+ 			"Please close other programs that may have this file open.");
+			alert.showAndWait();
 		}
-
-		pw.close(); //Don't forget to close the PrintWriter
 	}
 
 	/**
