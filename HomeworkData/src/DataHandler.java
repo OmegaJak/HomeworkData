@@ -617,7 +617,8 @@ public class DataHandler {
 			System.out.println("There was an issue parsing the date while getting the line chart data");
 			showErrorDialogue(e);
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("There was an error getting line chart data. Most likely because there isn't any. (DataHandler.java:610)");
+			// The weird call in this gives the current line number. This may have to be updated with future Java versions
+			System.out.println("There was an error getting line chart data. Most likely because there isn't any. (DataHandler.java:" + Thread.currentThread().getStackTrace()[1].getLineNumber() + ")");
 		}
 		return toReturn;
 	}
