@@ -79,7 +79,7 @@
                                           <Insets top="10.0" />
                                        </VBox.margin>
                                     </AnchorPane>
-                                    <AnchorPane>
+                                    <AnchorPane VBox.vgrow="ALWAYS">
                                        <children>
                                           <GridPane fx:id="mainGrid" alignment="CENTER" vgap="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columnConstraints>
