@@ -519,7 +519,7 @@ public class DataHandler {
 		} else {
 			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
 					this.csvDir, this.csvName).get(0)));
-			startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {6, 8}, true, this.csvDir, this.csvName);
+			startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8, 7}, new String[] {"Date", "Time Started", "Time Ended", "Time Wasted"}, "Not", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
 		}
 		// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
 
@@ -624,7 +624,7 @@ public class DataHandler {
 	}
 	
 	public int getSecondsSpentOnDay(String date) {
-		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8}, true, this.csvDir, this.csvName);
+		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
 		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
 		
 		int totalSeconds = 0;
@@ -921,14 +921,21 @@ public class DataHandler {
 	}
 	
 	/**
-	 * Converts an ArrayList of the starting and stopping times to a combined ArrayList of the individual time spent strings
-	 * @param startStopTimes - ArrayList representing the starting and stopping times. In the format of ArrayList[String{"HH:MM", "HH:MM"}, String{"HH:MM", "HH:MM"}].
+	 * Converts an ArrayList of the starting, stopping, and wasted times to a combined ArrayList of the individual time spent strings
+	 * @param startStopTimes - ArrayList representing the starting and stopping times. In the format of ArrayList[String{"HH:MM", "HH:MM", "HH:MM"}, String{"HH:MM", "HH:MM", "HH:MM"}].
 	 * @return Arraylist in the form of ArrayList["HH:MM", "HH:MM"], with each string being the time spent
 	 */
 	public ArrayList<String> convertToSpentTime(ArrayList<String[]> startStopTimes) {
 		ArrayList<String> spentTimes = new ArrayList<String>();
+		String totalTime;
 		for (String[] startStopTime : startStopTimes) { // Creates an arrayList of the time spent based off of the start and stop times.
-			spentTimes.add(subtractTime(startStopTime[0], startStopTime[1]));
+			totalTime = subtractTime(startStopTime[0], startStopTime[1]); // The time difference between start and stop
+			String[] totalTimeInBetweens = findInBetween(totalTime, ':'); // Gets the numbers for hours and minutes seperately in an array (still strings)
+			String[] wastedInBetweens = findInBetween(startStopTime[2], ':');
+			System.out.println(Arrays.toString(wastedInBetweens));
+			int totalTimeSeconds = convertTimeToSeconds(new String[] {"HH", "MM"}, new int[] {Integer.parseInt(totalTimeInBetweens[0]), Integer.parseInt(totalTimeInBetweens[1])});
+			int wastedTimeSeconds = convertTimeToSeconds(new String[] {"HH", "MM"}, new int[] {Integer.parseInt(wastedInBetweens[0]), Integer.parseInt(wastedInBetweens[1])});
+			spentTimes.add(convertSecondsToFormattedString(new String[] {"HH", "MM"}, totalTimeSeconds - wastedTimeSeconds));
 		}
 		return spentTimes;
 	}
