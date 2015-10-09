@@ -258,17 +258,17 @@ public class EventHandlerController {
 	
 	private void initAutoCompletes() {
 		new AutoCompleteComboBoxListener(classField);
-		String[] classes = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);
+		String[] classes = handler.getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
 		classField.setItems(classOptions);
 		
 		new AutoCompleteComboBoxListener(typeField);
-		String[] types = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
+		String[] types = handler.getCellsMeetingCriteria(new int[] {2}, new String[] {"Type of Homework"}, "Not", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
 		typeField.setItems(typeOptions);
 		
 		new AutoCompleteComboBoxListener(unitField);
-		String[] units = handler.getCellsMeetingCriteria(new int[] {0}, new String[] {""}, "Not", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
+		String[] units = handler.getCellsMeetingCriteria(new int[] {3}, new String[] {"Unit"}, "Not", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		unitField.setItems(unitOptions);
 	}
