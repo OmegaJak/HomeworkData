@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
@@ -36,10 +37,17 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
         this.comboBox.getEditor().focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    // in focus
-                }
-                else {
+                if (newValue) { // In focus
+                	if (comboBox.getItems().size() > 0) {
+	                	((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView().getSelectionModel().clearAndSelect(0);
+						new java.util.Timer().schedule(new java.util.TimerTask() { // I guess I have to delay it like this
+							@Override											// because apparently something manually sets it to 0
+							public void run() {
+								comboBox.getEditor().selectAll();
+							}
+						}, 10);
+                	}
+                } else {
                     lastLength = 0;
                     sb.delete(0, sb.length());
                     selectClosestResultBasedOnTextFieldValue(false, false);
