@@ -39,6 +39,7 @@ public class DataHandler {
 	public String[] prefKeys = {"csvDir", "csvName"}; // An array of the keys for all the preferences
 	public String[] prefDefs = {"C:/Users/JAK/Documents/Google Drive/", "HomeworkDataSem2"}; // An array of the defaults for all the preferences, corresponding indexes to the prefKeys
 	public int mostRecentYear = 0;
+	private static long lastErrorTime;
 	
 	public DataHandler() {
 		//csvDir = "/home/jak/Programming/HomeworkData/HomeworkData";
@@ -1046,37 +1047,42 @@ public class DataHandler {
 	}
 	
 	public void showErrorDialogue(Exception e) { // Credit for this goes to this blog: http://code.makery.ch/blog/javafx-dialogs-official/
-		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Exception");
-		alert.setHeaderText("There was an exception of type " + e.getClass());
-		alert.setContentText("Shit...");
-
-		// Create expandable Exception.
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		e.printStackTrace(pw);
-		String exceptionText = sw.toString();
-
-		Label label = new Label("The exception stacktrace was:");
-
-		TextArea textArea = new TextArea(exceptionText);
-		textArea.setEditable(false);
-		textArea.setWrapText(true);
-
-		textArea.setMaxWidth(Double.MAX_VALUE);
-		textArea.setMaxHeight(Double.MAX_VALUE);
-		GridPane.setVgrow(textArea, Priority.ALWAYS);
-		GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-		GridPane expContent = new GridPane();
-		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(label, 0, 0);
-		expContent.add(textArea, 0, 1);
-
-		// Set expandable Exception into the dialog pane.
-		alert.getDialogPane().setExpandableContent(expContent);
-
-		alert.showAndWait();
+		if (System.currentTimeMillis() - this.lastErrorTime < 1000) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Exception");
+			alert.setHeaderText("There was an exception of type " + e.getClass());
+			alert.setContentText("Shit...");
+	
+			// Create expandable Exception.
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String exceptionText = sw.toString();
+	
+			Label label = new Label("The exception stacktrace was:");
+	
+			TextArea textArea = new TextArea(exceptionText);
+			textArea.setEditable(false);
+			textArea.setWrapText(true);
+	
+			textArea.setMaxWidth(Double.MAX_VALUE);
+			textArea.setMaxHeight(Double.MAX_VALUE);
+			GridPane.setVgrow(textArea, Priority.ALWAYS);
+			GridPane.setHgrow(textArea, Priority.ALWAYS);
+	
+			GridPane expContent = new GridPane();
+			expContent.setMaxWidth(Double.MAX_VALUE);
+			expContent.add(label, 0, 0);
+			expContent.add(textArea, 0, 1);
+	
+			// Set expandable Exception into the dialog pane.
+			alert.getDialogPane().setExpandableContent(expContent);
+	
+			alert.showAndWait();
+		} else {
+			System.out.println(e.toString());
+		}
+		lastErrorTime = System.currentTimeMillis();
 	}
 	
 	public void showColonError(Alert alert, int i, ButtonType... elements) {
