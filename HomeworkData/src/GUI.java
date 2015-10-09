@@ -13,6 +13,7 @@ public class GUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		System.setProperty("glass.accessible.force", "false"); // Fixed freeze on touchscreen devices
 		primaryStage.setTitle("Homework Data");
 		
 		final long startTime = System.currentTimeMillis();
@@ -29,7 +30,6 @@ public class GUI extends Application {
 					we.consume();
 				}
 			});
-			
 			
 		} catch (IOException e) {
 			System.err.println("Error loading GUI2.fxml!");
