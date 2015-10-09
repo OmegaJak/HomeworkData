@@ -123,16 +123,16 @@ public class EventHandlerController {
 		});
 
 		startedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes into or out of focus
-					@Override
-					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (newPropertyValue) { //Into focus
-							autoFillStartTime();
-						} else { //Out of focus
-							checkForTimePerUnit();
-							checkForEndPrediction();
-						}
-					}
-				});
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) { //Into focus
+					autoFillStartTime();
+				} else { //Out of focus
+					checkForTimePerUnit();
+					checkForEndPrediction();
+				}
+			}
+		});
 
 		
 		ChangeListener<Boolean> endedAutoFillListener = new ChangeListener<Boolean>() { // Add a listener for when the endedField goes out of focus
