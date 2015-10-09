@@ -192,6 +192,7 @@ public class EventHandlerController {
 				if (!newPropertyValue) {
 					String[] types = handler.getCellsMeetingCriteria(new int[] {1}, new String[] {classField.getEditor().getText()}, "And", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
 					ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
+					javafx.collections.FXCollections.reverse(typeOptions); // This reversal makes the most recent items be at the top of the list
 					typeField.setItems(typeOptions);
 					checkForTimePrediction();
 				}
@@ -213,6 +214,7 @@ public class EventHandlerController {
 				if (!newPropertyValue) {
 					String[] units = handler.getCellsMeetingCriteria(new int[] {2}, new String[] {typeField.getEditor().getText()}, "And", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
 					ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
+					javafx.collections.FXCollections.reverse(unitOptions);
 					unitField.setItems(unitOptions);
 					checkForTimePrediction();
 				}
@@ -265,11 +267,13 @@ public class EventHandlerController {
 		new AutoCompleteComboBoxListener(typeField);
 		String[] types = handler.getCellsMeetingCriteria(new int[] {2}, new String[] {"Type of Homework"}, "Not", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
+		javafx.collections.FXCollections.reverse(typeOptions);
 		typeField.setItems(typeOptions);
 		
 		new AutoCompleteComboBoxListener(unitField);
 		String[] units = handler.getCellsMeetingCriteria(new int[] {3}, new String[] {"Unit"}, "Not", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
+		javafx.collections.FXCollections.reverse(unitOptions);
 		unitField.setItems(unitOptions);
 	}
 
