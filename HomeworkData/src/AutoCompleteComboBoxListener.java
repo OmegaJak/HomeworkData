@@ -38,7 +38,7 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
             @Override
             public void changed(ObservableValue observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) { // In focus
-                	if (comboBox.getItems().size() > 0) {
+                	if (comboBox.getItems().size() > 0 && comboBox.getEditor().getText().equals("")) { // Do the autofill of the first item
 	                	((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView().getSelectionModel().clearAndSelect(0);
 						new java.util.Timer().schedule(new java.util.TimerTask() { // I guess I have to delay it like this
 							@Override											// because apparently something manually sets it to 0
