@@ -13,7 +13,10 @@ public class GUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		System.setProperty("glass.accessible.force", "false"); // Fixed freeze on touchscreen devices
+		if (System.getProperty("os.name").equals("Windows 10")) {
+			System.setProperty("glass.accessible.force", "false"); // Fixed freeze on touchscreen devices
+		}
+		
 		primaryStage.setTitle("Homework Data");
 		
 		final long startTime = System.currentTimeMillis();
