@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
+import CustomControls.RadialSpinnerControl;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -249,6 +250,9 @@ public class EventHandlerController {
 				initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
 			}
 		});
+		
+		//RadialSpinnerControl radial = new RadialSpinnerControl();
+		//mainGrid.add(radial, 1, 4);
 		
 		PrintStream ps = System.out;
 		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
