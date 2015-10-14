@@ -1,26 +1,34 @@
 package CustomControls;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
+import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinnerControl, RadialSpinnerBehavior> {
+public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpinnerBehavior> {
 
 	private static final double RADIUS = 25.0;
 	
 	double orgSceneX, orgSceneY;
 	double orgTranslateX, orgTranslateY;
-	double orgTheta;
+	double oldTheta, lastDelta;
 	
 	private StackPane stackPane;
 	
 	private Circle circle;
 	private Circle thumb;
 	
-	protected RadialSpinnerSkin(RadialSpinnerControl control) {
-		super(control, new RadialSpinnerBehavior(control));		
+	private NumberTextField numField;
+	
+	protected RadialSpinnerSkin(RadialSpinner control) {
+		super(control, new RadialSpinnerBehavior(control));
 		
 		circle = new Circle(RADIUS);
 		circle.setFill(Color.TRANSPARENT);
@@ -35,8 +43,6 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinnerControl, Ra
 			orgSceneY = me.getSceneY();
 			orgTranslateX = thumb.getTranslateX();
 			orgTranslateY = thumb.getTranslateY();
-			//System.out.println(orgTranslateX + " " + orgTranslateY);
-			//orgTheta = calculateTheta(orgTranslateX, orgTranslateY);
 		});
 		
 		thumb.setOnMouseDragged(me -> {
@@ -47,14 +53,28 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinnerControl, Ra
 			double newTranslateY = orgTranslateY + offsetY;
 			
 			double theta = calculateTheta(newTranslateX, newTranslateY);
+			if (oldTheta > 180.0 && theta < 180.0 && lastDelta >= 0) // Doesn't let it go past max
+				theta = 360.0;
+			else if (oldTheta < 180.0 && theta > 180.0 && lastDelta <= 0) // Doesn't let it go past min
+				theta = 0.0;
+			lastDelta = theta - oldTheta;
+			
 			// I think these need the "+ Math.PI / 2.0" because the 0 degrees is at the 'bottom', not the 'right'
 			double newThumbX = RADIUS * Math.cos(toRadians(theta) + Math.PI / 2.0);
 			double newThumbY = RADIUS * Math.sin(toRadians(theta) + Math.PI / 2.0);
-			System.out.println(theta);
+			
+			oldTheta = theta;
 			
 			thumb.setTranslateX(newThumbX);
 			thumb.setTranslateY(newThumbY);
+			
+			getBehavior().updateValue(theta);
+			numField.setNumber(control.getValue());
 		});
+		
+		numField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
+		numField.setMaxWidth(40);
+		numField.setAlignment(Pos.CENTER);
 		
 		stackPane = new StackPane();
 		
@@ -64,6 +84,7 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinnerControl, Ra
 	}
 
 	private void updateLayout() {
+		stackPane.getChildren().add(numField);
 		stackPane.getChildren().add(circle);
 		stackPane.getChildren().add(thumb);
 	}

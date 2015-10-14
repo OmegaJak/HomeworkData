@@ -1,3 +1,4 @@
+package CustomControls;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -27,6 +28,10 @@ public class NumberTextField extends TextField {
 
 	public final void setNumber(BigDecimal value) {
 		number.set(value);
+	}
+	
+	public final void setNumber(double value) {
+		number.set(new BigDecimal(value));
 	}
 
 	public ObjectProperty<BigDecimal> numberProperty() {

@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
-import CustomControls.RadialSpinnerControl;
+import CustomControls.NumberSpinner;
+import CustomControls.RadialSpinner;
 import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -251,7 +252,7 @@ public class EventHandlerController {
 			}
 		});
 		
-		RadialSpinnerControl radial = new RadialSpinnerControl();
+		RadialSpinner radial = new RadialSpinner();
 		mainGrid.add(radial, 3, 4);
 		
 		PrintStream ps = System.out;

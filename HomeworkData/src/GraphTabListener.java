@@ -48,6 +48,7 @@ import org.controlsfx.control.CheckComboBox;
 import CustomCharts.CustomPieChart;
 import CustomCharts.PieChart;
 import CustomCharts.PieChart.LabelLayoutInfo;
+import CustomControls.NumberSpinner;
 
 
 public class GraphTabListener implements ChangeListener<Number> {

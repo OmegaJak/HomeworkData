@@ -1,3 +1,4 @@
+package CustomControls;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import javafx.beans.binding.NumberBinding;
