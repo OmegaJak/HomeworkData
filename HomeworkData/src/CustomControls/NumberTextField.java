@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
  * @author Thomas Bolz
  * Taken from this post: http://java.dzone.com/articles/javafx-numbertextfield-and
  */
-public class NumberTextField extends TextField {
+public class NumberTextField extends FilteredTextField {
 
 	private final NumberFormat nf;
 	private ObjectProperty<BigDecimal> number = new SimpleObjectProperty<>();
@@ -48,7 +48,7 @@ public class NumberTextField extends TextField {
 	}
 
 	public NumberTextField(BigDecimal value, NumberFormat nf) {
-		super();
+		super("-?((\\d*)|(\\d+\\.\\d*))");
 		this.nf = nf;
 		initHandlers();
 		setNumber(value);

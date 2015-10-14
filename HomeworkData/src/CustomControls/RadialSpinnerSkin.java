@@ -84,8 +84,8 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 	}
 
 	private void updateLayout() {
-		stackPane.getChildren().add(numField);
 		stackPane.getChildren().add(circle);
+		stackPane.getChildren().add(numField);
 		stackPane.getChildren().add(thumb);
 	}
 	
