@@ -479,7 +479,7 @@ public class EventHandlerController {
 		DateFormat dateFormat = new SimpleDateFormat("kk:mm");
 		Date date = new Date();
 		String settingTo = dateFormat.format(date);
-		System.out.println("Setting the end time to: " + settingTo + "\". (It used to be \"" + endedField.getText() + "\")");
+		System.out.println("Setting the end time to: \"" + settingTo + "\". (It used to be \"" + endedField.getText() + "\")");
 		endedField.setText(settingTo);
 	}
 
