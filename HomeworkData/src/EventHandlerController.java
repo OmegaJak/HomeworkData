@@ -251,8 +251,8 @@ public class EventHandlerController {
 			}
 		});
 		
-		//RadialSpinnerControl radial = new RadialSpinnerControl();
-		//mainGrid.add(radial, 1, 4);
+		RadialSpinnerControl radial = new RadialSpinnerControl();
+		mainGrid.add(radial, 3, 4);
 		
 		PrintStream ps = System.out;
 		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
