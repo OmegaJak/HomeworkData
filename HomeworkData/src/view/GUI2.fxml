@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
+<?import CustomControls.RadialSpinner?>
 
 <VBox prefHeight="491.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="EventHandlerController">
   <children>
@@ -139,11 +140,11 @@
                                                 <VBox alignment="CENTER" GridPane.rowIndex="1">
                                                    <children>
                                                       <Label alignment="CENTER" text="Number of Unit" />
-                                                      <TextField fx:id="numUnitField">
+                                                      <RadialSpinner fx:id="numUnitField">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
-                                                      </TextField>
+                                                      </RadialSpinner>
                                                    </children>
                                                 </VBox>
                               				  <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">

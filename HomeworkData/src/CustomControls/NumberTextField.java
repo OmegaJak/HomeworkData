@@ -88,7 +88,7 @@ public class NumberTextField extends FilteredTextField {
 	/**
 	 * Tries to parse the user input to a number according to the provided NumberFormat
 	 */
-	private void parseAndFormatInput() {
+	public void parseAndFormatInput() {
 		try {
 			String input = getText();
 			if (input == null || input.length() == 0) {

@@ -56,7 +56,7 @@ public class EventHandlerController {
 	@FXML private ComboBox classField;
 	@FXML private ComboBox typeField;
 	@FXML private ComboBox unitField;
-	@FXML private TextField numUnitField;
+	@FXML private RadialSpinner numUnitField;
 	@FXML private TextField timeUnitField;
 	@FXML private TextField startedField;
 	@FXML private TextField spentField;
@@ -117,8 +117,8 @@ public class EventHandlerController {
 						checkForEndPrediction();
 					}
 				} else {
-					if (unitField.getEditor().getText().equals("***")) {
-						numUnitField.setText("1");
+					if (numUnitField.getValue() == 0) {
+						numUnitField.setValue(1);
 					}
 				}
 			}
@@ -294,16 +294,17 @@ public class EventHandlerController {
 	
 	private void checkForTimePrediction() {
 		try {
-			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField};
+			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField.getEditor()};
 			if (checkIfAllFilled(neededInputs)) {
 				String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear), classField.getEditor().getText(), typeField.getEditor().getText(),
 						unitField.getEditor().getText());
-				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getText()));
+				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getEditor().getText()));
 				predictedField.setText(predictedTimeSpent);
 				Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
 				predictedField.setTooltip(averageTime);
 			}
 		} catch (NumberFormatException e) {
+			e.printStackTrace();
 			handler.showErrorDialogue(e);
 		}
 	}
@@ -319,9 +320,9 @@ public class EventHandlerController {
 
 	private void checkForTimePerUnit() { // This is a different methodology than timePerUnit in DataHandler, but it produces the same result. Might as well leave this in.
 		try {
-			TextField[] neededInputs = {numUnitField, startedField, endedField, spentField};
+			TextField[] neededInputs = {numUnitField.getEditor(), startedField, endedField, spentField};
 			if (checkIfAllFilled(neededInputs)) {
-				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getText())), "H:MM:SS", "MM:SS", true));
+				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getEditor().getText())), "H:MM:SS", "MM:SS", true));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
@@ -404,10 +405,12 @@ public class EventHandlerController {
 				// Save the data
 				if (currentRow.length >= inputFields.length) {
 					for (int i = 0; i < inputFields.length; i++) {
-						if (i == 0 || i >= 4) {// Special conditions for the TextFields
+						if (inputFields[i] instanceof TextField) {// Special conditions for the TextFields
 							currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
-						} else if (i > 0 && i <= 3) {// Special conditons for the ComboBoxes
+						} else if (inputFields[i] instanceof ComboBox) {// Special conditons for the ComboBoxes
 							currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
+						} else if (inputFields[i] instanceof RadialSpinner) {
+							currentRow[i] = ((RadialSpinner)inputFields[i]).getEditor().getText();
 						}
 					}
 				}
@@ -425,6 +428,8 @@ public class EventHandlerController {
 						inputText = ((TextField)inputFields[i]).getText();
 					} else if (inputFields[i] instanceof ComboBox) {
 						inputText = ((ComboBox)inputFields[i]).getEditor().getText();
+					} else if (inputFields[i] instanceof RadialSpinner) {
+						inputText = ((RadialSpinner)inputFields[i]).getEditor().getText();
 					}
 
 					if (!data.get(data.size() - 1)[i].equals(inputText)) {

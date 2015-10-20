@@ -2,21 +2,27 @@ package CustomControls;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
-import javafx.geometry.Orientation;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 
 public class RadialSpinner extends Control {
 
+	private NumberTextField numTextField;
+	
 	public RadialSpinner() {
-		
+		getStyleClass().add("radial-spinner");
 	}
 	
 	@Override
 	protected Skin<?> createDefaultSkin() {
 		return new RadialSpinnerSkin(this);
+	}
+	
+	@Override
+	public String getUserAgentStylesheet() {
+		return RadialSpinner.class.getResource("css/radialSpinner.css").toExternalForm();
 	}
 	
 	// All this max stuff is VERY closely based on Slider.class's implementation of it
@@ -93,6 +99,7 @@ public class RadialSpinner extends Control {
     private DoubleProperty value;
     public final void setValue(double value) {
         if (!valueProperty().isBound()) valueProperty().set(value);
+        numTextField.setNumber(getValue());
     }
 
     public final double getValue() {
@@ -119,5 +126,17 @@ public class RadialSpinner extends Control {
             };
         }
         return value;
+    }
+    
+    protected void setTextField(NumberTextField field) {
+    	this.numTextField = field;
+    }
+    
+    public TextField getEditor() {
+    	return (TextField)this.numTextField;
+    }
+    
+    public NumberTextField getNumberTextField() {
+    	return this.numTextField;
     }
 }

@@ -1,12 +1,11 @@
 package CustomControls;
 
+import java.awt.Point;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.DoublePropertyBase;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,7 +22,7 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 	private StackPane stackPane;
 	
 	private Circle circle;
-	private Circle thumb;
+	private StackPane thumb;
 	
 	private NumberTextField numField;
 	
@@ -31,14 +30,21 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		super(control, new RadialSpinnerBehavior(control));
 		
 		circle = new Circle(RADIUS);
+		circle.getStyleClass().setAll("radial-track");
 		circle.setFill(Color.TRANSPARENT);
-		circle.setStroke(Color.RED);
+		//circle.setStroke(Color.RED);
 		
-		thumb = new Circle(7);
-		thumb.setFill(Color.BLUE);
+		thumb = new StackPane();
+		thumb.getStyleClass().setAll("radial-thumb");
+		thumb.setMaxHeight(7);
+		thumb.setMaxWidth(7);
+		//thumb.setFill(Color.BLUE);
 		thumb.setTranslateY(thumb.getTranslateY() + RADIUS); // Shift it down to 0 on the circle
+		thumb.setFocusTraversable(true);
 		
 		thumb.setOnMousePressed(me -> {
+			if (!thumb.isFocused())
+				thumb.requestFocus();
 			orgSceneX = me.getSceneX();
 			orgSceneY = me.getSceneY();
 			orgTranslateX = thumb.getTranslateX();
@@ -75,6 +81,19 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		numField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
 		numField.setMaxWidth(40);
 		numField.setAlignment(Pos.CENTER);
+		control.setTextField(numField);
+		/*control.valueProperty().addListener((observable, oldValue, newValue) -> {
+			updatePosition(control);
+			System.out.println("Yup");
+		});*/
+		numField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (!numField.getText().equals("")) {
+				numField.parseAndFormatInput();
+				control.setValue(numField.getNumber().intValue());
+				//System.out.println(numField.getNumber().intValue());
+				updatePosition(control);
+			}
+		});
 		
 		stackPane = new StackPane();
 		
@@ -89,6 +108,17 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		stackPane.getChildren().add(thumb);
 	}
 	
+	public void updatePosition(RadialSpinner control) {
+		Point newPos = getPosition(calculateTheta(control.getValue() / control.getMax()));
+		
+		thumb.setTranslateX(newPos.getX());
+		thumb.setTranslateY(newPos.getY());
+	}
+	
+	public NumberTextField getNumberTextField() {
+		return this.numField;
+	}
+	
 	private double calculateTheta(double x, double y) {
 		double[] startingVector = {0.0, RADIUS};
 		double[] pointVector = {x, y};
@@ -101,6 +131,14 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 			result = (180 - result) + 180;
 		
 		return result;
+	}
+	
+	private Point getPosition(double theta) {
+		return new Point((int)Math.round(this.RADIUS * Math.cos(theta)), (int)Math.round(this.RADIUS * Math.sin(theta)));
+	}
+	
+	private double calculateTheta(double percentage) {
+		return ((percentage) * 2 * Math.PI) + Math.PI / 2.0;
 	}
 	
 	private double toRadians(double theta) {
