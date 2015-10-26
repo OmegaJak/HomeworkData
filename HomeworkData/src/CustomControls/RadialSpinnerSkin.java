@@ -32,15 +32,13 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		circle = new Circle(RADIUS);
 		circle.getStyleClass().setAll("radial-track");
 		circle.setFill(Color.TRANSPARENT);
-		//circle.setStroke(Color.RED);
 		
 		thumb = new StackPane();
 		thumb.getStyleClass().setAll("radial-thumb");
 		thumb.setMaxHeight(7);
 		thumb.setMaxWidth(7);
-		//thumb.setFill(Color.BLUE);
 		thumb.setTranslateY(thumb.getTranslateY() + RADIUS); // Shift it down to 0 on the circle
-		thumb.setFocusTraversable(true);
+		thumb.setFocusTraversable(false);
 		
 		thumb.setOnMousePressed(me -> {
 			if (!thumb.isFocused())
@@ -81,15 +79,10 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		numField = control.getNumberTextField();
 		numField.setMaxWidth(40);
 		numField.setAlignment(Pos.CENTER);
-		/*control.valueProperty().addListener((observable, oldValue, newValue) -> {
-			updatePosition(control);
-			System.out.println("Yup");
-		});*/
 		numField.textProperty().addListener((observable, oldValue, newValue) -> {
 			if (!numField.getText().equals("")) {
 				numField.parseAndFormatInput();
 				control.setValue(numField.getNumber().intValue());
-				//System.out.println(numField.getNumber().intValue());
 				updatePosition(control);
 			}
 		});
