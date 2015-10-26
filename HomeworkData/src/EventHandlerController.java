@@ -210,6 +210,16 @@ public class EventHandlerController {
 			}
 		});
 		
+		numUnitField.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				if (Math.round(oldValue.doubleValue()) != Math.round(newValue.doubleValue())) {
+					checkForTimePrediction();
+					checkForTimePerUnit();
+				}
+			}
+		});
+		
 		typeField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when typeField goes out of focus
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
@@ -251,9 +261,6 @@ public class EventHandlerController {
 				initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
 			}
 		});
-		
-		RadialSpinner radial = new RadialSpinner();
-		mainGrid.add(radial, 3, 4);
 		
 		PrintStream ps = System.out;
 		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
