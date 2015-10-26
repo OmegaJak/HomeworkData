@@ -826,16 +826,17 @@ public class DataHandler {
 		int hours = parts[0] * num;
 		
 		int minutesProduct = 0;
-		minutesProduct = parts[1] * num;
-		while (minutesProduct > 59) {
-			hours++;
-			minutesProduct -= 60;
-		}
 		
 		int secondsProduct = parts[2] * num;
 		while (secondsProduct > 59) {
 			minutesProduct++;
 			secondsProduct -= 60;
+		}
+		
+		minutesProduct += parts[1] * num;
+		while (minutesProduct > 59) {
+			hours++;
+			minutesProduct -= 60;
 		}
 		
 		String hoursReturn = "" + hours;
