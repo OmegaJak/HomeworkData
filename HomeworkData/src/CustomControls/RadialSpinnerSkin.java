@@ -78,10 +78,9 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 			numField.setNumber(control.getValue());
 		});
 		
-		numField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
+		numField = control.getNumberTextField();
 		numField.setMaxWidth(40);
 		numField.setAlignment(Pos.CENTER);
-		control.setTextField(numField);
 		/*control.valueProperty().addListener((observable, oldValue, newValue) -> {
 			updatePosition(control);
 			System.out.println("Yup");

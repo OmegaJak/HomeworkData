@@ -1,5 +1,8 @@
 package CustomControls;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.AccessibleAttribute;
@@ -9,7 +12,7 @@ import javafx.scene.control.TextField;
 
 public class RadialSpinner extends Control {
 
-	private NumberTextField numTextField;
+	private NumberTextField numTextField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
 	
 	public RadialSpinner() {
 		getStyleClass().add("radial-spinner");
