@@ -200,21 +200,21 @@
                                                 <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                    <children>
                                                       <Label alignment="CENTER" text="Music Volume" />
-                                                      <TextField fx:id="musicField">
+                                                      <RadialSpinner fx:id="musicField">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
-                                                      </TextField>
+                                                      </RadialSpinner>
                                                    </children>
                                                 </VBox>
                                                 <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                                    <children>
                                                       <Label alignment="CENTER" text="Focus" />
-                                                      <TextField fx:id="focusField">
+                                                      <RadialSpinner fx:id="focusField">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
-                                                      </TextField>
+                                                      </RadialSpinner>
                                                    </children>
                                                 </VBox>
                                                 <VBox alignment="CENTER" GridPane.rowIndex="3">

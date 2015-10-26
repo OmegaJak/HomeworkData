@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,12 +63,12 @@ public class EventHandlerController {
 	@FXML private TextField spentField;
 	@FXML private TextField endedField;
 	@FXML private TextField predictedField;
-	@FXML private TextField musicField;
+	@FXML private RadialSpinner musicField;
 	@FXML private TextField preAlertField;
 	@FXML private TextField postAlertField;
 	@FXML private TextField preMoodField;
 	@FXML private TextField postMoodField;
-	@FXML private TextField focusField;
+	@FXML private RadialSpinner focusField;
 	@FXML private TextArea consoleLog;
 	@FXML private Button newRowButton;
 	@FXML private Button saveRowButton;
@@ -246,7 +247,15 @@ public class EventHandlerController {
 					graphListener.unload();
 				}
 			}
-		});	
+		});
+		
+		musicField.getNumberTextField().setFormat(new DecimalFormat("0.0"));
+		musicField.setMin(0.0);
+		musicField.setMax(10.0);
+		
+		focusField.getNumberTextField().setFormat(new DecimalFormat("0.0"));
+		focusField.setMin(0.0);
+		focusField.setMax(10.0);
 		
 		initAutoCompletes();
 		

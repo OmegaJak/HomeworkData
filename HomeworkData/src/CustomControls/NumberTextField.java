@@ -19,7 +19,7 @@ import javafx.scene.control.TextField;
  */
 public class NumberTextField extends FilteredTextField {
 
-	private final NumberFormat nf;
+	private NumberFormat nf;
 	private ObjectProperty<BigDecimal> number = new SimpleObjectProperty<>();
 
 	public final BigDecimal getNumber() {
@@ -83,6 +83,10 @@ public class NumberTextField extends FilteredTextField {
 				setText(nf.format(newValue));
 			}
 		});
+	}
+	
+	public void setFormat(NumberFormat format) {
+		this.nf = format;
 	}
 
 	/**

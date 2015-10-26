@@ -82,7 +82,7 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		numField.textProperty().addListener((observable, oldValue, newValue) -> {
 			if (!numField.getText().equals("")) {
 				numField.parseAndFormatInput();
-				control.setValue(numField.getNumber().intValue());
+				control.setValue(numField.getNumber().doubleValue());
 				updatePosition(control);
 			}
 		});
