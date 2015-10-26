@@ -529,6 +529,8 @@ public class EventHandlerController {
 				inputText = ((TextField)inputFields[i]).getText();
 			} else if (inputFields[i] instanceof ComboBox) {
 				inputText = ((ComboBox)inputFields[i]).getEditor().getText();
+			} else if (inputFields[i] instanceof RadialSpinner) {
+				inputText = ((RadialSpinner)inputFields[i]).getEditor().getText();
 			}
 			
 			if (!data.get(data.size() - 1)[i].equals(inputText)) {
