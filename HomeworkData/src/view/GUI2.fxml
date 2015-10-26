@@ -100,11 +100,11 @@
                                                 <VBox alignment="CENTER">
                                                    <children>
                                                       <Label alignment="CENTER" text="Date" />
-                                                      <TextField fx:id="dateField" onDragExited="#autoFillDate">
+                                                      <DatePicker fx:id="dateField">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
-                                                      </TextField>
+                                                      </DatePicker>
                                                    </children>
                                                 </VBox>
                                                 <VBox alignment="CENTER" GridPane.columnIndex="1">

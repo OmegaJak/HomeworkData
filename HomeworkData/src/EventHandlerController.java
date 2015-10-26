@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,6 +38,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -49,11 +52,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 public class EventHandlerController {
 
 	@FXML private GridPane mainGrid;
-	@FXML private TextField dateField;
+	@FXML private DatePicker dateField;
 	@FXML private ComboBox classField;
 	@FXML private ComboBox typeField;
 	@FXML private ComboBox unitField;
@@ -98,15 +102,6 @@ public class EventHandlerController {
 		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
 				postAlertField, preMoodField, postMoodField, focusField};//Ewwwwww
 		this.inputFields = inputFields;
-
-		dateField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the dateField comes into focus
-					@Override
-					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (newPropertyValue) {
-							autoFillDate();
-						}
-					}
-				});
 		
 		numUnitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus or into focus
 			@Override
@@ -245,6 +240,35 @@ public class EventHandlerController {
 					graphListener = new GraphTabListener(graphDisplay, graphPicker, graphTabOptions, handler);
 				} else if (oldValue.intValue() == 2) { // Just left the graphTab
 					graphListener.unload();
+				}
+			}
+		});
+		
+		String pattern = "d-MMM-yy";
+		dateField.setValue(LocalDate.now());
+		dateField.setPromptText(pattern);
+		dateField.setConverter(new StringConverter<LocalDate>() {
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+			
+			@Override
+			public String toString(LocalDate date) {
+				if (date != null) {
+					return dateFormatter.format(date);
+				} else {
+					return "";
+				}
+			}
+
+			@Override
+			public LocalDate fromString(String string) {
+				if (string != null && !string.isEmpty()) {
+					if (string.toLowerCase().equals("now") || string.toLowerCase().equals("today")) {
+						return LocalDate.now();
+					} else {
+						return LocalDate.parse(string, dateFormatter);
+					}
+				} else {
+					return null;
 				}
 			}
 		});
@@ -475,15 +499,6 @@ public class EventHandlerController {
 			System.out.print("]");
 		}
 		return false;
-	}
-
-	@FXML
-	private void autoFillDate() {
-		DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
-		Date date = new Date();
-		String settingTo = dateFormat.format(date);
-		System.out.println("Setting the date to: \"" + settingTo + "\". (It used to be \"" + dateField.getText() + "\")");
-		dateField.setText(settingTo);
 	}
 
 	@FXML
