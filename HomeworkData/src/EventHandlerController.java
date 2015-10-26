@@ -61,18 +61,18 @@ public class EventHandlerController {
 	@FXML private ComboBox classField;
 	@FXML private ComboBox typeField;
 	@FXML private ComboBox unitField;
-	@FXML private RadialSpinner numUnitField;
+	@FXML private RadialSpinner numUnitRadial;
 	@FXML private TextField timeUnitField;
 	@FXML private TextField startedField;
-	@FXML private TextField spentField;
+	@FXML private TextField wastedField;
 	@FXML private TextField endedField;
 	@FXML private TextField predictedField;
-	@FXML private RadialSpinner musicField;
+	@FXML private RadialSpinner musicRadial;
 	@FXML private TextField preAlertField;
 	@FXML private TextField postAlertField;
 	@FXML private TextField preMoodField;
 	@FXML private TextField postMoodField;
-	@FXML private RadialSpinner focusField;
+	@FXML private RadialSpinner focusRadial;
 	@FXML private TextArea consoleLog;
 	@FXML private Button newRowButton;
 	@FXML private Button saveRowButton;
@@ -99,11 +99,11 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitField, timeUnitField, startedField, spentField, endedField, predictedField, musicField, preAlertField,
-				postAlertField, preMoodField, postMoodField, focusField};//Ewwwwww
+		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitRadial, timeUnitField, startedField, wastedField, endedField, predictedField, musicRadial, preAlertField,
+				postAlertField, preMoodField, postMoodField, focusRadial};//Ewwwwww
 		this.inputFields = inputFields;
 		
-		numUnitField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus or into focus
+		numUnitRadial.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus or into focus
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
@@ -113,8 +113,8 @@ public class EventHandlerController {
 						checkForEndPrediction();
 					}
 				} else {
-					if (numUnitField.getValue() == 0) {
-						numUnitField.setValue(1);
+					if (numUnitRadial.getValue() == 0) {
+						numUnitRadial.setValue(1);
 					}
 				}
 			}
@@ -173,10 +173,10 @@ public class EventHandlerController {
 			}
 		});
 
-		spentField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the Time Wasted comes into/out of focus
+		wastedField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the Time Wasted comes into/out of focus
 					@Override
 					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-						if (newPropertyValue && spentField.getText().equals("")) {
+						if (newPropertyValue && wastedField.getText().equals("")) {
 							autoFillWasted();
 						} else if (!newPropertyValue) {
 							checkForTimePerUnit();
@@ -206,7 +206,7 @@ public class EventHandlerController {
 			}
 		});
 		
-		numUnitField.valueProperty().addListener(new ChangeListener<Number>() {
+		numUnitRadial.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				if (Math.round(oldValue.doubleValue()) != Math.round(newValue.doubleValue())) {
@@ -273,13 +273,13 @@ public class EventHandlerController {
 			}
 		});
 		
-		musicField.getNumberTextField().setFormat(new DecimalFormat("0.0"));
-		musicField.setMin(0.0);
-		musicField.setMax(10.0);
+		musicRadial.getNumberTextField().setFormat(new DecimalFormat("0.0"));
+		musicRadial.setMin(0.0);
+		musicRadial.setMax(10.0);
 		
-		focusField.getNumberTextField().setFormat(new DecimalFormat("0.0"));
-		focusField.setMin(0.0);
-		focusField.setMax(10.0);
+		focusRadial.getNumberTextField().setFormat(new DecimalFormat("0.0"));
+		focusRadial.setMin(0.0);
+		focusRadial.setMax(10.0);
 		
 		initAutoCompletes();
 		
@@ -334,11 +334,11 @@ public class EventHandlerController {
 	
 	private void checkForTimePrediction() {
 		try {
-			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField.getEditor()};
+			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitRadial.getEditor()};
 			if (checkIfAllFilled(neededInputs)) {
 				String averageTimeSpent = handler.averageTimeSpent(classField.getEditor().getText(), typeField.getEditor().getText(),
 						unitField.getEditor().getText());
-				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getEditor().getText()));
+				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitRadial.getEditor().getText()));
 				predictedField.setText(predictedTimeSpent);
 				Tooltip averageTime = new Tooltip("The average time spent on a unit is: " + averageTimeSpent);
 				predictedField.setTooltip(averageTime);
@@ -360,11 +360,11 @@ public class EventHandlerController {
 
 	private void checkForTimePerUnit() { // This is a different methodology than timePerUnit in DataHandler, but it produces the same result. Might as well leave this in.
 		try {
-			TextField[] neededInputs = {numUnitField.getEditor(), startedField, endedField, spentField};
+			TextField[] neededInputs = {numUnitRadial.getEditor(), startedField, endedField, wastedField};
 			if (checkIfAllFilled(neededInputs)) {
 				String timeTaken = handler.subtractTime(startedField.getText(), endedField.getText());
-				String timeMinusWasted = handler.subtractTime(spentField.getText(), timeTaken);
-				int numUnit = Integer.parseInt(numUnitField.getEditor().getText());
+				String timeMinusWasted = handler.subtractTime(wastedField.getText(), timeTaken);
+				int numUnit = Integer.parseInt(numUnitRadial.getEditor().getText());
 				String division = handler.divideTime(timeMinusWasted, "HH:MM", numUnit);
 				timeUnitField.setText(handler.convertTime(division, "HH:MM", "MM:SS", true));
 			}
@@ -525,7 +525,7 @@ public class EventHandlerController {
 
 	@FXML
 	private void autoFillWasted() {
-		spentField.setText("0:00");
+		wastedField.setText("0:00");
 	}
 	
 	@FXML

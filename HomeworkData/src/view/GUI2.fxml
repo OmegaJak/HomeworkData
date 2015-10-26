@@ -140,7 +140,7 @@
                                                 <VBox alignment="CENTER" GridPane.rowIndex="1">
                                                    <children>
                                                       <Label alignment="CENTER" text="Number of Unit" />
-                                                      <RadialSpinner fx:id="numUnitField">
+                                                      <RadialSpinner fx:id="numUnitRadial">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
@@ -190,7 +190,7 @@
                                                 <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                                    <children>
                                                       <Label alignment="CENTER" text="Time Wasted" />
-                                                      <TextField fx:id="spentField" text="0:00">
+                                                      <TextField fx:id="wastedField" text="0:00">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
@@ -200,7 +200,7 @@
                                                 <VBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                    <children>
                                                       <Label alignment="CENTER" text="Music Volume" />
-                                                      <RadialSpinner fx:id="musicField">
+                                                      <RadialSpinner fx:id="musicRadial">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
@@ -210,7 +210,7 @@
                                                 <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                                    <children>
                                                       <Label alignment="CENTER" text="Focus" />
-                                                      <RadialSpinner fx:id="focusField">
+                                                      <RadialSpinner fx:id="focusRadial">
                                                          <VBox.margin>
                                                             <Insets left="12.5" right="12.5" />
                                                          </VBox.margin>
