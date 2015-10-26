@@ -455,11 +455,28 @@ public class DataHandler {
 		return null;
 	}
 	
-	public String averageTimeSpent(ArrayList<String[]> datasheet, String homeworkClass, String homeworkType, String homeworkUnit) {
-		String[] timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {homeworkClass, homeworkType, homeworkUnit}, "And", new int[] {5}, true, csvDir, csvName).get(0);
+	/**
+	 * Determines the average time that was spent
+	 * @param className - Name of the class for the homework you want to know about
+	 * @param type - Type of the homework
+	 * @param unit - The unit of homework
+	 * @return Average time in the format of "HH:MM:SS"
+	 */
+	public String averageTimeSpent(String className, String type, String unit) {
+		ArrayList<String[]> timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {className, type, unit}, "And", new int[] {4, 6, 7, 8}, true, csvDir, csvName); // Get numUnits, startTime, wasted, endTime for each
 		
-		String result = divideTime(addTimes(timePerUnits), timePerUnits.length);
-		System.out.println("I found the average time spent on \"" + homeworkType + "\" and unit \"" + homeworkUnit + "\" in the class \"" + homeworkClass + "\" to be " + result + ".");
+		String totalTime = "00:00:00", timeSpent, timeMinusWasted;
+		int totalUnits = 0;
+		for (String[] arr : timePerUnits) { // Go through each time that homework was done
+			totalUnits += Integer.parseInt(arr[0]);
+			
+			timeSpent = subtractTime(arr[1], arr[3]);
+			timeMinusWasted = subtractTime(arr[2], timeSpent);
+			totalTime = addTimes(new String[] {convertTime(totalTime, "HH:MM:SS", "MM:SS", false), convertTime(timeMinusWasted, "HH:MM", "MM:SS", false)});
+		}
+		
+		String result = divideTime(totalTime, "HH:MM:SS", totalUnits);
+		
 		return result;
 	}
 	
@@ -694,9 +711,10 @@ public class DataHandler {
 	 * @param input Needs to be in the format provided
 	 * @param inputFormat Something like HH:MM:SS
 	 * @param outputFormat Same as above, like HH:MM:SS
+	 * @param verbose Whether or not to output the conversion to the console
 	 * @return The total minutes in the time provided
 	 */
-	public String convertTime(String input, String inputFormat, String outputFormat, boolean isVerbose) {
+	public String convertTime(String input, String inputFormat, String outputFormat, boolean verbose) {
 
 		String[] inputFormatInBetweens = findInBetween(inputFormat, ':'); //This is an array something like... {"HH","MM","SS"}
 		String[] inputInBetweens = findInBetween(input, ':'); //This is an array something like... {"05","32","50"}
@@ -711,7 +729,8 @@ public class DataHandler {
 			outputString = convertSecondsToFormattedString(outputFormatInBetweens, totalSeconds);
 		}
 
-		System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\". The result is: " + outputString);
+		if (verbose)
+			System.out.println("Converting \"" + input + "\" with format \"" + inputFormat + "\", outputting with format \"" + outputFormat + "\". The result is: " + outputString);
 
 		return outputString;
 	}
@@ -827,43 +846,18 @@ public class DataHandler {
 	}
 	
 	/**
-	 * Divides an amount of time by a number
-	 * 
-	 * @param time - The amount of time to divide, in the format of HH:MM:SS
+	 * Divides given time by a number
+	 * @param time - The amount of time
+	 * @param inputFormat - The format of that time
 	 * @param num - The number to divide the time by
-	 * @return - The rounded, divided time
+	 * @return The resultant time, rounded to the nearest second
 	 */
-	public String divideTime(String time, int num) {
-		int[] parts = convertStringsToInts(findInBetween(time, ':'));
-		double returnHours = 0, returnMinutes = 0, returnSeconds = 0;
+	public String divideTime(String time, String inputFormat, double num) {
+		String[] formatInBetweens = findInBetween(inputFormat, ':');
+		int totalSeconds = convertTimeToSeconds(formatInBetweens, convertStringsToInts(findInBetween(time, ':')));
+		double dividedSeconds = totalSeconds / (double)num;
 		
-		double dividedHours = parts[0] / (double)num;
-		double decimalHours = dividedHours - round(dividedHours, 2);
-		returnHours = dividedHours - decimalHours;
-		
-		returnMinutes += round(60 * decimalHours, 2);
-
-		if (parts.length > 1) {
-			double dividedMinutes = parts[1] / (double)num;
-			double decimalMinutes = dividedMinutes - round(dividedMinutes, 2);
-			returnMinutes = returnMinutes + dividedMinutes - decimalMinutes;
-			if (returnMinutes > 60) {
-				// TODO Do some stuff here that will probably never be run
-			}
-
-			returnSeconds += round(60 * decimalMinutes, 2);
-
-			if (parts.length > 2) {
-				double dividedSeconds = parts[2] / (double)num;
-				double decimalSeconds = dividedSeconds - round(dividedSeconds, 2);
-				returnSeconds = returnSeconds + dividedSeconds - decimalSeconds;
-				if (returnSeconds > 60) {
-					// TODO Do some stuff here
-				}
-			}
-		}
-
-		return (int)returnHours + ":" + addZeroes("" + (int)returnMinutes, 2) + ":" + addZeroes("" + (int)returnSeconds, 2);
+		return convertSecondsToFormattedString(formatInBetweens, (int)Math.round(dividedSeconds));
 	}
 	
 	/**

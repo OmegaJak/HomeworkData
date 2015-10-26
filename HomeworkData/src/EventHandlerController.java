@@ -336,7 +336,7 @@ public class EventHandlerController {
 		try {
 			TextField[] neededInputs = {classField.getEditor(), typeField.getEditor(), unitField.getEditor(), numUnitField.getEditor()};
 			if (checkIfAllFilled(neededInputs)) {
-				String averageTimeSpent = handler.averageTimeSpent(handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear), classField.getEditor().getText(), typeField.getEditor().getText(),
+				String averageTimeSpent = handler.averageTimeSpent(classField.getEditor().getText(), typeField.getEditor().getText(),
 						unitField.getEditor().getText());
 				String predictedTimeSpent = handler.multiplyTime(averageTimeSpent, Integer.parseInt(numUnitField.getEditor().getText()));
 				predictedField.setText(predictedTimeSpent);
@@ -362,7 +362,11 @@ public class EventHandlerController {
 		try {
 			TextField[] neededInputs = {numUnitField.getEditor(), startedField, endedField, spentField};
 			if (checkIfAllFilled(neededInputs)) {
-				timeUnitField.setText(handler.convertTime(handler.divideTime(handler.subtractTime(spentField.getText(), handler.subtractTime(startedField.getText(), endedField.getText())), Integer.parseInt(numUnitField.getEditor().getText())), "H:MM:SS", "MM:SS", true));
+				String timeTaken = handler.subtractTime(startedField.getText(), endedField.getText());
+				String timeMinusWasted = handler.subtractTime(spentField.getText(), timeTaken);
+				int numUnit = Integer.parseInt(numUnitField.getEditor().getText());
+				String division = handler.divideTime(timeMinusWasted, "HH:MM", numUnit);
+				timeUnitField.setText(handler.convertTime(division, "HH:MM", "MM:SS", true));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
