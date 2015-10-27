@@ -35,8 +35,8 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 		
 		thumb = new StackPane();
 		thumb.getStyleClass().setAll("radial-thumb");
-		thumb.setMaxHeight(7);
-		thumb.setMaxWidth(7);
+		thumb.setMaxHeight(20);
+		thumb.setMaxWidth(20);
 		thumb.setTranslateY(thumb.getTranslateY() + RADIUS); // Shift it down to 0 on the circle
 		thumb.setFocusTraversable(false);
 		
