@@ -451,13 +451,7 @@ public class EventHandlerController {
 				// Save the data
 				if (currentRow.length >= inputFields.length) {
 					for (int i = 0; i < inputFields.length; i++) {
-						if (inputFields[i] instanceof TextField) {// Special conditions for the TextFields
-							currentRow[i] = ((TextField)inputFields[i]).getText(); // Set the cells to the input fields
-						} else if (inputFields[i] instanceof ComboBox) {// Special conditons for the ComboBoxes
-							currentRow[i] = ((ComboBox)inputFields[i]).getEditor().getText();
-						} else if (inputFields[i] instanceof RadialSpinner) {
-							currentRow[i] = ((RadialSpinner)inputFields[i]).getEditor().getText();
-						}
+						currentRow[i] = getText(inputFields[i]);
 					}
 				}
 
@@ -469,14 +463,7 @@ public class EventHandlerController {
 				boolean didSave = true;
 				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
 				for (int i = 0; i < inputFields.length; i++) {
-					String inputText = "";
-					if (inputFields[i] instanceof TextField) {
-						inputText = ((TextField)inputFields[i]).getText();
-					} else if (inputFields[i] instanceof ComboBox) {
-						inputText = ((ComboBox)inputFields[i]).getEditor().getText();
-					} else if (inputFields[i] instanceof RadialSpinner) {
-						inputText = ((RadialSpinner)inputFields[i]).getEditor().getText();
-					}
+					String inputText = getText(inputFields[i]);
 
 					if (!data.get(data.size() - 1)[i].equals(inputText)) {
 						didSave = false;
@@ -496,11 +483,7 @@ public class EventHandlerController {
 			System.out.print("[");
 			for (int i = 0; i < inputFields.length; i++) {
 				System.out.print(inputFields[i].getId() + ":");
-				if (inputFields[i] instanceof TextField) {
-					System.out.print(((TextField)inputFields[i]).getText() + (i != inputFields.length - 1 ? ", " : ""));
-				} else if (inputFields[i] instanceof ComboBox) {
-					System.out.print(((ComboBox)inputFields[i]).getEditor().getText() + (i != inputFields.length - 1 ? ", " : ""));
-				}
+				System.out.print(getText(inputFields[i]) + (i != inputFields.length - 1 ? ", " : ""));
 			}
 			System.out.print("]");
 		}
@@ -554,14 +537,7 @@ public class EventHandlerController {
 		boolean wasSaved = true;
 		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
 		for (int i = 0; i < inputFields.length; i++) {
-			String inputText = "";
-			if (inputFields[i] instanceof TextField) {
-				inputText = ((TextField)inputFields[i]).getText();
-			} else if (inputFields[i] instanceof ComboBox) {
-				inputText = ((ComboBox)inputFields[i]).getEditor().getText();
-			} else if (inputFields[i] instanceof RadialSpinner) {
-				inputText = ((RadialSpinner)inputFields[i]).getEditor().getText();
-			}
+			String inputText = getText(inputFields[i]);
 			
 			if (!data.get(data.size() - 1)[i].equals(inputText)) {
 				wasSaved = false;
@@ -571,12 +547,7 @@ public class EventHandlerController {
 		
 		boolean isEmpty = true; // True until proven false
 		for (int i = 0; i < inputFields.length; i++) {
-			String inputText = "";
-			if (inputFields[i] instanceof TextField) {
-				inputText = ((TextField)inputFields[i]).getText();
-			} else if (inputFields[i] instanceof ComboBox) {
-				inputText = ((ComboBox)inputFields[i]).getEditor().getText();
-			}
+			String inputText = getText(inputFields[i]);
 			
 			if ((i != 7 && !inputText.equals("")) || (i == 7 && !((TextField)inputFields[i]).getText().equals("0:00"))) {
 				isEmpty = false;
@@ -630,6 +601,23 @@ public class EventHandlerController {
 	void newYear() {
 		addOtherInfo("NEW SCHOOL YEAR");
 		handler.mostRecentYear++;
+	}
+	
+	private String getText(Control input) {
+		String toReturn = "";
+		if (input instanceof TextField) {
+			toReturn = ((TextField)input).getText();
+		} else if (input instanceof ComboBox) {
+			toReturn = ((ComboBox)input).getEditor().getText();
+		} else if (input instanceof RadialSpinner) {
+			toReturn = ((RadialSpinner)input).getEditor().getText();
+		} else if (input instanceof DatePicker) {
+			toReturn = ((DatePicker)input).getEditor().getText();
+		} else {
+			System.out.println("There's an unknown control, and I can therefore not interact with the file properly.");
+			toReturn = "ERROR";
+		}
+		return toReturn;
 	}
 	
 	private void addOtherInfo(String infoText) {
