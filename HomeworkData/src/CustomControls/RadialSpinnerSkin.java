@@ -49,6 +49,8 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 			orgTranslateY = thumb.getTranslateY();
 		});
 		
+		oldTheta = (control.getMin() / control.getMax()) * 360.0; // Need to initialize it with the starting position
+		
 		thumb.setOnMouseDragged(me -> {
 			//getBehavior().trackPress(me, (me.getX()));
 			double offsetX = me.getSceneX() - orgSceneX; // How much the mouse has moved
@@ -57,10 +59,14 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 			double newTranslateY = orgTranslateY + offsetY;
 			
 			double theta = calculateTheta(newTranslateX, newTranslateY);
-			if (oldTheta > 180.0 && theta < 180.0 && lastDelta >= 0) // Doesn't let it go past max
+			double max = control.getMax(), min = control.getMin();
+			double minTheta = (min / max) * 360.0;
+			double halfwayTheta = ((360.0 - minTheta)/2.0) + minTheta;
+			if (oldTheta > halfwayTheta && theta < halfwayTheta && lastDelta >= 0) // Doesn't let it go past max
 				theta = 360.0;
-			else if (oldTheta < 180.0 && theta > 180.0 && lastDelta <= 0) // Doesn't let it go past min
-				theta = 0.0;
+			else if ((oldTheta >= minTheta && theta < minTheta && lastDelta <= 0) || (oldTheta < halfwayTheta && theta > halfwayTheta && lastDelta <= 0))
+				theta = (min / max) * 360.0;
+			
 			lastDelta = theta - oldTheta;
 			
 			// I think these need the "+ Math.PI / 2.0" because the 0 degrees is at the 'bottom', not the 'right'
@@ -86,6 +92,7 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 				updatePosition(control);
 			}
 		});
+		numField.setText("" + control.getMin()); // Start it at the minimum value
 		
 		stackPane = new StackPane();
 		

@@ -273,6 +273,8 @@ public class EventHandlerController {
 			}
 		});
 		
+		numUnitRadial.setMin(1.0);
+		
 		musicRadial.getNumberTextField().setFormat(new DecimalFormat("0.0"));
 		musicRadial.setMin(0.0);
 		musicRadial.setMax(10.0);
