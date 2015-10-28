@@ -48,7 +48,11 @@ public class NumberTextField extends FilteredTextField {
 	}
 
 	public NumberTextField(BigDecimal value, NumberFormat nf) {
-		super("((\\d*)|(\\d+\\.\\d*))");
+		this(value, nf, "((\\d*)|(\\d+\\.\\d*))");
+	}
+	
+	public NumberTextField(BigDecimal value, NumberFormat nf, String regex) {
+		super(regex);
 		this.nf = nf;
 		initHandlers();
 		setNumber(value);

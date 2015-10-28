@@ -283,8 +283,7 @@ public class EventHandlerController {
 		
 		initAutoCompletes();
 		
-		NumberSpinner yearSpinner = new NumberSpinner();
-		yearSpinner.setNumber(new BigDecimal(handler.mostRecentYear));
+		NumberSpinner yearSpinner = new NumberSpinner(new BigDecimal(handler.mostRecentYear), BigDecimal.ONE, "((\\-+\\d*)|(\\d*))");
 		mainGrid.add(yearSpinner, 0, 4);
 		mainGrid.setMargin(yearSpinner, new Insets(30.0, 11, 0.0, 12.5));
 		yearSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {

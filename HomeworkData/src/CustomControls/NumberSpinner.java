@@ -45,16 +45,23 @@ public class NumberSpinner extends HBox {
 	}
 
 	public NumberSpinner(BigDecimal value, BigDecimal stepWidth) {
-		this(value, stepWidth, NumberFormat.getInstance());
+		this(value, stepWidth, NumberFormat.getInstance(), "");
+	}
+	
+	public NumberSpinner(BigDecimal value, BigDecimal stepWidth, String regex) {
+		this(value, stepWidth, NumberFormat.getInstance(), regex);
 	}
 
-	public NumberSpinner(BigDecimal value, BigDecimal stepWidth, NumberFormat nf) {
+	public NumberSpinner(BigDecimal value, BigDecimal stepWidth, NumberFormat nf, String regex) {
 		super();
 		this.setId(NUMBER_SPINNER);
 		this.stepWitdhProperty.set(stepWidth);
 
 		// TextField
-		numberField = new NumberTextField(value, nf);
+		if (regex.equals(""))
+			numberField = new NumberTextField(value, nf);
+		else
+			numberField = new NumberTextField(value, nf, regex);
 		numberField.setId(NUMBER_FIELD);
 
 		// Enable arrow keys for dec/inc
