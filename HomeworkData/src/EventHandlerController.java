@@ -206,13 +206,11 @@ public class EventHandlerController {
 			}
 		});
 		
-		numUnitRadial.valueProperty().addListener(new ChangeListener<Number>() {
+		numUnitRadial.getEditor().textProperty().addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				if (Math.round(oldValue.doubleValue()) != Math.round(newValue.doubleValue())) {
-					checkForTimePrediction();
-					checkForTimePerUnit();
-				}
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				checkForTimePrediction();
+				checkForTimePerUnit();
 			}
 		});
 		
@@ -366,9 +364,9 @@ public class EventHandlerController {
 			if (checkIfAllFilled(neededInputs)) {
 				String timeTaken = handler.subtractTime(startedField.getText(), endedField.getText());
 				String timeMinusWasted = handler.subtractTime(wastedField.getText(), timeTaken);
-				int numUnit = Integer.parseInt(numUnitRadial.getEditor().getText());
+				double numUnit = Math.round(numUnitRadial.getValue());
 				String division = handler.divideTime(timeMinusWasted, "HH:MM", numUnit);
-				timeUnitField.setText(handler.convertTime(division, "HH:MM", "MM:SS", true));
+				timeUnitField.setText(handler.convertTime(division, "HH:MM:SS", "MM:SS", false));
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");

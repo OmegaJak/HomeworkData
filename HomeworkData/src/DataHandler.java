@@ -851,14 +851,14 @@ public class DataHandler {
 	 * @param time - The amount of time
 	 * @param inputFormat - The format of that time
 	 * @param num - The number to divide the time by
-	 * @return The resultant time, rounded to the nearest second
+	 * @return The resultant time, rounded to the nearest second, in the format of HH:MM:SS
 	 */
 	public String divideTime(String time, String inputFormat, double num) {
 		String[] formatInBetweens = findInBetween(inputFormat, ':');
 		int totalSeconds = convertTimeToSeconds(formatInBetweens, convertStringsToInts(findInBetween(time, ':')));
 		double dividedSeconds = totalSeconds / (double)num;
 		
-		return convertSecondsToFormattedString(formatInBetweens, (int)Math.round(dividedSeconds));
+		return convertSecondsToFormattedString(new String[] {"HH", "MM", "SS"}, (int)Math.round(dividedSeconds));
 	}
 	
 	/**
