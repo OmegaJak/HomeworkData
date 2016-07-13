@@ -8,7 +8,7 @@ import javafx.scene.control.Skinnable;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
 
-//Another test
+//Another test and another
 public class ArrowButton extends Button implements Styleable, EventTarget, Skinnable {
 
 	private double ARROW_SIZE;
