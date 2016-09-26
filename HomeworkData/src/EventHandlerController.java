@@ -86,6 +86,8 @@ public class EventHandlerController {
 	
 	private DataHandler handler;
 	private Control[] inputFields = new Control[16];
+	
+	private boolean hasPotentiallyBeenEdited = false;
 
 	/**
 	 * The constructor. The constructor is called before the initialize() method.
@@ -102,6 +104,18 @@ public class EventHandlerController {
 		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitRadial, timeUnitField, startedField, wastedField, endedField, predictedField, musicRadial, preAlertField,
 				postAlertField, preMoodField, postMoodField, focusRadial};//Ewwwwww
 		this.inputFields = inputFields;
+		
+		for (Control curControl : inputFields) {
+			curControl.focusedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+					if (newPropertyValue) { // Into focus
+						hasPotentiallyBeenEdited = true;
+						// TODO: Make RadialSpinner work with this
+					}
+				}
+			});
+		}
 		
 		numUnitRadial.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus or into focus
 			@Override
@@ -244,7 +258,6 @@ public class EventHandlerController {
 		
 		String pattern = "d-MMM-yy";
 		dateField.setValue(LocalDate.now());
-		dateField.setPromptText(pattern);
 		dateField.setConverter(new StringConverter<LocalDate>() {
 			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
 			
@@ -532,26 +545,45 @@ public class EventHandlerController {
 	@FXML 
 	void quit() {
 		boolean wasSaved = true;
-		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
-		for (int i = 0; i < inputFields.length; i++) {
-			String inputText = getText(inputFields[i]);
+		if (hasPotentiallyBeenEdited) {
+			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
 			
-			if (!data.get(data.size() - 1)[i].equals(inputText)) {
-				wasSaved = false;
-				break;
+			int[] indexes = 	{0, 4, 4, 7, 10, 15};
+			String[] ignores = 	{";.;", "1", "0", "0:00", "0.0", "0.0"}; // Vampire is best special character
+			
+			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
+				String inputText = getText(inputFields[i]);
+				
+				boolean exhaustedAllPossibilities = true;
+				for (int k = 0; k < indexes.length; k++) {
+					if (i == indexes[k]) {
+						if (ignores[k] == ";.;" ? false : !(getText(inputFields[i]).equals(ignores[k]))) {
+							System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\"..");
+							
+							wasSaved = false;
+							break;
+						} else {
+							//System.out.println("Ignored input " + indexes[k] + " because of ignore value \"" + ignores[k] + "\"");
+							exhaustedAllPossibilities = false;
+							break;
+						}
+					}
+				}
+				if (wasSaved == false)
+					break;
+				
+				if (exhaustedAllPossibilities) { // Went through all potential ignores, this wasn't one, so do a normal check
+					if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
+						System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\".");
+
+						wasSaved = false;
+						break;
+					}
+				} else {
+					exhaustedAllPossibilities = true; // Reset it
+				}
 			}
 		}
-		
-		boolean isEmpty = true; // True until proven false
-		for (int i = 0; i < inputFields.length; i++) {
-			String inputText = getText(inputFields[i]);
-			
-			if ((i != 7 && !inputText.equals("")) || (i == 7 && !((TextField)inputFields[i]).getText().equals("0:00"))) {
-				isEmpty = false;
-			}
-		}
-		
-		if(isEmpty)  wasSaved = true;
 		
 		if (wasSaved) {
 			System.exit(0);
