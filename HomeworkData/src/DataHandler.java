@@ -533,7 +533,7 @@ public class DataHandler {
 		if (classFilters.size() > 0) {
 			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {0}, true,
 					this.csvDir, this.csvName).get(0)));
-			startStopTimes = getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {6, 8}, true, this.csvDir, this.csvName);
+			startStopTimes = getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
 		} else {
 			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
 					this.csvDir, this.csvName).get(0)));
