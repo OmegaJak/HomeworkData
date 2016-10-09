@@ -131,8 +131,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 					
 					groupingRangeSpinner.setNumber(new BigDecimal(1));
 					
-					ObservableList<String> classOptions = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {"Class"}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0));
-					classFilter.getItems().addAll(classOptions);
+					ObservableList<String> classOptions = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.CLASS}, false, handler.csvDir, handler.csvName).get(0));
+					classFilter.getItems().addAll(classOptions);					
+					String[] classFilterArr = classFilter.getCheckModel().getCheckedItems().toArray(new String[] {});
 					
 					XYChart.Series series = getLineChartData(showBlanks.selectedProperty().getValue(), groupingRangeSpinner.getNumber().toBigInteger().intValue(), classFilter.getCheckModel().getCheckedItems());
 					
@@ -157,7 +158,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					});
 					
 			        lineChart.getData().add(series);
-			        series = addSeriesListeners(series);
+			        series = addSeriesListeners(series, classFilterArr);
 			        
 			        graphDisplay.getChildren().add(lineChart);
 			        graphTabOptions.getChildren().add(groupingRangeSpinner);
@@ -165,18 +166,35 @@ public class GraphTabListener implements ChangeListener<Number> {
 					graphTabOptions.getChildren().add(classFilter);
 			        
 					break;
+				case "Report Generator":
+					System.out.println("Asdf");
+					break;
 			}
 		}
 	}
+	
+	/*
+	 * Report Generator
+	 */
+	
+	
+	
+	/*
+	 * 
+	 */
+	
+	/*
+	 * Spent Time Line Chart
+	 */
 	
 	private void updateChartData(LineChart lineChart, boolean shouldShowBlanks, int groupingRange, ObservableList<String> classFilters) {
 		lineChart.getData().clear(); // Get rid of the old data
 		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange, classFilters); // Get the new data
 		lineChart.getData().add(series); // Add that new data
-		addSeriesListeners(series); // Set animation & click listeners for the new chart data
+		addSeriesListeners(series, classFilters.toArray(new String[] {})); // Set animation & click listeners for the new chart data
 	}
 	
-	private XYChart.Series addSeriesListeners(XYChart.Series originalSeries) {
+	private XYChart.Series addSeriesListeners(XYChart.Series originalSeries, String[] classFilter) {
 		XYChart.Series series = originalSeries;
 		
 		for (int i = 0; i < series.getData().size(); i++) {
@@ -213,7 +231,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 						Separator separatorOne = new Separator();
 						separatorOne.setOrientation(Orientation.VERTICAL);
 						
-						int secondsSpentOnDay = handler.getSecondsSpentOnDay(startingDay);
+						int secondsSpentOnDay = handler.getSecondsSpentOnDay(startingDay, classFilter);
 						Label secondsSpent = new Label(secondsSpentOnDay + " seconds");
 						secondsSpent.fontProperty().bind(date.fontProperty());
 						
@@ -262,9 +280,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 						TableColumn timeEndedCol = new TableColumn("Time Ended");
 						timeEndedCol.setCellValueFactory(new PropertyValueFactory("timeEnded"));
 						
-						ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {startingDay}, "And",
-								new int[] {1, 2, 6, 8}, true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
-
+						ArrayList<String[]> dataArr = handler.getCellsMeetingCriteria(new int[] {Columns.DATE}, new String[] {startingDay}, "And",
+								new int[] {Columns.CLASS, Columns.HOMEWORK_TYPE, Columns.TIME_STARTED, Columns.TIME_ENDED}, true, handler.csvDir, handler.csvName);
+						if (classFilter.length > 0)
+							dataArr = handler.getCellsMeetingCriteria(new int[] {0}, classFilter, "Or", new int[] {0, 1, 2, 3}, true, dataArr); // Gotta keep in mind now we're working with an already-limited set
+						ObservableList<String[]> relevantData = FXCollections.observableArrayList(dataArr); // Get the rows on this date, and convert it to an ObservableList
+						
 						ObservableList<Homework> data = FXCollections.observableArrayList();
 						for (String[] row : relevantData) {
 							data.add(new Homework(row));
@@ -305,7 +326,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				currentData.getNode().setOnMouseEntered(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
-						ScaleTransition transition = new ScaleTransition(Duration.millis(500), currentData.getNode());
+						ScaleTransition transition = new ScaleTransition(Duration.millis(50), currentData.getNode());
 						transition.setFromX(currentData.getNode().getScaleX());
 						transition.setFromX(currentData.getNode().getScaleY());
 						transition.setToX(1.5);
@@ -318,7 +339,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				currentData.getNode().setOnMouseExited(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
-						ScaleTransition transition = new ScaleTransition(Duration.millis(500), currentData.getNode());
+						ScaleTransition transition = new ScaleTransition(Duration.millis(50), currentData.getNode());
 						transition.setFromX(currentData.getNode().getScaleX());
 						transition.setFromX(currentData.getNode().getScaleY());
 						transition.setToX(1);
@@ -357,13 +378,14 @@ public class GraphTabListener implements ChangeListener<Number> {
 			}
 
 			date.setText(dateFormat.format(currentCalendar.getTime()));
-			int secondsSpentOnDay = handler.getSecondsSpentOnDay(date.getText());
+			int secondsSpentOnDay = handler.getSecondsSpentOnDay(date.getText(), new String[] {});
 			secondsSpent.setText(secondsSpentOnDay + " seconds");
 			timeSpent.setText(handler.convertSecondsToFormattedString(handler.findInBetween("HH:MM", ':'), secondsSpentOnDay));
 			//--------//
 
 			//----Updating the Data Table----//
-			ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {0}, new String[] {date.getText()}, "And", new int[] {1, 2, 6, 8},
+			ObservableList<String[]> relevantData = FXCollections.observableArrayList(handler.getCellsMeetingCriteria(new int[] {Columns.DATE}, new String[] {date.getText()}, "And",
+					new int[] {Columns.CLASS, Columns.HOMEWORK_TYPE, Columns.TIME_STARTED, Columns.TIME_ENDED},
 					true, handler.csvDir, handler.csvName)); // Get the rows on this date, and convert it to an ObservableList
 
 			ObservableList<Homework> data = FXCollections.observableArrayList();
@@ -394,6 +416,10 @@ public class GraphTabListener implements ChangeListener<Number> {
 		return toReturn;
 	}
 	
+	/*
+	 * 
+	 */
+	
 	public void unload() {
 		graphDisplay.getChildren().clear();
 		graphPicker.getSelectionModel().clearSelection();
@@ -407,6 +433,10 @@ public class GraphTabListener implements ChangeListener<Number> {
 			graphTabOptions.getChildren().remove(startingNumGraphTabOptionsChildren);
 		}
 	}
+	
+	/*
+	 * Pie Chart Craziness
+	 */
 
 	/**
 	 * 
@@ -603,5 +633,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 			return 360.0 * (d.getPieValue() / total);
 		}
+		
+		/*
+		 * 
+		 */
 	}
 }

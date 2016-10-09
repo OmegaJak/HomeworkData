@@ -202,7 +202,7 @@ public class EventHandlerController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					String[] types = handler.getCellsMeetingCriteria(new int[] {1}, new String[] {classField.getEditor().getText()}, "And", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
+					String[] types = handler.getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {classField.getEditor().getText()}, "And", new int[] {Columns.HOMEWORK_TYPE}, false, handler.csvDir, handler.csvName).get(0);
 					ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
 					javafx.collections.FXCollections.reverse(typeOptions); // This reversal makes the most recent items be at the top of the list
 					typeField.setItems(typeOptions);
@@ -232,7 +232,7 @@ public class EventHandlerController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					String[] units = handler.getCellsMeetingCriteria(new int[] {2}, new String[] {typeField.getEditor().getText()}, "And", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
+					String[] units = handler.getCellsMeetingCriteria(new int[] {Columns.HOMEWORK_TYPE}, new String[] {typeField.getEditor().getText()}, "And", new int[] {Columns.UNIT}, false, handler.csvDir, handler.csvName).get(0);
 					ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 					javafx.collections.FXCollections.reverse(unitOptions);
 					unitField.setItems(unitOptions);
@@ -317,18 +317,18 @@ public class EventHandlerController {
 	
 	private void initAutoCompletes() {
 		new AutoCompleteComboBoxListener(classField);
-		String[] classes = handler.getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, handler.csvDir, handler.csvName).get(0);
+		String[] classes = handler.getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.CLASS}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
 		classField.setItems(classOptions);
 		
 		new AutoCompleteComboBoxListener(typeField);
-		String[] types = handler.getCellsMeetingCriteria(new int[] {2}, new String[] {"Type of Homework"}, "Not", new int[] {2}, false, handler.csvDir, handler.csvName).get(0);
+		String[] types = handler.getCellsMeetingCriteria(new int[] {Columns.HOMEWORK_TYPE}, new String[] {"Type of Homework"}, "Not", new int[] {Columns.HOMEWORK_TYPE}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> typeOptions = FXCollections.observableArrayList(types);
 		javafx.collections.FXCollections.reverse(typeOptions);
 		typeField.setItems(typeOptions);
 		
 		new AutoCompleteComboBoxListener(unitField);
-		String[] units = handler.getCellsMeetingCriteria(new int[] {3}, new String[] {"Unit"}, "Not", new int[] {3}, false, handler.csvDir, handler.csvName).get(0);
+		String[] units = handler.getCellsMeetingCriteria(new int[] {Columns.UNIT}, new String[] {"Unit"}, "Not", new int[] {Columns.UNIT}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		javafx.collections.FXCollections.reverse(unitOptions);
 		unitField.setItems(unitOptions);

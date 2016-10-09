@@ -94,7 +94,7 @@ public class DataHandler {
 			String[] timesToAdd = {};
 			DateFormat dateFormat = new SimpleDateFormat("d-MMM-yy");
 			String date = dateFormat.format(new Date());
-			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8}, true, csvDir, csvName);
+			ArrayList<String[]> matchingCells = getCellsMeetingCriteria(new int[] {Columns.DATE}, new String[] {date}, "And", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED}, true, csvDir, csvName);
 			for (int i = 0; i < matchingCells.size(); i++) {
 				if (matchingCells.get(i)[0].contains(":") && matchingCells.get(i)[1].contains(":")) {
 					String[] timesToAdd2 = new String[timesToAdd.length + 1];
@@ -361,6 +361,17 @@ public class DataHandler {
 		return temp.size();
 	}
 	
+	
+	/**
+	 * Simply reads the data file, then passes along to other overload.
+	 * For paramater descriptions, see other overload. 
+	 */
+	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, String dir, String file) {
+		ArrayList<String[]> dataSheet = readFile(dir, file, false, mostRecentYear);
+
+		return getCellsMeetingCriteria(columnsToLookIn, cellValuesToMatch, operator, desiredColumns, allowDuplicates, dataSheet);
+	}
+	
 	/**
 	 * @param columnsToLookIn - Which columns the cellValuesToMatch will be looked for in. Ex: new int[] {2, 5}
 	 * @param cellValuesToMatch - Tests whether the currently examined cell matches this value, in the specified column, with corresponding indexes, in
@@ -369,15 +380,11 @@ public class DataHandler {
 	 * @param desiredColumns - The column of the result cells. Ex: new int[] {2, 6, 8}.   
 	 * 							Note: If this is only one column, then ArrayList will just contain one String[], which will contain that column.
 	 * @param allowDuplicates - Whether or not duplicate values are allowed to be returned. Ex: true: {5, 5, 2, 3, 5}, false: {5, 2, 3}
-	 * @param dir -	The directory of the file to read from
-	 * @param file - The name of the file to read from
+	 * @param dataSheet - The data to process
 	 * @return All of the cells that meet the specified criteria in an Arraylist of String arrays from the desired column
 	 */
-	// TODO: Modify so that if cellValuesToMatch is just one index, then it matches all the columns to that one value. As it is, if cellValuesToMatch is a different length from desiredColumns, it will fail.
 	// TODO: Add option to ignore first line. Or just make it default. Probably that.
-	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, String dir, String file) {
-		ArrayList<String[]> dataSheet = readFile(dir, file, false, mostRecentYear);
-
+	public ArrayList<String[]> getCellsMeetingCriteria(int[] columnsToLookIn, String[] cellValuesToMatch, String operator, int[] desiredColumns, boolean allowDuplicates, ArrayList<String[]> dataSheet) {
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
 		boolean success;
 		if (operator.equals("Or"))
@@ -387,26 +394,24 @@ public class DataHandler {
 		String[] arrayListIndex = {};
 		for (int i = 0; i < dataSheet.size(); i++) { // Loops 'top to bottom' through the whole data sheet
 			if (!dataSheet.get(i)[0].equals("OTHER INFO")) {
-				for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row
-					switch (operator) {
-						case "And":
-							if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-								success = false;
+				for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row					
+					for (String cellValue : cellValuesToMatch) {
+						boolean equality = dataSheet.get(i)[columnsToLookIn[k]].equals(cellValue);
+
+						switch (operator) {
+							case "And":
+								if (!equality)
+									success = false;
 								break;
-							}
-							break;
-						case "Or":
-							if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-								success = true;
+							case "Or":
+								if (equality)
+									success = true;
 								break;
-							}
-							break;
-						case "Not":
-							if (dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
-								success = false;
+							case "Not":
+								if (equality)
+									success = false;
 								break;
-							}
-							break;
+						}
 					}
 				}
 				if (success) {
@@ -463,7 +468,7 @@ public class DataHandler {
 	 * @return Average time in the format of "HH:MM:SS"
 	 */
 	public String averageTimeSpent(String className, String type, String unit) {
-		ArrayList<String[]> timePerUnits = getCellsMeetingCriteria(new int[] {1,  2,  3}, new String[] {className, type, unit}, "And", new int[] {4, 6, 7, 8}, true, csvDir, csvName); // Get numUnits, startTime, wasted, endTime for each
+		ArrayList<String[]> timePerUnits = getCellsMeetingCriteria(new int[] {Columns.CLASS,  Columns.HOMEWORK_TYPE,  Columns.UNIT}, new String[] {className, type, unit}, "And", new int[] {Columns.NUM_UNIT, Columns.TIME_STARTED, Columns.TIME_WASTED, Columns.TIME_ENDED}, true, csvDir, csvName); // Get numUnits, startTime, wasted, endTime for each
 		
 		String totalTime = "00:00:00", timeSpent, timeMinusWasted;
 		int totalUnits = 0;
@@ -487,7 +492,7 @@ public class DataHandler {
 	 * @return An ArrayList of String arrays for each class, in the format of String{"Class", "Total Time (format of HH:MM)"}
 	 */
 	public ArrayList<String[]> getClassTotalTimes(String csvDir, String csvName) {
-		String[] classNames = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
+		String[] classNames = getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.CLASS}, false, csvDir, csvName).get(0);
 		
 		ArrayList<ArrayList<String[]>> superList = new ArrayList<ArrayList<String[]>>();
 		//Looks something like this:
@@ -495,7 +500,7 @@ public class DataHandler {
 		
 		ArrayList<String[]> relevantColumns = new ArrayList<String[]>();
 		for (String className : classNames) {
-			relevantColumns = getCellsMeetingCriteria(new int[] {1}, new String[] {className}, "Or", new int[] {6, 8}, true, csvDir, csvName);
+			relevantColumns = getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {className}, "Or", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED}, true, csvDir, csvName);
 			relevantColumns.add(0, new String[] {className});
 			superList.add(relevantColumns);
 		}
@@ -531,13 +536,13 @@ public class DataHandler {
 		ArrayList<String> dates = new ArrayList<String>();
 		ArrayList<String[]> startStopTimes = new ArrayList<String[]>();
 		if (classFilters.size() > 0) {
-			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {0}, true,
+			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {Columns.CLASS}, classFilters.toArray(new String[0]), "Or", new int[] {Columns.DATE}, true,
 					this.csvDir, this.csvName).get(0)));
-			startStopTimes = getCellsMeetingCriteria(new int[] {1}, classFilters.toArray(new String[0]), "Or", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
+			startStopTimes = getCellsMeetingCriteria(new int[] {Columns.CLASS}, classFilters.toArray(new String[0]), "Or", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, true, this.csvDir, this.csvName);
 		} else {
-			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {0, 6, 8}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {0}, true,
+			dates = new ArrayList<String>(Arrays.asList(getCellsMeetingCriteria(new int[] {Columns.CLASS, Columns.TIME_STARTED, Columns.TIME_WASTED}, new String[] {"Date", "Time Started", "Time Ended"}, "Not", new int[] {Columns.DATE}, true,
 					this.csvDir, this.csvName).get(0)));
-			startStopTimes = getCellsMeetingCriteria(new int[] {0, 6, 8, 7}, new String[] {"Date", "Time Started", "Time Ended", "Time Wasted"}, "Not", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
+			startStopTimes = getCellsMeetingCriteria(new int[] {Columns.DATE, Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, new String[] {"Date", "Time Started", "Time Ended", "Time Wasted"}, "Not", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, true, this.csvDir, this.csvName);
 		}
 		// This gets the first column, which is in the form of ArrayList[String{"asdf", "wqerqwer"}], and converts it to ArrayList["asdf", "wqerqwer"]
 
@@ -641,8 +646,15 @@ public class DataHandler {
 		return toReturn;
 	}
 	
-	public int getSecondsSpentOnDay(String date) {
-		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {date}, "And", new int[] {6, 8, 7}, true, this.csvDir, this.csvName);
+	public int getSecondsSpentOnDay(String date, String[] classFilter) {
+		ArrayList<String[]> startStopTimesWithClass = getCellsMeetingCriteria(new int[] {Columns.DATE}, new String[] {date}, "And", new int[] {Columns.CLASS, Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, true, this.csvDir, this.csvName);
+		
+		ArrayList<String[]> startStopTimes;
+		if (classFilter.length > 0)
+			startStopTimes = getCellsMeetingCriteria(new int[] {Columns.DATE}, classFilter, "Or", new int[] {1, 2, 3}, true, startStopTimesWithClass);
+		else
+			startStopTimes = getCellsMeetingCriteria(new int[] {}, new String[] {}, "Not", new int[] {1, 2, 3}, true, startStopTimesWithClass);
+				
 		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
 		
 		int totalSeconds = 0;
