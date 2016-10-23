@@ -394,23 +394,30 @@ public class DataHandler {
 		String[] arrayListIndex = {};
 		for (int i = 0; i < dataSheet.size(); i++) { // Loops 'top to bottom' through the whole data sheet
 			if (!dataSheet.get(i)[0].equals("OTHER INFO")) {
-				for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row					
-					for (String cellValue : cellValuesToMatch) {
-						boolean equality = dataSheet.get(i)[columnsToLookIn[k]].equals(cellValue);
+				for (int k = 0; k < columnsToLookIn.length; k++) { // Loops 'left to right' through the current row
+					if (operator.equals("And")) {
+						if (k >= cellValuesToMatch.length) {
+							System.out.println("Trying to compare too many values to columns inside getCellsMeetingCriteria with the \"And\" operator.");
+							break;
+						}
+						
+						if (!dataSheet.get(i)[columnsToLookIn[k]].equals(cellValuesToMatch[k])) {
+							success = false;
+						}
+					} else if (operator.equals("Or") || operator.equals("Not")) {
+						for (String cellValue : cellValuesToMatch) {
+							boolean equality = dataSheet.get(i)[columnsToLookIn[k]].equals(cellValue);
 
-						switch (operator) {
-							case "And":
-								if (!equality)
-									success = false;
-								break;
-							case "Or":
-								if (equality)
-									success = true;
-								break;
-							case "Not":
-								if (equality)
-									success = false;
-								break;
+							switch (operator) {
+								case "Or":
+									if (equality)
+										success = true;
+									break;
+								case "Not":
+									if (equality)
+										success = false;
+									break;
+							}
 						}
 					}
 				}
