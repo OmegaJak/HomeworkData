@@ -232,7 +232,7 @@ public class EventHandlerController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					String[] units = handler.getCellsMeetingCriteria(new int[] {Columns.HOMEWORK_TYPE}, new String[] {typeField.getEditor().getText()}, "And", new int[] {Columns.UNIT}, false, handler.csvDir, handler.csvName).get(0);
+					String[] units = handler.getCellsMeetingCriteria(new int[] {Columns.CLASS, Columns.HOMEWORK_TYPE}, new String[] {classField.getEditor().getText(), typeField.getEditor().getText()}, "And", new int[] {Columns.UNIT}, false, handler.csvDir, handler.csvName).get(0);
 					ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 					javafx.collections.FXCollections.reverse(unitOptions);
 					unitField.setItems(unitOptions);
