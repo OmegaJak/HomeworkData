@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 
 import CustomControls.NumberSpinner;
@@ -548,39 +549,33 @@ public class EventHandlerController {
 		if (hasPotentiallyBeenEdited) {
 			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
 			
-			int[] indexes = 	{0, 4, 4, 7, 10, 15};
-			String[] ignores = 	{";.;", "1", "0", "0:00", "0.0", "0.0"}; // Vampire is best special character
+			HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
+			ignores.put(0, new String[] {";.;"});
+			ignores.put(4, new String[] {"0","1"});
+			ignores.put(7, new String[] {"0:00"});
+			ignores.put(10, new String[] {"0.0"});
+			ignores.put(15, new String[] {"0.0"});
 			
+			outer:
 			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
 				String inputText = getText(inputFields[i]);
 				
-				boolean exhaustedAllPossibilities = true;
-				for (int k = 0; k < indexes.length; k++) {
-					if (i == indexes[k]) {
-						if (ignores[k] == ";.;" ? false : !(getText(inputFields[i]).equals(ignores[k]))) {
-							System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\"..");
+				if (ignores.containsKey(i)) {
+					for (String ignore : ignores.get(i)) {
+						if (ignore == ";.;" || inputText.equals(ignore)) {
+							System.out.println("Skipped index " + i + " , with value \"" + inputText + "\"..");
 							
-							wasSaved = false;
-							break;
-						} else {
-							//System.out.println("Ignored input " + indexes[k] + " because of ignore value \"" + ignores[k] + "\"");
-							exhaustedAllPossibilities = false;
-							break;
+							continue outer;
 						}
 					}
 				}
-				if (wasSaved == false)
-					break;
-				
-				if (exhaustedAllPossibilities) { // Went through all potential ignores, this wasn't one, so do a normal check
-					if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
-						System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\".");
 
-						wasSaved = false;
-						break;
-					}
-				} else {
-					exhaustedAllPossibilities = true; // Reset it
+				// By virtue of making it here, there weren't any indexes to ignore
+				if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
+					System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\".");
+
+					wasSaved = false;
+					break;
 				}
 			}
 		}
