@@ -432,7 +432,7 @@ public class EventHandlerController {
 	private boolean saveData() {
 		try {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, -1);// Get the current data sheet
-			int numLines = handler.getNumberOfLines(handler.csvDir, handler.csvName, true) - 1; // Get the length of said sheet, subtract 1 because things start at 0
+			int numLines = dataSheet.size() - 1;
 			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
 			boolean shouldSave = true;
 
