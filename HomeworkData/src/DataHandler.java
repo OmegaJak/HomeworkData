@@ -449,6 +449,11 @@ public class DataHandler {
 
 		return toReturn;
 	}
+	
+	public void printLastLine() {
+		ArrayList<String[]> dataSheet = readFile(csvDir, csvName, true, mostRecentYear);
+		System.out.println(Arrays.toString(dataSheet.get(dataSheet.size() - 1)));
+	}
 
 	//-------------------------------------------------------------------------------------//
 	//--------------------------------Data analysis methods--------------------------------//

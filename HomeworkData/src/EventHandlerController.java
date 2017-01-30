@@ -491,12 +491,7 @@ public class EventHandlerController {
 			handler.showErrorDialogue(e);
 			e.printStackTrace();
 			System.out.println("The data did not save! Shit... Outputting data to console(hopefully)...");
-			System.out.print("[");
-			for (int i = 0; i < inputFields.length; i++) {
-				System.out.print(inputFields[i].getId() + ":");
-				System.out.print(getText(inputFields[i]) + (i != inputFields.length - 1 ? ", " : ""));
-			}
-			System.out.print("]");
+			printCurrentData();
 		}
 		return false;
 	}
@@ -545,42 +540,7 @@ public class EventHandlerController {
 	
 	@FXML 
 	void quit() {
-		boolean wasSaved = true;
-		if (hasPotentiallyBeenEdited) {
-			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
-			
-			HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
-			ignores.put(0, new String[] {";.;"});
-			ignores.put(4, new String[] {"0","1"});
-			ignores.put(7, new String[] {"0:00"});
-			ignores.put(10, new String[] {"0.0"});
-			ignores.put(15, new String[] {"0.0"});
-			
-			outer:
-			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
-				String inputText = getText(inputFields[i]);
-				
-				if (ignores.containsKey(i)) {
-					for (String ignore : ignores.get(i)) {
-						if (ignore == ";.;" || inputText.equals(ignore)) {
-							System.out.println("Skipped index " + i + " , with value \"" + inputText + "\"..");
-							
-							continue outer;
-						}
-					}
-				}
-
-				// By virtue of making it here, there weren't any indexes to ignore
-				if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
-					System.out.println("Stopped on index " + i + " , with value \"" + inputText + "\".");
-
-					wasSaved = false;
-					break;
-				}
-			}
-		}
-		
-		if (wasSaved) {
+		if (isSaved()) {
 			System.exit(0);
 		} else {
 			Alert quitWarning = new Alert(AlertType.WARNING);
@@ -627,6 +587,49 @@ public class EventHandlerController {
 		handler.mostRecentYear++;
 	}
 	
+	private boolean isSaved() {
+		boolean wasSaved = true;
+		System.out.print("The last row of the file was: ");
+		handler.printLastLine();
+		System.out.print("The current data is: ");
+		printCurrentData();
+		if (hasPotentiallyBeenEdited) {
+			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
+			
+			HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
+			ignores.put(0, new String[] {";.;"});
+			ignores.put(4, new String[] {"0","1"});
+			ignores.put(7, new String[] {"0:00"});
+			ignores.put(10, new String[] {"0.0"});
+			ignores.put(15, new String[] {"0.0"});
+			
+			outer:
+			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
+				String inputText = getText(inputFields[i]);
+				
+				if (ignores.containsKey(i)) {
+					for (String ignore : ignores.get(i)) {
+						if (ignore == ";.;" || inputText.equals(ignore)) {
+							System.out.println("Skipped index " + i + ", with value \"" + inputText + "\".");
+							
+							continue outer;
+						}
+					}
+				}
+
+				// By virtue of making it here, there weren't any indexes to ignore
+				if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
+					System.out.println("Stopped on index " + i + ", with value \"" + inputText + "\".");
+
+					wasSaved = false;
+					break;
+				}
+			}
+		}
+		
+		return wasSaved;
+	}
+	
 	private String getText(Control input) {
 		String toReturn = "";
 		if (input instanceof TextField) {
@@ -642,6 +645,19 @@ public class EventHandlerController {
 			toReturn = "ERROR";
 		}
 		return toReturn;
+	}
+	
+	public void printCurrentData() {
+		System.out.print("[");
+		for (int i = 0; i < inputFields.length; i++) {
+			System.out.print(getText(inputFields[i]) + (i != inputFields.length - 1 ? ", " : ""));
+		}
+		System.out.print("] ([");
+		for (int i = 0; i < inputFields.length; i++) {
+			System.out.print(inputFields[i].getId() + ":");
+			System.out.print("\"" + getText(inputFields[i]) + "\"" + (i != inputFields.length - 1 ? ", " : ""));
+		}
+		System.out.println(")]");
 	}
 	
 	private void addOtherInfo(String infoText) {
