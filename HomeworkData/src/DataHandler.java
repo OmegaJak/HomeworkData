@@ -672,6 +672,14 @@ public class DataHandler {
 		return totalSeconds;
 	}
 	
+	public String getAverageHomeworkPerWeek() {
+		//ArrayList<String[]> data = readFile(this.csvDir, this.csvName, false, this.mostRecentYear);
+		ArrayList<String[]> data = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {0, 6, 7, 8}, true, this.csvDir, this.csvName);
+		//String[] classNames = getCellsMeetingCriteria(new int[] {1}, new String[] {"Class"}, "Not", new int[] {1}, false, csvDir, csvName).get(0);
+		
+		return "";
+	}
+	
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//

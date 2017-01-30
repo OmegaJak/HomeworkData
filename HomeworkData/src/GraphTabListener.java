@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -6,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.controlsfx.control.CheckComboBox;
+
+import CustomCharts.CustomPieChart;
+import CustomCharts.PieChart;
+import CustomCharts.PieChart.LabelLayoutInfo;
+import CustomControls.NumberSpinner;
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
@@ -17,6 +24,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -30,25 +38,22 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
-
-import org.controlsfx.control.CheckComboBox;
-
-import CustomCharts.CustomPieChart;
-import CustomCharts.PieChart;
-import CustomCharts.PieChart.LabelLayoutInfo;
-import CustomControls.NumberSpinner;
 
 
 public class GraphTabListener implements ChangeListener<Number> {
@@ -67,7 +72,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 		
 		startingNumGraphTabOptionsChildren = graphTabOptions.getChildren().size();
 		
-		graphNames = new String[] {"Total Spent Time Pie Chart", "Spent Time Line Chart"};
+		graphNames = new String[] {"Total Spent Time Pie Chart", "Spent Time Line Chart", "Random Stats"};
 		ObservableList<String> graphOptions = FXCollections.observableArrayList(graphNames);
 		graphPicker.setItems(graphOptions);
 		
@@ -166,8 +171,18 @@ public class GraphTabListener implements ChangeListener<Number> {
 					graphTabOptions.getChildren().add(classFilter);
 			        
 					break;
-				case "Report Generator":
-					System.out.println("Asdf");
+				case "Random Stats":
+					ListView<String> statsList = new ListView<String>();
+					ObservableList<String> items =FXCollections.observableArrayList();
+					
+					handler.getAverageHomeworkPerWeek();
+					
+					statsList.setItems(items);
+					
+					statsList.minWidthProperty().bind(graphDisplay.widthProperty().subtract(10));
+					statsList.minHeightProperty().bind(graphDisplay.heightProperty().subtract(10));
+					
+					graphDisplay.getChildren().add(statsList);
 					break;
 			}
 		}
