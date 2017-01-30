@@ -420,10 +420,13 @@ public class EventHandlerController {
 			transition.setAutoReverse(true);
 			transition.play();
 		} else {
+			printCurrentData();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Save Failure!");
 			alert.setHeaderText("Your data was not saved!");
-			alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+			alert.setContentText("You should ensure that the data is not lost somehow, and try again.\n"
+					+ "If it fails again, save data in some other way, reopen the program again, and try again.\n"
+					+ "The current data has been written to the console and log.");
 
 			alert.showAndWait();
 		}			
