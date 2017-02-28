@@ -68,13 +68,13 @@
                                  <children>
                                     <AnchorPane>
                                        <children>
-                                          <Button fx:id="leftArrow" mnemonicParsing="false" text="Left Arrow" AnchorPane.leftAnchor="12.5" />
+                                          <Button fx:id="leftArrow" mnemonicParsing="false" text="Left Arrow" onAction="#lastEntry" AnchorPane.leftAnchor="12.5" />
                                           <HBox fx:id="dateInfo" alignment="CENTER" spacing="20.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
                                              <children>
                                                 <Label fx:id="date" alignment="CENTER" text="Date" />
                                              </children>
                                           </HBox>
-                                          <Button fx:id="rightArrow" mnemonicParsing="false" text="Right Arrow" AnchorPane.rightAnchor="12.5" />
+                                          <Button fx:id="rightArrow" mnemonicParsing="false" text="Right Arrow" onAction="#nextEntry" AnchorPane.rightAnchor="12.5" />
                                        </children>
                                        <VBox.margin>
                                           <Insets top="10.0" />

@@ -59,6 +59,8 @@ public class EventHandlerController {
 
 	@FXML private GridPane mainGrid;
 	@FXML private DatePicker dateField;
+	@FXML private Button leftArrow;
+	@FXML private Button rightArrow;
 	@FXML private ComboBox classField;
 	@FXML private ComboBox typeField;
 	@FXML private ComboBox unitField;
@@ -86,6 +88,7 @@ public class EventHandlerController {
 	@FXML private TabPane tabPane;
 	
 	private DataHandler handler;
+	private PastManager pastManager;
 	private Control[] inputFields = new Control[16];
 	
 	private boolean hasPotentiallyBeenEdited = false;
@@ -95,6 +98,7 @@ public class EventHandlerController {
 	 */
 	public EventHandlerController() {
 		this.handler = new DataHandler();
+		this.pastManager = new PastManager();
 	}
 
 	/**
@@ -303,6 +307,20 @@ public class EventHandlerController {
 		yearSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {
 			@Override
 			public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
+				if (pastManager.IsInPast()) {
+					if (!isSaved(pastManager.currentLine)) {
+						int saved = showSaveWarning("Continue");
+						if (saved == 0) {
+							newRow();
+							saveData();
+						} else if (saved == 2) {
+							yearSpinner.numberProperty().setValue(oldValue);
+							return;
+						}
+					}
+					resetInputs();
+					pastManager.resetCurrentLine();
+				}
 				handler.mostRecentYear = newValue.intValue();
 				initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
 			}
@@ -339,10 +357,21 @@ public class EventHandlerController {
 	private void newRow() {
 		try {
 			this.handler.insertNewRow(-2, 16, handler.csvDir, handler.csvName);
+			pastManager.resetCurrentLine();
 		} catch (IOException e) {
 			handler.showErrorDialogue(e);
 			e.printStackTrace();
 		}
+	}
+	
+	@FXML
+	private void lastEntry() {
+		pastManager.lastEntry();
+	}
+	
+	@FXML
+	private void nextEntry() {
+		pastManager.nextEntry();
 	}
 	
 	private void checkForTimePrediction() {
@@ -435,8 +464,13 @@ public class EventHandlerController {
 	private boolean saveData() {
 		try {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, -1);// Get the current data sheet
-			int numLines = dataSheet.size() - 1;
-			String[] currentRow = dataSheet.get(numLines); // Get the last row of the sheet
+			
+			int line = dataSheet.size() - 1;
+			if (pastManager.IsInPast()){
+				line = (dataSheet.size() - handler.readFile(handler.csvDir, handler.csvName, true, handler.mostRecentYear).size()) + pastManager.currentLine;
+			}
+			
+			String[] currentRow = dataSheet.get(line); // Get the last row of the sheet
 			boolean shouldSave = true;
 
 			boolean isEmpty = true;
@@ -469,17 +503,17 @@ public class EventHandlerController {
 					}
 				}
 
-				dataSheet.set(numLines, currentRow); // Set the data sheet line to the modified line
+				dataSheet.set(line, currentRow); // Set the data sheet line to the modified line
 				handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName); // Write the modified file (Array) to the file on disk
 
 				// Save confirmation stuff
 
 				boolean didSave = true;
-				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+				ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
 				for (int i = 0; i < inputFields.length; i++) {
 					String inputText = getText(inputFields[i]);
 
-					if (!data.get(data.size() - 1)[i].equals(inputText)) {
+					if (!data.get(line)[i].equals(inputText)) {
 						didSave = false;
 						break;
 					}
@@ -543,23 +577,12 @@ public class EventHandlerController {
 	
 	@FXML 
 	void quit() {
-		if (isSaved()) {
+		if (isSaved(pastManager.currentLine)) {
 			System.exit(0);
 		} else {
-			Alert quitWarning = new Alert(AlertType.WARNING);
+			int warningResult = showSaveWarning("Quit");
 			
-			quitWarning.setTitle("Data Not Saved!");
-			quitWarning.setHeaderText("If you continue, you will lose this data.");
-			quitWarning.setContentText("The data currently contained in the input boxes does not match the last line of \"" + handler.csvName + "\". You may want to save this data.");
-			
-			ButtonType saveQuitButton = new ButtonType("New Row, Save, and Quit");
-			ButtonType quitButton = new ButtonType("Quit Without Saving");
-			ButtonType cancelButton = new ButtonType("Cancel");
-			
-			quitWarning.getButtonTypes().setAll(saveQuitButton, quitButton, cancelButton);
-			
-			Optional<ButtonType> warningResult = quitWarning.showAndWait();
-			if (warningResult.get().equals(saveQuitButton)) {
+			if (warningResult == 0) {
 				newRow();
 				boolean didSave = saveData();
 				if (didSave) { // This is basically the same as the saveRow() method above
@@ -573,7 +596,7 @@ public class EventHandlerController {
 
 					alert.showAndWait();
 				}	
-			} else if (warningResult.get().equals(quitButton)) {
+			} else if (warningResult == 1) {
 				System.exit(0);
 			}
 		}
@@ -590,14 +613,54 @@ public class EventHandlerController {
 		handler.mostRecentYear++;
 	}
 	
-	private boolean isSaved() {
+	/**
+	 * Shows a warning that the user is about to quit without the data being saved
+	 * @param verb - The verb to use in the buttons: "Save and [verb]","[verb] without saving"
+	 * @return An int representing the index of the button clicked:
+	 * <li>0 == Save and [verb]
+	 * <li>1 == [verb] without Saving
+	 * <li>2 == Cancel
+	 */
+	private int showSaveWarning(String verb) {
+		Alert quitWarning = new Alert(AlertType.WARNING);
+		
+		quitWarning.setTitle("Data Not Saved!");
+		quitWarning.setHeaderText("If you continue, you will lose this data.");
+		quitWarning.setContentText("The data currently contained in the input boxes does not match the last line of \"" + handler.csvName + "\". You may want to save this data.");
+		
+		ButtonType saveQuitButton = new ButtonType("New Row, Save, and " + verb);
+		ButtonType quitButton = new ButtonType(verb + " Without Saving");
+		ButtonType cancelButton = new ButtonType("Cancel");
+		
+		quitWarning.getButtonTypes().setAll(saveQuitButton, quitButton, cancelButton);
+		//quitWarning.getButtonTypes().setAll(buttons);
+		
+		Optional<ButtonType> result = quitWarning.showAndWait();
+		
+		if (result.get().equals(saveQuitButton)) {
+			return 0;
+		} else if (result.get().equals(quitButton)) {
+			return 1;
+		} else {
+			return 2;
+		}
+		
+	}
+	
+	/**
+	 * Determines whether or now the current data is saved in the given row.
+	 * @param rowIndex - The row to check the current data against. Pass -1 if the most recent row is desired.
+	 * @return True if the data is saved, false if it's not.
+	 */
+	private boolean isSaved(int rowIndex) {
 		boolean wasSaved = true;
-		System.out.print("The last row of the file was: ");
-		handler.printLastLine();
-		System.out.print("The current data is: ");
-		printCurrentData();
 		if (hasPotentiallyBeenEdited) {
-			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, -1);
+			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+			
+			System.out.print("The last row of the file was: ");
+			handler.printLine(rowIndex);
+			System.out.print("The current data is: ");
+			printCurrentData();
 			
 			HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
 			ignores.put(0, new String[] {";.;"});
@@ -605,6 +668,10 @@ public class EventHandlerController {
 			ignores.put(7, new String[] {"0:00"});
 			ignores.put(10, new String[] {"0.0"});
 			ignores.put(15, new String[] {"0.0"});
+			
+			// It's debatable whether the following two should be ignored - not ignoring can cause troubles when viewing old data
+			ignores.put(5, new String[] {";.;"});
+			ignores.put(9, new String[] {";.;"});
 			
 			outer:
 			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
@@ -621,8 +688,11 @@ public class EventHandlerController {
 				}
 
 				// By virtue of making it here, there weren't any indexes to ignore
-				if (!inputText.equals(("")) && !data.get(data.size() - 1)[i].equals(inputText)) {
-					System.out.println("Stopped on index " + i + ", with value \"" + inputText + "\".");
+				int index = rowIndex;
+				if (index == -1)
+					index = data.size() - 1;
+				if (!inputText.equals(data.get(index)[i])) {
+					System.out.println("Stopped on index " + i + ", with value \"" + inputText + "\". It was found to be inequal with \"" + data.get(index)[i] + "\".");
 
 					wasSaved = false;
 					break;
@@ -650,6 +720,21 @@ public class EventHandlerController {
 		return toReturn;
 	}
 	
+	private void setText(Control input, String value) {
+		if (input instanceof TextField) {
+			((TextField)input).setText(value);;
+		} else if (input instanceof ComboBox) {
+			((ComboBox)input).getEditor().setText(value);
+		} else if (input instanceof RadialSpinner) {
+			((RadialSpinner)input).getEditor().setText(value);
+		} else if (input instanceof DatePicker) {
+			((DatePicker)input).getEditor().setText(value);
+		} else {
+			String message = "There's an unknown control, and I can therefore not interact with it properly.";
+			System.out.println(message);
+		}
+	}
+	
 	public void printCurrentData() {
 		System.out.print("[");
 		for (int i = 0; i < inputFields.length; i++) {
@@ -675,6 +760,102 @@ public class EventHandlerController {
 			handler.writeStringArray(dataSheet, handler.csvDir, handler.csvName);
 		} catch (IOException e) {
 			handler.showErrorDialogue(e);
+		}
+	}
+	
+	protected void loadLine(int rowIndex) { // rowIndex == -1 means most recent line
+		ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+		int index = rowIndex;
+		if (index == -1) {
+			index = dataSheet.size() - 1;
+		}
+		
+		for (int i = 0; i < inputFields.length; i++) {
+			setText(inputFields[i], dataSheet.get(index)[i]);
+		}
+	}
+	
+	protected void resetInputs() {
+		dateField.setValue(LocalDate.now());
+		dateField.getEditor().setText(dateField.getConverter().toString(LocalDate.now()));
+		
+		numUnitRadial.setValue(1);
+		for (Control input : inputFields) {
+			if (input != dateField && input != numUnitRadial) {
+				setText(input, "");
+			}
+		}
+		hasPotentiallyBeenEdited = false;
+	}
+	
+	private class PastManager {
+		private int currentLine; // For use only when going to the last entry or next entry. Should be -1 when those aren't currently happening.
+		
+		public boolean IsInPast() { return currentLine != -1 ; }
+
+		public PastManager() {
+			resetCurrentLine();
+		}
+		
+		public void resetCurrentLine() {
+			currentLine = -1;
+		}
+		
+		protected void lastEntry() {
+			if (!isSaved(currentLine)) {				
+				int action = showSaveWarning("Continue");
+				if (action == 0) { // Save and continue
+					newRow();
+					saveData(); // Save the data, and by the function being allowed to proceed, it continues
+				} else if (action == 2) { // Cancel
+					return; // Don't allow the function to proceed
+				}
+			}
+			decrementCurrentLine();
+			loadLine(currentLine);
+			hasPotentiallyBeenEdited = false;
+		}
+		
+		protected void nextEntry() {
+			if (!isSaved(currentLine)) {
+				int action = showSaveWarning("Continue");
+				if (action == 0) {
+					newRow();
+					saveData();
+				} else if (action == 2) {
+					return;
+				}
+			}
+			incrementCurrentLine();
+			if (currentLine == -1) {
+				resetInputs();
+			} else {
+				loadLine(currentLine);
+				hasPotentiallyBeenEdited = false;
+			}
+		}
+		
+		private void decrementCurrentLine() {
+			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+			if (currentLine == -1 || currentLine == 1) {
+				currentLine = dataSheet.size() - 1; // -1 denotes the most recent line, which is size() - 1, therefore the one before that is size() - 2
+			} else {
+				currentLine--;
+			}
+			System.out.println(currentLine);
+		}
+		
+		private void incrementCurrentLine() {
+			if (currentLine == -1)
+				return;
+			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+			if (currentLine == dataSheet.size() - 1) { // We're at the most recent data already written
+				resetInputs(); // So clear that data to allow inputting the new data
+				currentLine = -1; // Signal that we're on the most recent line (not yet saved)
+			} else { 
+				currentLine++;
+			}
+			System.out.println(currentLine);
 		}
 	}
 }

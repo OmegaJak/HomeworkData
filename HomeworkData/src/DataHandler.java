@@ -451,8 +451,16 @@ public class DataHandler {
 	}
 	
 	public void printLastLine() {
+		printLine(-1);
+	}
+	
+	public void printLine(int lineIndex) { // Pass in -1 if you want to print the last line
 		ArrayList<String[]> dataSheet = readFile(csvDir, csvName, true, mostRecentYear);
-		System.out.println(Arrays.toString(dataSheet.get(dataSheet.size() - 1)));
+		int index = lineIndex;
+		if (lineIndex == -1)
+			index = dataSheet.size() - 1;
+		
+		System.out.println(Arrays.toString(dataSheet.get(index)));
 	}
 
 	//-------------------------------------------------------------------------------------//
