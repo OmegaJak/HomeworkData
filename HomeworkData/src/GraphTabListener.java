@@ -90,17 +90,22 @@ public class GraphTabListener implements ChangeListener<Number> {
 				case "Total Spent Time Pie Chart":
 					try {
 						ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
-
+						int totalTime = 0;
+						
 						for (int i = 0; i < totalTimes.size(); i++) {
 							String className = totalTimes.get(i)[0];
 							String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
+							totalTime += Integer.parseInt(totalSeconds);
 							totalTimes.remove(i);
 							totalTimes.add(i, new String[] {className, totalSeconds});
 						}
-
+						
+						System.out.println("Total Time: " + totalTime + " seconds.");
+						
 						ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
-						for (int i = 0; i < totalTimes.size(); i++) {
-							obsArr.add(new PieChart.Data(totalTimes.get(i)[0], Integer.parseInt(totalTimes.get(i)[1])));
+						for (int i = 0; i < totalTimes.size(); i++) { 
+							obsArr.add(new PieChart.Data(totalTimes.get(i)[0] + " (" + Math.round(((Double.parseDouble(totalTimes.get(i)[1])/totalTime))*100) + "%)",
+									Integer.parseInt(totalTimes.get(i)[1])));
 						}
 						ObservableList<PieChart.Data> pieChartData = obsArr;
 
