@@ -12,15 +12,23 @@ import javafx.scene.control.TextField;
 
 public class RadialSpinner extends Control {
 
-	private NumberTextField numTextField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
+	public static final int DEFAULT_MAX = 100;
+	public static final int DEFAULT_MIN = 0;
+	
+	private NumberTextField numTextField;
 	
 	public RadialSpinner() {
 		getStyleClass().add("radial-spinner");
+		numTextField = new NumberTextField(new BigDecimal(0), new DecimalFormat("#"));
 	}
 	
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new RadialSpinnerSkin(this);
+		RadialSpinnerSkin toReturn = new RadialSpinnerSkin(this);
+		toReturn.getBehavior().skin = toReturn;
+		numTextField.setText("" + (int)getMin());
+		numTextField.parseAndFormatInput();
+		return toReturn;
 	}
 	
 	@Override
@@ -35,12 +43,12 @@ public class RadialSpinner extends Control {
     }
 
     public final double getMax() {
-        return max == null ? 100 : max.get();
+        return max == null ? DEFAULT_MAX : max.get();
     }
 
     public final DoubleProperty maxProperty() {
         if (max == null) {
-            max = new DoublePropertyBase(100) {
+            max = new DoublePropertyBase(DEFAULT_MAX) {
                 @Override protected void invalidated() {
                     /*if (get() < getMin()) {
                         setMin(get());
@@ -70,12 +78,12 @@ public class RadialSpinner extends Control {
     }
 
     public final double getMin() {
-        return min == null ? 0 : min.get();
+        return min == null ? DEFAULT_MIN : min.get();
     }
 
     public final DoubleProperty minProperty() {
         if (min == null) {
-            min = new DoublePropertyBase(0) {
+            min = new DoublePropertyBase(DEFAULT_MIN) {
                 @Override protected void invalidated() {
                     if (get() > getMax()) {
                         setMax(get());
@@ -105,13 +113,15 @@ public class RadialSpinner extends Control {
         	valueProperty().set(value);
         	if (value > getMax()) {
         		setMax(value);
+        	} else if (value < getMin()) {
+        		setMin(value);
         	}
         }
         numTextField.setNumber(getValue());
     }
 
     public final double getValue() {
-        return value == null ? 0 : value.get();
+        return value == null ? DEFAULT_MIN : value.get();
     }
 
     public final DoubleProperty valueProperty() {
