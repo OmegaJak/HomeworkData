@@ -101,7 +101,12 @@ public class RadialSpinner extends Control {
     // Same source as min and max
     private DoubleProperty value;
     public final void setValue(double value) {
-        if (!valueProperty().isBound()) valueProperty().set(value);
+        if (!valueProperty().isBound()) {
+        	valueProperty().set(value);
+        	if (value > getMax()) {
+        		setMax(value);
+        	}
+        }
         numTextField.setNumber(getValue());
     }
 

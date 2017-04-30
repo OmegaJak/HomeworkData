@@ -1,12 +1,11 @@
 package CustomControls;
 
 import java.awt.Point;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -47,6 +46,22 @@ public class RadialSpinnerSkin extends BehaviorSkinBase<RadialSpinner, RadialSpi
 			orgSceneY = me.getSceneY();
 			orgTranslateX = thumb.getTranslateX();
 			orgTranslateY = thumb.getTranslateY();
+		});
+		
+		thumb.setOnKeyPressed(keyEvent -> {
+			KeyCode code = keyEvent.getCode();
+			switch (code) {
+				case UP:
+				case RIGHT:
+					control.setValue(control.getValue() + 1);
+					updatePosition(control);
+					break;
+				case DOWN:
+				case LEFT:
+					control.setValue(control.getValue() - 1);
+					updatePosition(control);
+					break;
+			}
 		});
 		
 		oldTheta = (control.getMin() / control.getMax()) * 360.0; // Need to initialize it with the starting position
