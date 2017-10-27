@@ -725,6 +725,31 @@ public class DataHandler {
 		return "";
 	}
 	
+	public int getAverageDailySeconds() { // TODO: Add option for including zero days, currently does not include them
+		ArrayList<String[]> days = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {Columns.DATE}, true, this.csvDir, this.csvName);
+		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, true, this.csvDir, this.csvName);
+		
+		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
+		
+		int totalSeconds = 0;
+		for (Integer integer : secondsSpents) {
+			totalSeconds += integer.intValue();
+		}
+		
+		int numDays = 0;
+		String lastDay = "";
+		for (String day : days.get(0)) {
+			if (!day.equals(lastDay)) {
+				numDays++;
+				lastDay = day;
+			}
+		}
+		
+		double dailySeconds = ((double)totalSeconds) / numDays;
+		
+		return (int)Math.round(dailySeconds); // Safe cast as the double is just a division of two ints and therefore fits in int
+	}
+	
 	//------------------------------------------------------------------------------------//
 	//--------------------------------Other Helper Methods--------------------------------//
 	//------------------------------------------------------------------------------------//
