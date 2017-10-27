@@ -12,6 +12,10 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -725,8 +729,7 @@ public class DataHandler {
 		return "";
 	}
 	
-	public int getAverageDailySeconds() { // TODO: Add option for including zero days, currently does not include them
-		ArrayList<String[]> days = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {Columns.DATE}, true, this.csvDir, this.csvName);
+	public int getAverageDailySeconds(boolean includeZeroDays) { // TODO: Add option for including zero days, currently does not include them
 		ArrayList<String[]> startStopTimes = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED, Columns.TIME_WASTED}, true, this.csvDir, this.csvName);
 		
 		ArrayList<Integer> secondsSpents = convertTimesToSeconds(convertToSpentTime(startStopTimes), "HH:MM");
@@ -736,18 +739,37 @@ public class DataHandler {
 			totalSeconds += integer.intValue();
 		}
 		
-		int numDays = 0;
-		String lastDay = "";
-		for (String day : days.get(0)) {
-			if (!day.equals(lastDay)) {
-				numDays++;
-				lastDay = day;
-			}
-		}
+		int numDays = getNumDays(includeZeroDays);
 		
 		double dailySeconds = ((double)totalSeconds) / numDays;
 		
 		return (int)Math.round(dailySeconds); // Safe cast as the double is just a division of two ints and therefore fits in int
+	}
+	
+	public int getNumDays(boolean includeZeroDays) {
+		ArrayList<String[]> days = getCellsMeetingCriteria(new int[] {0}, new String[] {"Date"}, "Not", new int[] {Columns.DATE}, true, this.csvDir, this.csvName);
+		
+		int numDays = 0;
+		String lastDay = "";
+		for (String day : days.get(0)) {
+			if (!day.equals(lastDay)) {
+				if (includeZeroDays) {
+					if (!lastDay.equals("")) {
+						LocalDate lastDate = LocalDate.parse(lastDay, DateTimeFormatter.ofPattern("d-MMM-yy"));
+						LocalDate currentDate = LocalDate.parse(day, DateTimeFormatter.ofPattern("d-MMM-yy"));
+						numDays += currentDate.getLong(ChronoField.EPOCH_DAY) - lastDate.getLong(ChronoField.EPOCH_DAY);
+					} else {
+						numDays++;
+					}
+				} else {
+					numDays++;
+				}
+				
+				lastDay = day;
+			}
+		}
+		
+		return numDays;
 	}
 	
 	//------------------------------------------------------------------------------------//

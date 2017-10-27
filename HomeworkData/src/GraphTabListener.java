@@ -162,8 +162,11 @@ public class GraphTabListener implements ChangeListener<Number> {
 					ObservableList<String> items =FXCollections.observableArrayList();
 					
 					//handler.getAverageHomeworkPerWeek();
-					items.add("Average Daily Homework (on days homework was done): " + 
-							handler.convertSecondsToFormattedString(new String[] {"HH", "MM", "SS"}, handler.getAverageDailySeconds()));
+					items.add("Average Daily Homework  (ignoring zero days): " + 
+							handler.convertSecondsToFormattedString(new String[] {"HH", "MM", "SS"}, handler.getAverageDailySeconds(false)));
+					items.add("Average Daily Homework (including zero days): " + 
+							handler.convertSecondsToFormattedString(new String[] {"HH", "MM", "SS"}, handler.getAverageDailySeconds(true)));
+					items.add("Number of days no homework was done on: " + (handler.getNumDays(true) - handler.getNumDays(false))); // TODO: Make this more efficient
 					
 					statsList.setItems(items);
 					
