@@ -542,7 +542,39 @@ public class DataHandler {
 
 		return toReturn;
 	}
+	
+	public ArrayList<String[]> getFilteredTotals(int filterColumn, String filterValue, int itemColumn, String csvDir, String csvName) {
+		String[] classNames = getCellsMeetingCriteria(new int[] {filterColumn}, new String[] {filterValue}, "Or", new int[] {itemColumn}, false, csvDir, csvName).get(0);
+		
+		ArrayList<ArrayList<String[]>> superList = new ArrayList<ArrayList<String[]>>();
+		//Looks something like this:
+		//ArrayList{ArrayList{String{"Euro"}, String{"1:23", "2:34"}}, ArrayList{String{"Lit"}, String{"5:34", 6:21"}}}
+		
+		ArrayList<String[]> relevantColumns = new ArrayList<String[]>();
+		for (String className : classNames) {
+			relevantColumns = getCellsMeetingCriteria(new int[] {filterColumn, itemColumn}, new String[] {filterValue, className}, "Or", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED}, true, csvDir, csvName);
+			relevantColumns.add(0, new String[] {className});
+			superList.add(relevantColumns);
+		}
+		
+		ArrayList<String[]> toReturn = new ArrayList<String[]>();
+		for (int i = 0; i < superList.size(); i++) { // Which class we're dealing with
+			String[] subtractedClass = new String[superList.get(i).size() - 1]; // Will end up being something like: {"Euro", "2:45", "1:23"}
+			for (int k = 1; k < superList.get(i).size(); k++) { // The String array in the class that we're dealing with
+				subtractedClass[k - 1] = subtractTime(superList.get(i).get(k)[0], superList.get(i).get(k)[1]);
+			}
+			toReturn.add(subtractedClass);
+		}
+		
+		for (int i = 0; i < toReturn.size(); i++) {
+			String tempTotal = addTimes(toReturn.get(i));
+			toReturn.remove(i);
+			toReturn.add(i, new String[] {classNames[i], tempTotal.substring(2)});
+		}
 
+		return toReturn;
+	}
+	
 	/**
 	 * Gets the properly formatted and relevant data for the "Spent Time Line Chart"
 	 * @param timeUnit - Either day, week, or month. Controls how much time is lumped together in the data points.

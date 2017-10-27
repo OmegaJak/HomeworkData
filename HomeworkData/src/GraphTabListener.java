@@ -28,6 +28,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -90,35 +91,15 @@ public class GraphTabListener implements ChangeListener<Number> {
 				case "Total Spent Time Pie Chart":
 					try {
 						ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
-						int totalTime = 0;
 						
-						for (int i = 0; i < totalTimes.size(); i++) {
-							String className = totalTimes.get(i)[0];
-							String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
-							totalTime += Integer.parseInt(totalSeconds);
-							totalTimes.remove(i);
-							totalTimes.add(i, new String[] {className, totalSeconds});
-						}
-						
-						System.out.println("Total Time: " + totalTime + " seconds.");
-						
-						ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
-						for (int i = 0; i < totalTimes.size(); i++) { 
-							obsArr.add(new PieChart.Data(totalTimes.get(i)[0] + " (" + Math.round(((Double.parseDouble(totalTimes.get(i)[1])/totalTime))*100) + "%)",
-									Integer.parseInt(totalTimes.get(i)[1])));
-						}
-						ObservableList<PieChart.Data> pieChartData = obsArr;
+						ObservableList<PieChart.Data> pieChartData = getPieChartData(totalTimes);
 
 						final CustomPieChart chart = new CustomPieChart(pieChartData);
 						chart.setTitle(graphNames[newValue.intValue()]);
 						chart.scaleShapeProperty().set(true);
 
-						for (PieChart.Data data : pieChartData) {
-							PieChartMouseHoverAnimation hoverAnim = new PieChartMouseHoverAnimation(data, chart, pieChartData.size());
-							data.getNode().setOnMouseEntered(hoverAnim);
-							data.getNode().setOnMouseExited(hoverAnim);
-						}
-
+						addChartAnimations(chart, pieChartData);
+						
 						graphDisplay.getChildren().add(chart);
 						
 					} catch (NumberFormatException e) {
@@ -207,6 +188,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 	 * Spent Time Line Chart
 	 */
 	
+	
+
 	private void updateChartData(LineChart lineChart, boolean shouldShowBlanks, int groupingRange, ObservableList<String> classFilters) {
 		lineChart.getData().clear(); // Get rid of the old data
 		XYChart.Series series = getLineChartData(shouldShowBlanks, groupingRange, classFilters); // Get the new data
@@ -457,6 +440,50 @@ public class GraphTabListener implements ChangeListener<Number> {
 	/*
 	 * Pie Chart Craziness
 	 */
+	
+	private void addChartAnimations(CustomPieChart chart, ObservableList<CustomCharts.PieChart.Data> pieChartData) {
+		for (PieChart.Data data : pieChartData) {
+			PieChartMouseHoverAnimation hoverAnim = new PieChartMouseHoverAnimation(data, chart, pieChartData.size());
+			data.getNode().setOnMouseEntered(hoverAnim);
+			data.getNode().setOnMouseExited(hoverAnim);
+			data.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					System.out.println(data.getName());
+					String name = data.getName().substring(0, data.getName().length() - 6);
+					ArrayList<String[]> newTotalTimes = handler.getFilteredTotals(Columns.CLASS, name, Columns.HOMEWORK_TYPE, handler.csvDir, handler.csvName);
+					ObservableList<PieChart.Data> newData = getPieChartData(newTotalTimes);
+
+					chart.getChartChildren().removeIf(node -> node instanceof Path);
+					
+					chart.setData(newData);
+					addChartAnimations(chart, newData);
+				}
+			});
+		}
+	}
+	
+	private ObservableList<PieChart.Data> getPieChartData(ArrayList<String[]> totalTimes) {
+		int totalTime = 0;
+		
+		for (int i = 0; i < totalTimes.size(); i++) {
+			String className = totalTimes.get(i)[0];
+			String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
+			totalTime += Integer.parseInt(totalSeconds);
+			totalTimes.remove(i);
+			totalTimes.add(i, new String[] {className, totalSeconds});
+		}
+		
+		System.out.println("Total Time: " + totalTime + " seconds.");
+		
+		ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
+		for (int i = 0; i < totalTimes.size(); i++) { 
+			obsArr.add(new PieChart.Data(totalTimes.get(i)[0] + " (" + Math.round(((Double.parseDouble(totalTimes.get(i)[1])/totalTime))*100) + "%)",
+					Integer.parseInt(totalTimes.get(i)[1])));
+		}
+		
+		return obsArr;
+	}
 
 	/**
 	 * 
@@ -501,6 +528,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 		@Override
 		public void handle(MouseEvent event) {
 			Node n = (Node)event.getSource();
+			CustomPieChart pieChart = (CustomPieChart)n.getParent().getParent();
 			
 			double minX = Double.MAX_VALUE; // Just temporarily
 			double maxX = Double.MAX_VALUE * -1;
@@ -511,8 +539,8 @@ public class GraphTabListener implements ChangeListener<Number> {
 			}
 			
 			
-			ArrayList<LabelLayoutInfo> fullPieLabels = ((CustomPieChart)n.getParent().getParent()).getFullPieLabels();
-			ArrayList<Region> fullPieRegions  = ((CustomPieChart)n.getParent().getParent()).getFullPieRegions();
+			ArrayList<LabelLayoutInfo> fullPieLabels = pieChart.getFullPieLabels();
+			ArrayList<Region> fullPieRegions  = pieChart.getFullPieRegions();
 			
 			int sliceIndex = 0;
 			for (int i = 0; i < fullPieRegions.size(); i++) {
@@ -521,12 +549,14 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 			}
 			
-			ArrayList<ArrayList<PathElement>> drawnPathElements = ((CustomPieChart)n.getParent().getParent()).getCategorizedPathElements(((CustomPieChart)n.getParent().getParent()).getLabelLinePath().getElements());
+			// Process the raw array of line components into a number of ArrayLists, each of which represents one of the label lines
+			ArrayList<ArrayList<PathElement>> drawnPathElements = pieChart.getCategorizedPathElements(pieChart.getLabelLinePath().getElements());
 
-			((CustomPieChart)n.getParent().getParent()).getLabelLinePath().setOpacity(0.0);
+			pieChart.getLabelLinePath().setOpacity(0.0); // Hide the old lines from view
+			chart.getChartChildren().removeIf(node -> node instanceof Path);
 			
-			ObservableList<Node> chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
-			if (!(chartChildrenList.get(chartChildrenList.size() - 1) instanceof Path)) { // Ensure that we don;t just endlessly add Paths to the chart
+			ObservableList<Node> chartChildrenList = pieChart.getChartChildren();
+			if (!(chartChildrenList.get(chartChildrenList.size() - 1) instanceof Path)) { // Ensure that we don't just endlessly add Paths to the chart
 				for (int i = 0; i < drawnPathElements.size(); i++) {
 					Path newPath = new Path();
 					for (PathElement element : drawnPathElements.get(i)) {
@@ -539,7 +569,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 				}
 			}
 			
-			chartChildrenList = ((CustomPieChart)n.getParent().getParent()).getChartChildren();
+			chartChildrenList = pieChart.getChartChildren();
 			
 			ArrayList<Path> paths = new ArrayList<Path>();
 			for (int i = 1; i < chartChildrenList.size(); i++) {
@@ -642,6 +672,9 @@ public class GraphTabListener implements ChangeListener<Number> {
 					translateTransition.setInterpolator(Interpolator.EASE_BOTH);
 					translateTransition.play();
 				}
+				
+				
+				//chart.getChartChildren().removeIf(node -> node instanceof Path);
 			}
 		}
 
