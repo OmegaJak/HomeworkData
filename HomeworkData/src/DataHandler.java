@@ -541,7 +541,7 @@ public class DataHandler {
 		for (int i = 0; i < toReturn.size(); i++) {
 			String tempTotal = addTimes(toReturn.get(i));
 			toReturn.remove(i);
-			toReturn.add(i, new String[] {classNames[i], tempTotal.substring(2)});
+			toReturn.add(i, new String[] {classNames[i], convertTime(tempTotal, "HH:MM:SS", "MM:SS", false)});
 		}
 
 		return toReturn;

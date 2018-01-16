@@ -93,7 +93,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 						ArrayList<String[]> totalTimes = handler.getClassTotalTimes(handler.csvDir, handler.csvName);
 						
 						ObservableList<PieChart.Data> pieChartData = getPieChartData(totalTimes);
-
+						
 						final CustomPieChart chart = new CustomPieChart(pieChartData);
 						chart.setTitle(graphNames[newValue.intValue()]);
 						chart.scaleShapeProperty().set(true);
@@ -473,10 +473,12 @@ public class GraphTabListener implements ChangeListener<Number> {
 		
 		for (int i = 0; i < totalTimes.size(); i++) {
 			String className = totalTimes.get(i)[0];
+			// TODO: Investigate whether this is necessary
 			String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
 			totalTime += Integer.parseInt(totalSeconds);
 			totalTimes.remove(i);
 			totalTimes.add(i, new String[] {className, totalSeconds});
+			System.out.println(className + ": " + totalSeconds + " seconds");
 		}
 		
 		System.out.println("Total Time: " + totalTime + " seconds.");
