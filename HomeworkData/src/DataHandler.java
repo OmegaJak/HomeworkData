@@ -14,7 +14,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +24,10 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -1200,6 +1201,15 @@ public class DataHandler {
 
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
+		
+		ButtonType printType = new ButtonType("Print to Console");
+		alert.getButtonTypes().add(printType);
+		
+		final Button printButton = (Button)alert.getDialogPane().lookupButton(printType);
+		printButton.addEventFilter(ActionEvent.ACTION, event -> {
+			e.printStackTrace();
+			event.consume();
+		});
 
 		alert.showAndWait();
 	}
