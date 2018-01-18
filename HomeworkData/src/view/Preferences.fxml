@@ -39,6 +39,18 @@
                </HBox.margin>
             </TextField>
          </children>
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox fx:id="yearBox" alignment="CENTER" prefWidth="200.0">
+         <children>
+            <Label text="Current Sem:">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="10.0" top="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
       </HBox>
       <Separator prefWidth="200.0">
          <padding>

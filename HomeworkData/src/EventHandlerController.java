@@ -70,12 +70,6 @@ public class EventHandlerController {
 	@FXML private TextField wastedField;
 	@FXML private TextField endedField;
 	@FXML private TextField predictedField;
-	@FXML private RadialSpinner musicRadial;
-	@FXML private TextField preAlertField;
-	@FXML private TextField postAlertField;
-	@FXML private TextField preMoodField;
-	@FXML private TextField postMoodField;
-	@FXML private RadialSpinner focusRadial;
 	@FXML private TextArea consoleLog;
 	@FXML private Button newRowButton;
 	@FXML private Button saveRowButton;
@@ -88,7 +82,7 @@ public class EventHandlerController {
 	@FXML private TabPane tabPane;
 	
 	private DataHandler handler;
-	private PastManager pastManager;
+	public PastManager pastManager;
 	private Control[] inputFields = new Control[16];
 	
 	private boolean hasPotentiallyBeenEdited = false;
@@ -106,8 +100,7 @@ public class EventHandlerController {
 	 */
 	@FXML
 	private void initialize() {
-		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitRadial, timeUnitField, startedField, wastedField, endedField, predictedField, musicRadial, preAlertField,
-				postAlertField, preMoodField, postMoodField, focusRadial};//Ewwwwww
+		Control[] inputFields = {dateField, classField, typeField, unitField, numUnitRadial, timeUnitField, startedField, wastedField, endedField, predictedField};//Ewwwwww
 		this.inputFields = inputFields;
 		
 		for (Control curControl : inputFields) {
@@ -291,40 +284,7 @@ public class EventHandlerController {
 		
 		numUnitRadial.setMin(1.0);
 		
-		musicRadial.getNumberTextField().setFormat(new DecimalFormat("0.0"));
-		musicRadial.setMin(0.0);
-		musicRadial.setMax(10.0);
-		
-		focusRadial.getNumberTextField().setFormat(new DecimalFormat("0.0"));
-		focusRadial.setMin(0.0);
-		focusRadial.setMax(10.0);
-		
 		initAutoCompletes();
-		
-		NumberSpinner yearSpinner = new NumberSpinner(new BigDecimal(handler.mostRecentYear), BigDecimal.ONE, "((\\-+\\d*)|(\\d*))");
-		mainGrid.add(yearSpinner, 0, 4);
-		mainGrid.setMargin(yearSpinner, new Insets(30.0, 11, 0.0, 12.5));
-		yearSpinner.numberProperty().addListener(new ChangeListener<BigDecimal>() {
-			@Override
-			public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
-				if (pastManager.IsInPast()) {
-					if (!isSaved(pastManager.currentLine)) {
-						int saved = showSaveWarning("Continue");
-						if (saved == 0) {
-							newRow();
-							saveData();
-						} else if (saved == 2) {
-							yearSpinner.numberProperty().setValue(oldValue);
-							return;
-						}
-					}
-					resetInputs();
-					pastManager.resetCurrentLine();
-				}
-				handler.mostRecentYear = newValue.intValue();
-				initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
-			}
-		});
 		
 		PrintStream ps = System.out;
 		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
@@ -334,7 +294,7 @@ public class EventHandlerController {
 		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
 	}
 	
-	private void initAutoCompletes() {
+	public void initAutoCompletes() {
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.CLASS}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
@@ -354,7 +314,7 @@ public class EventHandlerController {
 	}
 
 	@FXML
-	private void newRow() {
+	public void newRow() {
 		try {
 			this.handler.insertNewRow(-2, 16, handler.csvDir, handler.csvName);
 			pastManager.resetCurrentLine();
@@ -461,7 +421,7 @@ public class EventHandlerController {
 		}			
 	}
 	
-	private boolean saveData() {
+	public boolean saveData() {
 		try {
 			ArrayList<String[]> dataSheet = handler.readFile(handler.csvDir, handler.csvName, true, -1);// Get the current data sheet
 			
@@ -475,8 +435,10 @@ public class EventHandlerController {
 
 			boolean isEmpty = true;
 			for (String item : currentRow) {
-				if (!item.equals(""))
+				if (!item.equals("")) {
 					isEmpty = false;
+					break;
+				}
 			}
 
 			if (!isEmpty) {
@@ -566,9 +528,16 @@ public class EventHandlerController {
 			Scene scene = new Scene(page);
 			prefStage.setScene(scene);
 			prefStage.show();
-			((PreferencesHandler)loader.getController()).setPrefArrays(this.handler.prefKeys, this.handler.prefDefs); // Just so it knows what the pref keys and defs are, coming from DataHandler
-			((PreferencesHandler)loader.getController()).setDefaultPrefValues();
-			((PreferencesHandler)loader.getController()).handler = this.handler;
+			PreferencesHandler preferencesHandler = (PreferencesHandler)loader.getController();
+			preferencesHandler.setPrefArrays(this.handler.prefKeys, this.handler.prefDefs); // Just so it knows what the pref keys and defs are, coming from DataHandler
+			preferencesHandler.setDefaultPrefValues();
+			preferencesHandler.handler = this.handler;
+			preferencesHandler.controller = this;
+			
+			NumberSpinner yearSpinner = new NumberSpinner(new BigDecimal(handler.mostRecentYear), BigDecimal.ONE, "((\\-+\\d*)|(\\d*))");
+			preferencesHandler.yearSpinner = yearSpinner;
+			preferencesHandler.initYearSpinner();
+			
 		} catch (IOException e) {
 			System.out.println("Something went wrong with loading the preferences window in showPreferences()");
 			e.printStackTrace();
@@ -621,7 +590,7 @@ public class EventHandlerController {
 	 * <li>1 == [verb] without Saving
 	 * <li>2 == Cancel
 	 */
-	private int showSaveWarning(String verb) {
+	public int showSaveWarning(String verb) {
 		Alert quitWarning = new Alert(AlertType.WARNING);
 		
 		quitWarning.setTitle("Data Not Saved!");
@@ -652,7 +621,7 @@ public class EventHandlerController {
 	 * @param rowIndex - The row to check the current data against. Pass -1 if the most recent row is desired.
 	 * @return True if the data is saved, false if it's not.
 	 */
-	private boolean isSaved(int rowIndex) {
+	public boolean isSaved(int rowIndex) {
 		boolean wasSaved = true;
 		if (hasPotentiallyBeenEdited) {
 			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
@@ -788,7 +757,7 @@ public class EventHandlerController {
 		hasPotentiallyBeenEdited = false;
 	}
 	
-	private class PastManager {
+	public class PastManager {
 		private int currentLine; // For use only when going to the last entry or next entry. Should be -1 when those aren't currently happening.
 		
 		public boolean IsInPast() { return currentLine != -1 ; }
@@ -799,6 +768,10 @@ public class EventHandlerController {
 		
 		public void resetCurrentLine() {
 			currentLine = -1;
+		}
+		
+		public int getCurrentLine() {
+			return currentLine;
 		}
 		
 		protected void lastEntry() {
