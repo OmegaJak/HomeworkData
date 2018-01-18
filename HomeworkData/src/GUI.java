@@ -2,6 +2,7 @@
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ public class GUI extends Application {
 		}
 		
 		primaryStage.setTitle("Homework Data");
+		Thread.setDefaultUncaughtExceptionHandler(GUI::showError);
 		
 		final long startTime = System.currentTimeMillis();
 		
@@ -41,6 +43,19 @@ public class GUI extends Application {
 		
 		System.out.println("The loading time was: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
+	
+	private static void showError(Thread t, Throwable e) {
+        System.err.println("***Default exception handler***");
+        if (Platform.isFxApplicationThread()) {
+            showErrorDialog(e);
+        } else {
+            System.err.println("An unexpected error occurred in "+t);
+        }
+    }
+
+    private static void showErrorDialog(Throwable e) {
+    	DataHandler.errorDialogue(e);
+    }
 	
 	public static void main(String[] args) {
 		launch(args);

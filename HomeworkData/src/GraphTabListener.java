@@ -103,7 +103,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 						graphDisplay.getChildren().add(chart);
 						
 					} catch (NumberFormatException e) {
-						System.out.println("There was an error parsing some numbers when generating the \"Total Spent Time Pie Chart\"");
+						System.err.println("There was an error parsing some numbers when generating the \"Total Spent Time Pie Chart\"");
 						handler.showErrorDialogue(e);
 					}
 					break;
@@ -406,7 +406,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 			tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 			//--------//
 		} catch (ParseException e) {
-			System.out.println("There was an error parsing the string after the left arrow was clicked.");
+			System.err.println("There was an error parsing the string after the left arrow was clicked.");
 			handler.showErrorDialogue(e);
 			e.printStackTrace();
 		}

@@ -286,8 +286,11 @@ public class EventHandlerController {
 		
 		initAutoCompletes();
 		
-		PrintStream ps = System.out;
-		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, ps, handler)));
+		PrintStream outStream = System.out;
+		System.setOut(new PrintStream(new StreamCapturer("STDOUT", consoleLog, outStream, handler)));
+		
+		PrintStream errStream = System.err;
+		System.setErr(new PrintStream(new StreamCapturer("ERR", consoleLog, errStream, handler)));
 		
 		DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy @ KK:mm a");
 		Date date = new Date();
@@ -371,7 +374,7 @@ public class EventHandlerController {
 				timeUnitField.setText(handler.convertTime(division, "HH:MM:SS", "MM:SS", false));
 			}
 		} catch (NumberFormatException e) {
-			System.out.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
+			System.err.println("There was an error converting the text in \"Time Per Unit\" to an integer. Try again.");
 		}
 	}
 

@@ -354,7 +354,7 @@ public class DataHandler {
 			reader.close();
 			return rows;
 		} catch (IOException e) {
-			System.out.println("There was an error while reading the file!");
+			System.err.println("There was an error while reading the file!");
 			e.printStackTrace();
 		}
 		return new ArrayList<String[]>();
@@ -697,7 +697,7 @@ public class DataHandler {
 			showErrorDialogue(e);
 		} catch (IndexOutOfBoundsException e) {
 			// The weird call in this gives the current line number. This may have to be updated with future Java versions
-			System.out.println("There was an error getting line chart data. Most likely because there isn't any. (DataHandler.java:" + Thread.currentThread().getStackTrace()[1].getLineNumber() + ")");
+			System.err.println("There was an error getting line chart data. Most likely because there isn't any. (DataHandler.java:" + Thread.currentThread().getStackTrace()[1].getLineNumber() + ")");
 		}
 		return toReturn;
 	}
@@ -1014,7 +1014,7 @@ public class DataHandler {
 			}
 			return convertedTo;
 		} catch (NumberFormatException e) {
-			System.out.println("There was an error while converting a string to ints");
+			System.err.println("There was an error while converting a string to ints");
 			showErrorDialogue(e);
 			
 			throw e;
@@ -1160,43 +1160,48 @@ public class DataHandler {
 		return inBetween;
 	}
 	
-	public void showErrorDialogue(Exception e) { // Credit for this goes to this blog: http://code.makery.ch/blog/javafx-dialogs-official/
+	public void showErrorDialogue(Exception e) { 
 		if (System.currentTimeMillis() - this.lastErrorTime < 1000) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Exception");
-			alert.setHeaderText("There was an exception of type " + e.getClass());
-			alert.setContentText("Shit...");
-	
-			// Create expandable Exception.
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String exceptionText = sw.toString();
-	
-			Label label = new Label("The exception stacktrace was:");
-	
-			TextArea textArea = new TextArea(exceptionText);
-			textArea.setEditable(false);
-			textArea.setWrapText(true);
-	
-			textArea.setMaxWidth(Double.MAX_VALUE);
-			textArea.setMaxHeight(Double.MAX_VALUE);
-			GridPane.setVgrow(textArea, Priority.ALWAYS);
-			GridPane.setHgrow(textArea, Priority.ALWAYS);
-	
-			GridPane expContent = new GridPane();
-			expContent.setMaxWidth(Double.MAX_VALUE);
-			expContent.add(label, 0, 0);
-			expContent.add(textArea, 0, 1);
-	
-			// Set expandable Exception into the dialog pane.
-			alert.getDialogPane().setExpandableContent(expContent);
-	
-			alert.showAndWait();
+			errorDialogue(e);
 		} else {
-			System.out.println(e.toString());
+			System.err.println(e.toString());
 		}
+		
 		lastErrorTime = System.currentTimeMillis();
+	}
+	
+	public static void errorDialogue(Throwable e) { // Credit for this goes to this blog: http://code.makery.ch/blog/javafx-dialogs-official/
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Exception");
+		alert.setHeaderText("There was an exception of type " + e.getClass());
+		alert.setContentText("Shit...");
+
+		// Create expandable Exception.
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		String exceptionText = sw.toString();
+
+		Label label = new Label("The exception stacktrace was:");
+
+		TextArea textArea = new TextArea(exceptionText);
+		textArea.setEditable(false);
+		textArea.setWrapText(true);
+
+		textArea.setMaxWidth(Double.MAX_VALUE);
+		textArea.setMaxHeight(Double.MAX_VALUE);
+		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(label, 0, 0);
+		expContent.add(textArea, 0, 1);
+
+		// Set expandable Exception into the dialog pane.
+		alert.getDialogPane().setExpandableContent(expContent);
+
+		alert.showAndWait();
 	}
 	
 	public void showColonError(Alert alert, int i, ButtonType... elements) {
@@ -1221,7 +1226,7 @@ public class DataHandler {
 					writeStringArray(data, csvDir, csvName);
 				} catch (IOException e) {
 					showErrorDialogue(e);
-					System.out.println("You know things are bad when there's an error dialog showing an error. (1)");
+					System.err.println("You know things are bad when there's an error dialog showing an error. (1)");
 					showColonError(alert, i, elements);
 				}
 		    } else {
@@ -1233,7 +1238,7 @@ public class DataHandler {
 				writeCell(i, 1, "0:00", csvDir, csvName);
 			} catch (IOException e) {
 				showErrorDialogue(e);
-				System.out.println("You know things are bad when there's an error dialog showing an error. (2)");
+				System.err.println("You know things are bad when there's an error dialog showing an error. (2)");
 				showColonError(alert, i, elements);
 			}
 		} else {
