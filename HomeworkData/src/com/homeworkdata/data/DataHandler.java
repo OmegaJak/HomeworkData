@@ -1294,5 +1294,7 @@ public class DataHandler {
 	public void refreshPreferences() {
 		csvDir = prefs.get(prefKeys[0], prefDefs[0]); // Set the csvDir to the stored preference value
 		csvName = prefs.get(prefKeys[1], prefDefs[1]) + ".csv"; // The extra ".csv" is necessary because the user isn't allowed to change that in the preferences, so it isn't a part of the stored value
+		
+		mostRecentYear = getMostRecentYear(csvDir, csvName);
 	}
 }

@@ -303,7 +303,7 @@ public class EventHandlerController {
 		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
 	}
 	
-	public void initAutoCompletes() {
+	private void initAutoCompletes() {
 		new AutoCompleteComboBoxListener(classField);
 		String[] classes = handler.getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.CLASS}, false, handler.csvDir, handler.csvName).get(0);
 		ObservableList<String> classOptions = FXCollections.observableArrayList(classes);
@@ -320,6 +320,11 @@ public class EventHandlerController {
 		ObservableList<String> unitOptions = FXCollections.observableArrayList(units);
 		javafx.collections.FXCollections.reverse(unitOptions);
 		unitField.setItems(unitOptions);
+	}
+	
+	public void refreshInterface() {
+		resetInputs();
+		initAutoCompletes();
 	}
 
 	@FXML
@@ -549,7 +554,7 @@ public class EventHandlerController {
 			preferencesHandler.initYearSpinner();
 			
 		} catch (IOException e) {
-			System.out.println("Something went wrong with loading the preferences window in showPreferences()");
+			System.err.println("Something went wrong when loading the preferences window in showPreferences()");
 			e.printStackTrace();
 		}
 	}

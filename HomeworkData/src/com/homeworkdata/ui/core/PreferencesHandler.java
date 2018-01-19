@@ -8,6 +8,8 @@ import com.homeworkdata.ui.custom.control.NumberSpinner;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -45,8 +47,9 @@ public class PreferencesHandler {
 		csvDirTextField.focusedProperty().addListener(new ChangeListener<Boolean>() { // Add a listener for when the startedField comes out of focus
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-				if (!newPropertyValue) {					
+				if (!newPropertyValue) {
 					prefs.put(prefKeys[0], csvDirTextField.getText());
+					System.out.println("Preference for \'" + prefKeys[0] + "\' saved as " + csvDirTextField.getText());
 				}
 			}
 		});
@@ -56,16 +59,16 @@ public class PreferencesHandler {
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
 					prefs.put(prefKeys[1], csvNameTextField.getText());
+					System.out.println("Preference for \'" + prefKeys[1] + "\' saved as " + csvNameTextField.getText());
 				}
 			}
 		});
-		
-		refreshButton.focusedProperty().addListener(new ChangeListener<Boolean>() {
+		refreshButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-				if (!newPropertyValue) {
-					//handler.refreshPreferences(); This probably actually isn't a good idea yet
-				}
+			public void handle(ActionEvent e) {
+				handler.refreshPreferences();
+				yearSpinner.numberProperty().setValue(new BigDecimal(handler.mostRecentYear));
+				controller.refreshInterface();
 			}
 		});
 	}
@@ -88,11 +91,10 @@ public class PreferencesHandler {
 							return;
 						}
 					}
-					controller.resetInputs();
 					pastManager.resetCurrentLine();
 				}
 				handler.mostRecentYear = newValue.intValue();
-				controller.initAutoCompletes(); // Gotta refresh these, since they depend on which year it currently is
+				controller.refreshInterface(); // Gotta refresh these, since they depend on which year it currently is
 			}
 		});
 	}
