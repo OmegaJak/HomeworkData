@@ -31,7 +31,7 @@ public class PreferencesHandler {
 	
 	@FXML
 	private void initialize() {
-		prefs = Preferences.userRoot().node(DataHandler.class.getName());
+		prefs = Preferences.userNodeForPackage(DataHandler.class);
 		
 		try {
 			prefs.sync(); // Not entirely sure that I need this or what exactly it does, but it seems like a good idea

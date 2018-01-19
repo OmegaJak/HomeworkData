@@ -1266,7 +1266,7 @@ public class DataHandler {
 	//------------------------------------------------------------------------------------//
 
 	public void initPreferences() {
-		prefs = Preferences.userRoot().node(this.getClass().getName());
+		prefs = Preferences.userNodeForPackage(DataHandler.class);
 		
 		for (int i = 0; i < prefKeys.length; i++) {
 			if (prefs.get(prefKeys[i], prefDefs[i]).equals(prefDefs[i])) { // If it's the default value currently, this works because .get() returns the default value given when no value is found
