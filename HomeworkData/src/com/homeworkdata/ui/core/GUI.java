@@ -29,6 +29,7 @@ public class GUI extends Application {
 		
 		try {
 			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("/resources/GUI2.fxml"));
+			loader.setController(new EventHandlerController());
 			VBox page = (VBox)loader.load();
 			Scene scene = new Scene(page);
 			primaryStage.setScene(scene);

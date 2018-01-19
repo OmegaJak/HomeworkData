@@ -12,7 +12,7 @@
 <?import javafx.scene.text.*?>
 <?import com.homeworkdata.ui.custom.control.RadialSpinner?>
 
-<VBox prefHeight="491.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.homeworkdata.ui.core.EventHandlerController">
+<VBox prefHeight="491.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
