@@ -1,5 +1,7 @@
 package com.homeworkdata.ui.core;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -12,6 +14,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -48,8 +52,17 @@ public class PreferencesHandler {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					prefs.put(prefKeys[0], csvDirTextField.getText());
-					System.out.println("Preference for \'" + prefKeys[0] + "\' saved as " + csvDirTextField.getText());
+					String newDir = csvDirTextField.getText();
+					newDir = newDir.replace('\\', '/');
+					if (newDir.charAt(newDir.length() - 1) != '/') {
+						newDir = newDir + '/';
+					}
+					csvDirTextField.textProperty().set(newDir);
+					
+					if (verifyPreferences()) {
+						prefs.put(prefKeys[0], newDir);
+						System.out.println("Preference for \'" + prefKeys[0] + "\' saved as " + newDir);
+					}
 				}
 			}
 		});
@@ -58,8 +71,14 @@ public class PreferencesHandler {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (!newPropertyValue) {
-					prefs.put(prefKeys[1], csvNameTextField.getText());
-					System.out.println("Preference for \'" + prefKeys[1] + "\' saved as " + csvNameTextField.getText());
+					String newName = csvNameTextField.getText();
+					if (newName.indexOf('.') != -1) {
+						newName = newName.substring(0, newName.indexOf('.')); // Take everything before the dot
+					}
+					csvNameTextField.textProperty().set(newName);
+					
+					prefs.put(prefKeys[1], newName);
+					System.out.println("Preference for \'" + prefKeys[1] + "\' saved as " + newName);
 				}
 			}
 		});
@@ -73,6 +92,23 @@ public class PreferencesHandler {
 		});
 	}
 	
+	protected boolean verifyPreferences() {
+		boolean validDir = Files.isDirectory(Paths.get(csvDirTextField.textProperty().get()));
+		
+		if (!validDir) {
+			Alert invalidWarning = new Alert(AlertType.WARNING);
+			
+			invalidWarning.setTitle("Invalid Directory");
+			invalidWarning.setHeaderText("The directory specified is invalid!");
+			invalidWarning.setContentText("The directory may not exist, or may contain invalid characters. "
+					+ "Please fix the mistake and try again.");
+			
+			invalidWarning.showAndWait();
+		}
+		
+		return validDir;
+	}
+
 	public void initYearSpinner() {
 		yearBox.getChildren().add(yearSpinner);
 		yearBox.setMargin(yearSpinner, new Insets(30.0, 11, 0.0, 12.5));
