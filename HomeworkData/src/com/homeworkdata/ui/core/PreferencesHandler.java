@@ -85,9 +85,11 @@ public class PreferencesHandler {
 		refreshButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				handler.refreshPreferences();
-				yearSpinner.numberProperty().setValue(new BigDecimal(handler.mostRecentYear));
-				controller.refreshInterface();
+				if (controller.verifySaved("Continue")) {
+					handler.refreshPreferences();
+					yearSpinner.numberProperty().setValue(new BigDecimal(handler.mostRecentYear));
+					controller.refreshInterface();
+				}
 			}
 		});
 	}
@@ -116,21 +118,16 @@ public class PreferencesHandler {
 			@Override
 			public void changed(ObservableValue<? extends BigDecimal> observable, BigDecimal oldValue, BigDecimal newValue) {
 				EventHandlerController.PastManager pastManager = controller.pastManager;
-				if (pastManager.IsInPast()) {
-					if (!controller.isSaved(pastManager.getCurrentLine())) {
-						int saved = controller.showSaveWarning("Continue");
-						if (saved == 0) {
-							controller.newRow();
-							controller.saveData();
-						} else if (saved == 2) {
-							yearSpinner.numberProperty().setValue(oldValue);
-							return;
-						}
-					}
+				if (controller.verifySaved("Continue")) {
 					pastManager.resetCurrentLine();
+					handler.mostRecentYear = newValue.intValue();
+					controller.refreshInterface(); // Gotta refresh these, since they depend on which year it currently is
+				} else {
+					// If we didn't first remove the listener it would trigger itself every time the action is canceled in the saveWarning
+					yearSpinner.numberProperty().removeListener(this);
+					yearSpinner.numberProperty().setValue(oldValue);
+					yearSpinner.numberProperty().addListener(this);
 				}
-				handler.mostRecentYear = newValue.intValue();
-				controller.refreshInterface(); // Gotta refresh these, since they depend on which year it currently is
 			}
 		});
 	}

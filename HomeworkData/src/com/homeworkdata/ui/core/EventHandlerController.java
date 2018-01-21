@@ -323,8 +323,11 @@ public class EventHandlerController {
 	}
 	
 	public void refreshInterface() {
-		resetInputs();
-		initAutoCompletes();
+		if (verifySaved("Continue")) {
+			System.out.println("Resetting interface");
+			initAutoCompletes();
+			resetInputs();
+		}
 	}
 
 	@FXML
@@ -564,23 +567,7 @@ public class EventHandlerController {
 		if (isSaved(pastManager.currentLine)) {
 			System.exit(0);
 		} else {
-			int warningResult = showSaveWarning("Quit");
-			
-			if (warningResult == 0) {
-				newRow();
-				boolean didSave = saveData();
-				if (didSave) { // This is basically the same as the saveRow() method above
-					System.out.println("Saved");
-					System.exit(0);
-				} else {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Save Failure!");
-					alert.setHeaderText("Your data was not saved!");
-					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
-
-					alert.showAndWait();
-				}	
-			} else if (warningResult == 1) {
+			if (verifySaved("Quit")) {
 				System.exit(0);
 			}
 		}
@@ -629,6 +616,38 @@ public class EventHandlerController {
 			return 2;
 		}
 		
+	}
+	
+	/**
+	 * Verifies that the data has been saved. Designed to be called before something is done to erase the data from input cells.
+	 * If the data has not been saved, and alert will appear asking if the user would like to save the data.
+	 * @param verb - The verb to use in the buttons: "Save and [verb]","[verb] without saving"
+	 * @return Whether or not the calling function should continue. If the user hits "cancel", this returns false. 
+	 * If they otherwise suggest that it should continue, it returns true.
+	 */
+	public boolean verifySaved(String verb) {
+		if (!isSaved(pastManager.currentLine)) {				
+			int action = showSaveWarning(verb);
+			if (action == 0) { // Save and verb
+				newRow();
+				if (!saveData()) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Save Failure!");
+					alert.setHeaderText("Your data was not saved!");
+					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+
+					alert.showAndWait();
+					return false;
+				}
+				return true;
+			} else if (action == 1) { // verb without saving
+				return true;
+			} else if (action == 2) { // cancel
+				return false;
+			}
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -790,36 +809,22 @@ public class EventHandlerController {
 		}
 		
 		protected void lastEntry() {
-			if (!isSaved(currentLine)) {				
-				int action = showSaveWarning("Continue");
-				if (action == 0) { // Save and continue
-					newRow();
-					saveData(); // Save the data, and by the function being allowed to proceed, it continues
-				} else if (action == 2) { // Cancel
-					return; // Don't allow the function to proceed
-				}
+			if (verifySaved("Continue")) {
+				decrementCurrentLine();
+				loadLine(currentLine);
+				hasPotentiallyBeenEdited = false;
 			}
-			decrementCurrentLine();
-			loadLine(currentLine);
-			hasPotentiallyBeenEdited = false;
 		}
 		
 		protected void nextEntry() {
-			if (!isSaved(currentLine)) {
-				int action = showSaveWarning("Continue");
-				if (action == 0) {
-					newRow();
-					saveData();
-				} else if (action == 2) {
-					return;
+			if (verifySaved("Continue")) {
+				incrementCurrentLine();
+				if (currentLine == -1) {
+					resetInputs();
+				} else {
+					loadLine(currentLine);
+					hasPotentiallyBeenEdited = false;
 				}
-			}
-			incrementCurrentLine();
-			if (currentLine == -1) {
-				resetInputs();
-			} else {
-				loadLine(currentLine);
-				hasPotentiallyBeenEdited = false;
 			}
 		}
 		
