@@ -231,7 +231,7 @@ public class DataHandler {
 
 		ArrayList<String[]> rows = readFile(dir, file, true, -1);
 
-		PrintWriter pw = new PrintWriter(new FileWriter("Backup-" + file));
+		PrintWriter pw = new PrintWriter(new File(dir + "Backup-" + file));
 
 		for (int i = 0; i < rows.size(); i++) {
 			for (int k = 0; k < rows.get(i).length; k++) {
