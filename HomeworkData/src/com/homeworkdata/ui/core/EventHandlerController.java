@@ -784,7 +784,9 @@ public class EventHandlerController {
 		
 		numUnitRadial.setValue(1);
 		for (Control input : inputFields) {
-			if (input != dateField && input != numUnitRadial) {
+			if (input == wastedField) {
+				setText(input, "0:00");
+			} else if (input != dateField && input != numUnitRadial) {
 				setText(input, "");
 			}
 		}

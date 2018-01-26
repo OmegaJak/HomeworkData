@@ -194,7 +194,7 @@
                                           <VBox alignment="CENTER" GridPane.columnIndex="1">
                                              <children>
                                                 <Label alignment="CENTER" text="Time Ended" />
-                                                <TextField fx:id="endedField">
+                                                <TextField fx:id="endedField" alignment="CENTER">
                                                    <VBox.margin>
                                                       <Insets left="80.0" right="80.0" />
                                                    </VBox.margin>
