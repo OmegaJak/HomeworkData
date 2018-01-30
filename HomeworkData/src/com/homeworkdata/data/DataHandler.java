@@ -552,6 +552,20 @@ public class DataHandler {
 		return toReturn;
 	}
 	
+	// TODO: Most of this code is copied and only slightly modified from averageTimeSpent. Should generalize & modularize
+	public String getTotalTime() {
+		ArrayList<String[]> timePerUnits = getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {"Class"}, "Not", new int[] {Columns.TIME_STARTED, Columns.TIME_WASTED, Columns.TIME_ENDED}, false, csvDir, csvName);
+		
+		String totalTime = "00:00:00", timeSpent, timeMinusWasted;
+		for (String[] arr : timePerUnits) { // Go through each time that homework was done
+			timeSpent = subtractTime(arr[0], arr[2]);
+			timeMinusWasted = subtractTime(arr[1], timeSpent);
+			totalTime = addTimes(new String[] {convertTime(totalTime, "HH:MM:SS", "MM:SS", false), convertTime(timeMinusWasted, "HH:MM", "MM:SS", false)});
+		}
+		
+		return totalTime;
+	}
+	
 	public ArrayList<String[]> getFilteredTotals(int filterColumn, String filterValue, int itemColumn, String csvDir, String csvName) {
 		String[] classNames = getCellsMeetingCriteria(new int[] {filterColumn}, new String[] {filterValue}, "Or", new int[] {itemColumn}, false, csvDir, csvName).get(0);
 		

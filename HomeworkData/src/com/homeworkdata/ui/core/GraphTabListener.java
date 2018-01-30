@@ -176,7 +176,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 					items.add("Average Daily Homework (including zero days): " + 
 							handler.convertSecondsToFormattedString(new String[] {"HH", "MM", "SS"}, handler.getAverageDailySeconds(true)));
 					items.add("Number of days no homework was done on: " + (handler.getNumDays(true) - handler.getNumDays(false))); // TODO: Make this more efficient
-					
+					items.add("Total homework done: " + handler.getTotalTime());
 					statsList.setItems(items);
 					
 					statsList.minWidthProperty().bind(graphDisplay.widthProperty().subtract(10));
