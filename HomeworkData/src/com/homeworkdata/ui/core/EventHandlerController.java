@@ -91,7 +91,7 @@ public class EventHandlerController {
 	public PastManager pastManager;
 	private Control[] inputFields = new Control[16];
 	
-	private boolean hasPotentiallyBeenEdited = false;
+	private boolean maybeChangesSinceLastSaveCheck = false;
 
 	/**
 	 * The constructor. The constructor is called before the initialize() method.
@@ -110,13 +110,10 @@ public class EventHandlerController {
 		this.inputFields = inputFields;
 		
 		for (Control curControl : inputFields) {
-			curControl.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			getTextField(curControl).textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
-					if (newPropertyValue) { // Into focus
-						hasPotentiallyBeenEdited = true;
-						// TODO: Make RadialSpinner work with this
-					}
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					maybeChangesSinceLastSaveCheck = true;
 				}
 			});
 		}
@@ -626,27 +623,33 @@ public class EventHandlerController {
 	 * If they otherwise suggest that it should continue, it returns true.
 	 */
 	public boolean verifySaved(String verb) {
-		if (!isSaved(pastManager.currentLine)) {				
-			int action = showSaveWarning(verb);
-			if (action == 0) { // Save and verb
-				newRow();
-				if (!saveData()) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Save Failure!");
-					alert.setHeaderText("Your data was not saved!");
-					alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
-
-					alert.showAndWait();
+		if (!isSaved(pastManager.currentLine)) {
+			if (maybeChangesSinceLastSaveCheck) {
+				maybeChangesSinceLastSaveCheck = false;
+				int action = showSaveWarning(verb);
+				if (action == 0) { // Save and verb
+					newRow();
+					if (!saveData()) {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Save Failure!");
+						alert.setHeaderText("Your data was not saved!");
+						alert.setContentText("You should ensure that the data is not lost somehow, and try again.\nIf it fails again, save data in some other way, reopen the program again, and try again.");
+	
+						alert.showAndWait();
+						return false;
+					}
+					return true;
+				} else if (action == 1) { // verb without saving
+					return true;
+				} else if (action == 2) { // cancel
 					return false;
 				}
-				return true;
-			} else if (action == 1) { // verb without saving
-				return true;
-			} else if (action == 2) { // cancel
 				return false;
+			} else {
+				return true;
 			}
-			return false;
 		}
+		
 		return true;
 	}
 	
@@ -657,49 +660,47 @@ public class EventHandlerController {
 	 */
 	public boolean isSaved(int rowIndex) {
 		boolean wasSaved = true;
-		if (hasPotentiallyBeenEdited) {
-			ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+		ArrayList<String[]> data = handler.readFile(handler.csvDir, handler.csvName, false, handler.mostRecentYear);
+		
+		System.out.print("The last row of the file was: ");
+		handler.printLine(rowIndex);
+		System.out.print("The current data is: ");
+		printCurrentData();
+		
+		HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
+		ignores.put(0, new String[] {";.;"});
+		ignores.put(4, new String[] {"0","1"});
+		ignores.put(7, new String[] {"0:00"});
+		ignores.put(10, new String[] {"0.0"});
+		ignores.put(15, new String[] {"0.0"});
+		
+		// It's debatable whether the following two should be ignored - not ignoring can cause troubles when viewing old data
+		ignores.put(5, new String[] {";.;"});
+		ignores.put(9, new String[] {";.;"});
+		
+		outer:
+		for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
+			String inputText = getText(inputFields[i]);
 			
-			System.out.print("The last row of the file was: ");
-			handler.printLine(rowIndex);
-			System.out.print("The current data is: ");
-			printCurrentData();
-			
-			HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
-			ignores.put(0, new String[] {";.;"});
-			ignores.put(4, new String[] {"0","1"});
-			ignores.put(7, new String[] {"0:00"});
-			ignores.put(10, new String[] {"0.0"});
-			ignores.put(15, new String[] {"0.0"});
-			
-			// It's debatable whether the following two should be ignored - not ignoring can cause troubles when viewing old data
-			ignores.put(5, new String[] {";.;"});
-			ignores.put(9, new String[] {";.;"});
-			
-			outer:
-			for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
-				String inputText = getText(inputFields[i]);
-				
-				if (ignores.containsKey(i)) {
-					for (String ignore : ignores.get(i)) {
-						if (ignore == ";.;" || inputText.equals(ignore)) {
-							System.out.println("Skipped index " + i + ", with value \"" + inputText + "\".");
-							
-							continue outer;
-						}
+			if (ignores.containsKey(i)) {
+				for (String ignore : ignores.get(i)) {
+					if (ignore == ";.;" || inputText.equals(ignore)) {
+						System.out.println("Skipped index " + i + ", with value \"" + inputText + "\".");
+						
+						continue outer;
 					}
 				}
+			}
 
-				// By virtue of making it here, there weren't any indexes to ignore
-				int index = rowIndex;
-				if (index == -1)
-					index = data.size() - 1;
-				if (!inputText.equals(data.get(index)[i])) {
-					System.out.println("Stopped on index " + i + ", with value \"" + inputText + "\". It was found to be inequal with \"" + data.get(index)[i] + "\".");
+			// By virtue of making it here, there weren't any indexes to ignore
+			int index = rowIndex;
+			if (index == -1)
+				index = data.size() - 1;
+			if (!inputText.equals(data.get(index)[i])) {
+				System.out.println("Stopped on index " + i + ", with value \"" + inputText + "\". It was found to be inequal with \"" + data.get(index)[i] + "\".");
 
-					wasSaved = false;
-					break;
-				}
+				wasSaved = false;
+				break;
 			}
 		}
 		
@@ -707,18 +708,25 @@ public class EventHandlerController {
 	}
 	
 	private String getText(Control input) {
-		String toReturn = "";
+		if (getTextField(input) != null) {
+			return getTextField(input).getText();
+		} else {
+			return "ERROR";
+		}
+	}
+	
+	private TextField getTextField(Control input) {
+		TextField toReturn = null;
 		if (input instanceof TextField) {
-			toReturn = ((TextField)input).getText();
+			toReturn = ((TextField)input);
 		} else if (input instanceof ComboBox) {
-			toReturn = ((ComboBox)input).getEditor().getText();
+			toReturn = ((ComboBox)input).getEditor();
 		} else if (input instanceof RadialSpinner) {
-			toReturn = ((RadialSpinner)input).getEditor().getText();
+			toReturn = ((RadialSpinner)input).getEditor();
 		} else if (input instanceof DatePicker) {
-			toReturn = ((DatePicker)input).getEditor().getText();
+			toReturn = ((DatePicker)input).getEditor();
 		} else {
 			System.out.println("There's an unknown control, and I can therefore not interact with the file properly.");
-			toReturn = "ERROR";
 		}
 		return toReturn;
 	}
@@ -790,7 +798,7 @@ public class EventHandlerController {
 				setText(input, "");
 			}
 		}
-		hasPotentiallyBeenEdited = false;
+		maybeChangesSinceLastSaveCheck = false;
 	}
 	
 	public class PastManager {
@@ -814,7 +822,7 @@ public class EventHandlerController {
 			if (verifySaved("Continue")) {
 				decrementCurrentLine();
 				loadLine(currentLine);
-				hasPotentiallyBeenEdited = false;
+				maybeChangesSinceLastSaveCheck = false;
 			}
 		}
 		
@@ -825,7 +833,7 @@ public class EventHandlerController {
 					resetInputs();
 				} else {
 					loadLine(currentLine);
-					hasPotentiallyBeenEdited = false;
+					maybeChangesSinceLastSaveCheck = false;
 				}
 			}
 		}
