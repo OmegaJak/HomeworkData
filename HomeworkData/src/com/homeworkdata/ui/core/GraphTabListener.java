@@ -512,7 +512,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 		private double cos;
 		private double sin;
 		private CustomPieChart chart;
-		public ArrayList<ArrayList<TranslateTransition>> transitions; // The first arrayList is for Region transitions, then linePaths, then Labels
 		double lineStartX = 500;
 		double lineStartY = 300;
 		
@@ -529,16 +528,6 @@ public class GraphTabListener implements ChangeListener<Number> {
 
 			cos = Math.cos(Math.toRadians(0 - start - angle / 2)); // The horizontal leg of the triangle
 			sin = Math.sin(Math.toRadians(0 + start + angle / 2)); // The vertical leg of the triangle
-			
-			transitions = new ArrayList<ArrayList<TranslateTransition>>();
-			transitions.add(new ArrayList<TranslateTransition>());
-			transitions.add(new ArrayList<TranslateTransition>());
-			transitions.add(new ArrayList<TranslateTransition>());
-			for (ArrayList<TranslateTransition> innerList : transitions) {
-				for (int i = 0; i < numberOfData; i++) {
-					innerList.add(null); // I realize this is dangerous, but I just want the indexes to be there and accessible
-				}
-			}
 		}
 
 		@Override
@@ -611,12 +600,7 @@ public class GraphTabListener implements ChangeListener<Number> {
 			double[] startingX = {0,0,0};
 			double[] startingY = {0,0,0};
 			if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
-				double startTime = 2000;
-				if (transitions.get(0).get(sliceIndex) != null) {
-					startTime =  transitions.get(0).get(sliceIndex).getCurrentTime().toMillis();
-				}
 				for (int i = 0; i < 3; i++) {
-					boolean isFirstTime = transitions.get(i).get(sliceIndex) == null;
 					TranslateTransition translateTransition = new TranslateTransition();
 					
 					if (i == 0) { // Animating the slice (Region)
