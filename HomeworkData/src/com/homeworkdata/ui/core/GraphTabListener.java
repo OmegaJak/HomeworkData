@@ -482,15 +482,16 @@ public class GraphTabListener implements ChangeListener<Number> {
 		
 		for (int i = 0; i < totalTimes.size(); i++) {
 			String className = totalTimes.get(i)[0];
-			// TODO: Investigate whether this is necessary
 			String totalSeconds = handler.convertTime(totalTimes.get(i)[1], "HH:MM", "SS", false);
 			totalTime += Integer.parseInt(totalSeconds);
+
+			System.out.println(className + ": " + totalTimes.get(i)[1] + " (" + totalSeconds + " seconds)");
+			
 			totalTimes.remove(i);
 			totalTimes.add(i, new String[] {className, totalSeconds});
-			System.out.println(className + ": " + totalSeconds + " seconds");
 		}
 		
-		System.out.println("Total Time: " + totalTime + " seconds.");
+		System.out.println("Total Time: " + handler.convertTime(totalTime + "", "SS", "HH:MM:SS", false) + " (" + totalTime + " seconds)");
 		
 		ObservableList<PieChart.Data> obsArr = FXCollections.observableArrayList();
 		for (int i = 0; i < totalTimes.size(); i++) { 

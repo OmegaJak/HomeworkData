@@ -529,16 +529,18 @@ public class DataHandler {
 		
 		ArrayList<String[]> relevantColumns = new ArrayList<String[]>();
 		for (String className : classNames) {
-			relevantColumns = getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {className}, "Or", new int[] {Columns.TIME_STARTED, Columns.TIME_ENDED}, true, csvDir, csvName);
+			relevantColumns = getCellsMeetingCriteria(new int[] {Columns.CLASS}, new String[] {className}, "Or", new int[] {Columns.TIME_STARTED, Columns.TIME_WASTED, Columns.TIME_ENDED}, true, csvDir, csvName);
 			relevantColumns.add(0, new String[] {className});
 			superList.add(relevantColumns);
 		}
 		
 		ArrayList<String[]> toReturn = new ArrayList<String[]>();
-		for (int i = 0; i < superList.size(); i++) { // Which class we're dealing with
+		for (int i = 0; i < superList.size(); i++) { // Iterates over the classes
 			String[] subtractedClass = new String[superList.get(i).size() - 1]; // Will end up being something like: {"Euro", "2:45", "1:23"}
+			String timeSpent;
 			for (int k = 1; k < superList.get(i).size(); k++) { // The String array in the class that we're dealing with
-				subtractedClass[k - 1] = subtractTime(superList.get(i).get(k)[0], superList.get(i).get(k)[1]);
+				timeSpent = subtractTime(superList.get(i).get(k)[0], superList.get(i).get(k)[2]);
+				subtractedClass[k - 1] = subtractTime(superList.get(i).get(k)[1], timeSpent);
 			}
 			toReturn.add(subtractedClass);
 		}
