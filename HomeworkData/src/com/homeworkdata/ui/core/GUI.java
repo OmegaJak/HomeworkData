@@ -29,11 +29,13 @@ public class GUI extends Application {
 		
 		try {
 			FXMLLoader loader = new FXMLLoader(GUI.class.getResource("/resources/GUI2.fxml"));
-			loader.setController(new EventHandlerController());
+			EventHandlerController controller = new EventHandlerController();
+			loader.setController(controller);
 			VBox page = (VBox)loader.load();
 			Scene scene = new Scene(page);
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			controller.maybeChangesSinceLastSaveCheck = false;
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				public void handle(WindowEvent we) {
 					((EventHandlerController)loader.getController()).quit();

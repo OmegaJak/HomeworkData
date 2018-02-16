@@ -91,7 +91,7 @@ public class EventHandlerController {
 	public PastManager pastManager;
 	private Control[] inputFields = new Control[16];
 	
-	private boolean maybeChangesSinceLastSaveCheck = false;
+	public boolean maybeChangesSinceLastSaveCheck = false;
 
 	/**
 	 * The constructor. The constructor is called before the initialize() method.
@@ -298,6 +298,8 @@ public class EventHandlerController {
 		DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy @ KK:mm a");
 		Date date = new Date();
 		System.out.println("Hello World! The current date and time is: " + dateFormat.format(date) + ".");
+		
+		maybeChangesSinceLastSaveCheck = false;
 	}
 	
 	private void initAutoCompletes() {
@@ -668,7 +670,7 @@ public class EventHandlerController {
 		printCurrentData();
 		
 		HashMap<Integer, String[]> ignores = new HashMap<Integer, String[]>(5);
-		ignores.put(0, new String[] {";.;"});
+		ignores.put(0, new String[] {";.;"}); // The ";.;" indicates an index should always be ignored
 		ignores.put(4, new String[] {"0","1"});
 		ignores.put(7, new String[] {"0:00"});
 		ignores.put(10, new String[] {"0.0"});
@@ -681,6 +683,9 @@ public class EventHandlerController {
 		outer:
 		for (int i = 0; i < inputFields.length; i++) { // Ignore date, it's always automatic
 			String inputText = getText(inputFields[i]);
+			
+			if (inputText.equals("")) // Ignore empty fields entirely
+				continue;
 			
 			if (ignores.containsKey(i)) {
 				for (String ignore : ignores.get(i)) {
