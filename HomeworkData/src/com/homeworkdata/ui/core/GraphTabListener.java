@@ -122,8 +122,11 @@ public class GraphTabListener implements ChangeListener<Number> {
 					CheckComboBox<String> classFilter = new CheckComboBox<String>();
 					
 					final CategoryAxis xAxis = new CategoryAxis();
-					final NumberAxis yAxis = new NumberAxis();
 					xAxis.setLabel("Date");
+
+					final NumberAxis yAxis = new NumberAxis();
+					yAxis.setLabel("Time Spent (HH:MM)");
+
 					final LineChart<String, Number> lineChart = new LineChart<String, Number>(xAxis, yAxis);
 					lineChart.setTitle("Spent Time Line Chart");
 					
